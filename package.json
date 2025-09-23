@@ -1,8 +1,10 @@
 {
   "dependencies": {
-    "codemirror": "^6.0.2"
+    "codemirror": "^6.0.2",
+    "firebase": "^12.3.0"
   },
   "devDependencies": {
+    "buffer": "^6.0.3",
     "parcel": "^2.16.0"
   },
   "scripts": {
