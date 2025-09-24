@@ -1,20 +1,47 @@
 import { initializeApp } from "@firebase/app";
 import { getFirestore, collection, getDocs } from "@firebase/firestore";
-// TODO: Replace the following with your app's Firebase project configuration
-// See: https://support.google.com/firebase/answer/7015592
-const firebaseConfig = {
-    apiKey: "AIzaSyDkreBOODrNhMrKUjM6D4W_wg57UVcPWFQ",
-    authDomain: "lume-d3efc.firebaseapp.com",
-    databaseURL: "https://lume-d3efc-default-rtdb.firebaseio.com",
-    projectId: "lume-d3efc",
-    storageBucket: "lume-d3efc.firebasestorage.app",
-    messagingSenderId: "82475007167",
-    appId: "1:82475007167:web:65d904fa3cd7977207da0a",
-    measurementId: "G-QM4RJSJQQN"
-};
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+import { getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
+import { appOneShot } from "./constants.js";
 
+// Initialize Firebase
+const app = appOneShot
+
+// Check if signed in
+const auth = getAuth(app);
+
+console.log('user', auth.currentUser)
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        loadSignin()
+    }
+})
+
+async function loadSignin() {
+    try {
+        const module = await import('./signin.js');
+        module.showSignInOptions((token) => {
+            console.log('onSuccess', token)
+            signInWithCustomToken(auth, token)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    console.log('SIGN IN WITH CUSTOMTOKEN', user)
+                    // ...
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.log('SIGN IN WITH ERROR', error)
+                    // ...
+                });
+        });
+    } catch (error) {
+        console.error("Error loading module:", error);
+    }
+}
+
+
+/*
 
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app, "oneshot");
@@ -33,4 +60,14 @@ async function run() {
     }
 
 }
-run()
+async function loadModule() {
+    try {
+        const module = await import('./signin.js');
+        // module.doAnotherThing();
+    } catch (error) {
+        console.error("Error loading module:", error);
+    }
+}
+// loadModule();
+// run()
+*/

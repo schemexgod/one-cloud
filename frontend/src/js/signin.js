@@ -1,0 +1,71 @@
+// Import the functions you need from the SDKs you need
+import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from "firebase/auth";
+import { appPlayAuth } from "./constants";
+
+// Initialize Firebase
+const app = appPlayAuth
+const provider = new GoogleAuthProvider();
+const auth = getAuth(app)
+
+/**
+ * 
+ * @param {function(string)} onSuccess - callback if sign in succeeds it receives a JWT Token to pass to OneShot Auth
+ * @param {*} onError 
+ */
+export function showSignInOptions(onSuccess, onError) {
+  onAuthStateChanged(auth, (user) => {
+    // Check if auth already
+    console.log("-- already signed in", auth.currentUser)
+    if (user) {
+      console.log("-- already signed in")
+      onSuccess(user.accessToken);
+      return;
+    }
+    document.body.innerHTML = `
+      <div id="google-btn" style="color: white; cursor: pointer;">sign in with google</div>
+    `;
+
+    document.getElementById('google-btn').addEventListener('click', () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential.accessToken;
+          // The signed-in user info.
+          const user = result.user;
+          // IdP data available using getAdditionalUserInfo(result)
+          // ...
+          console.log('user', user)
+          console.log('auth', auth)
+          onSuccess(user.accessToken)
+        }).catch((error) => {
+          // Handle Errors here.
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // The email of the user's account used.
+          const email = error.customData.email;
+          // The AuthCredential type that was used.
+          const credential = GoogleAuthProvider.credentialFromError(error);
+          // ...
+          console.log('error', error)
+        });
+    })
+  })
+
+
+}
+
+
+
+// const auth = getAuth();
+// signInWithCustomToken(auth, token)
+//   .then((userCredential) => {
+//     // Signed in
+//     const user = userCredential.user;
+//     // ...
+//   })
+//   .catch((error) => {
+//     const errorCode = error.code;
+//     const errorMessage = error.message;
+//     // ...
+//   });

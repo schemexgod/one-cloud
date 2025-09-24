@@ -12,5 +12,12 @@
         "destination": "/index.html"
       }
     ]
-  }
+  },
+  "ignore": [
+    ".git",
+    ".runtimeconfig.json",
+    "firebase-debug.log",
+    "firebase-debug.*.log",
+    "node_modules"
+  ]
 }
