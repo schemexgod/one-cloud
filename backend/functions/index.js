@@ -14,17 +14,18 @@ import admin from "firebase-admin";
 
 const credJson = {
   "type": "service_account",
-  "project_id": "playoneshot-b7bfb",
-  "private_key_id": "0480df8c987b166f36459b2fb933c01d419174e8",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC6IXAkKYl5ZMdM\nOBl4tfKxKAmeQb5YJEJJ6QxhRCt1iKDFrH21chGwn09nun19BPQopK6bdrvAChqB\nnVSlu60iW4Xrkj5l58buZdGet5Dv2F0uM2DDF+p0fJ966Eh3fnaHgyW3OxhObBUx\nA8kV68jVB4mRPEYrFWAtofUBdcF7AUFJHaZnekPgN9WrwPwPo2M0etu2II+Cpe0d\nL52KfOcjTqbXTJ4tkCXgFR4PisgLnhXqGmxXZp0G6D2DV0NGxTg+mGjCppgsMHl8\nw72iazga/z+5z2+vqFIzLhAs3EazkOsRCMfodLDhKo6nB0plyWQaWZvp5dImx1q6\nhH3IvK57AgMBAAECggEAIsXHcQIPjE2/C+a5H3uCZQVRUq7+k/HmLm+q3+r/4XvO\naU+RxpmSY3hHud21vurzgDpP4nxalARvMkLFwxaeQDpv+PP/00LrP7Nm52ts2NoH\ngm+XxqrLosp7ctc9XpGSLDvcinAwWMpJZThLU1ySzvWTBj6H71mVd8D3iDfLFyLx\nyV/8uFCwrjG/TmOX97vp2GCnMMA6H4qSgrw53gK5ROCftZSV6XYRPrGAbGiWG27K\n+vxCqFa/MNlilhT747g3sx0lLOfX8YjOMmJTjXoea6FFSJV/EyOEOYZi4+untTV0\nHFHDfUJsETSzdZUsu5XeHetaKOcZMRsa71xMJ2rIFQKBgQDhFsbkJngOq/cUPvXd\nTpHqjyWO24t+LG82omn9WJsB4Bca2L0Oid1bHPocJxP8mFmzbl9fhXvune93LFd3\nWKP5I5m4BadiAN/y+L2hdIXtSS9UGHIMxVceNw3pjPaW2cnoVgxBGNqIwr/nskq5\n+r+2bhH7IC3IhWhrhUOs5CZqDwKBgQDTsQrDSwakAOw4Yln5SeulJ7YuTsaP5Mcs\nIN5ZPCryKU1tJjVpcAhWTb+PK+fu7Azk1cKQW1VBDb519KbprfUur1ZgfP5w7Rrb\nhyjkw5HN92cVkQS9N/tifFkZNHyIWIusrxeA10cUBcUJ3uz2RWjs5Vy2lJAMDTFP\nW+i/KwKQ1QKBgCu+4n6630ByuX1s0xnkyEUe9vyxvIWUGzUyEYlUbCPMKpFkKDIo\nJyYrFozcJ21DKsPNoqmM5s40UbMGoiUmzA+ClMCIEMTiSKQPJcO4QsMgIxuj+J50\nx/6uUnzekZo1z6DhAFayft5vgx6DrzRAAHxzHfmBgoRjMS0cZE+4s6KPAoGAOKFX\n+76KXD1S9BJ7d1DrFRd2iRTR0ZSmI4v3b2/FHVsnN1fNWhN6Z3wNDsP0G9pR6LW2\ngt+sAucmWG/GZyT+PirxtIY7mwIS+T9DFU+sJalVjlNpLSVYvpP9UdzUo7TsSJne\nc70japvQhj94rLkMxLLnBoDfuBmfY1d3AA0FdrECgYEA0n6LGleGdICEEH3ZZFAD\nrUGSUCQSXLB6b8weYTy95gAwff5QFZpZEFOvkJCkCiRpC8cqfzNu8DLAmksr29CO\nZcMX8K6x5hsqPyEiU93M1tXHNrwhojzLJtb+HW2IJTtvl0RTVwE9e5x6vlgcroe8\n7ZKtup6i1Z1ExS0PyLYoc20=\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-fbsvc@playoneshot-b7bfb.iam.gserviceaccount.com",
-  "client_id": "115349168095171556015",
+  "project_id": "oneshot-c5e23",
+  "private_key_id": "3c4c440ad68b19c8d87fa98723b7fb1188528f20",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCyCjWigS8SpTVb\nLrjmlZQIlj64UnKkSeM2t/XWLEwPDKUv4Nsh+3bLTm1UoUdAVySJo5YPAuPJurow\n+1OSN78euSuysNP0sNvP+WQOz2YEtXNEhrfVlVZDUPb938YufOfMIpU3Otx71p2W\n3AjOiXRaVK6rc756qGEuHUc509ephQK/EeRHLWl6b/oMVz7v0RZqGw9yejkn4z3g\nIjgYaM/isLcWVChkM5TqNYo18ZG629+LXCCPMKlVS65kH2Tmpf3yuIuK/QSPSW8r\ndmg0If9y1xJzC+rmMKA8XSQIboD0k0QWgmuxeubvWugosfMQJkErSwpreXa35ogA\nBGYzcYUdAgMBAAECggEAC6znOQWrOlgKsHTXK8nl2A1QRiKkAXmV9KXqMXYcs8Ty\nxTnD7Q3SS8FUIp9j7oh4bS1E3y2jlfxQjvtATv+oYSGoB7MYZzy84X3bjawUptzm\nVvlVr2Q4cLgrxljJJI3M3qJq8iECSf24PmcmDbNOZckVXkl8FYuaud0yKUzm4Ocr\nxZNa7bIFkCyG5HKmpnix5tas9AEw9Wet1lFeBBswRaweg/gutGwbX7NDWlDH/fG9\n6RB5AX0HFfLYbxJ8LzgWwsSK60r19vxmK5YdNS/lr9KSjPIRFTkZ1mf8+tiq1v8F\nE99lcA/TL8FzqQSc8ssA7a5NByR5bowzdGWcenVhWQKBgQDlIIuxxRXNtTJqZoV3\nq8ZcBaK3QS4RA/AeKENBS1zjfZYEFAZkWJ0gPcEDpBW072G0zfv88Yr7SSDp7FWe\nVqXrqHazbOnmD+mqXr0QHOwbbRnB6C2BrKV3yLnrRrT+6SZPo0Rql8HmG6KzbLBI\nrhcBXsubwMsJ3BDoAXIZ8OGICQKBgQDG68nopKxb+ny2Su8YC4IPtDWklxZXT55J\nlBbgb3xkMMgwZ7fT4jNVyQYaGGVK9rVPT1lfy3OUlZ6s0zoWR406swQMVkCr/Ch/\nPggO2eVZm4wuIIlRuT4EMMFaoUCbi0cRBLvdIAVhxBcR56rCvHvTLxxRHEYPovS0\nE8Xnh5fRdQKBgGLcUQnp5Id2WANqqsnAtvx7fgKdv/edgFwyuRoSH0kUpcaqsTtY\ntKr1mjMs+CSyaLDvc3tm6LWVjvr/es2vyzVL4bN3GdCnKwXUjLTIFeObhlKREBl0\nWYy+ceGfB3c5N8uCwYFQa1wSrnfGPKWPX+O6eBWC8NgXOMAx535j3ZupAoGAc5tF\nVPefVDVXlXonSoolpIrPQkCss0GKdKikQvuIB5JyRe+BXprvysNx0GitNcv7w4QS\nJSJQoeHyve5kq94ZriusBp96Jnn97zVV6YupR1KnPYebRuuppzXOqaVdrwha3QEr\nTW/2sMMNxVImY9a3AB05D8qmzR+fp6h2NAERsqECgYBRqe6/UX3GQ/dQit/xPAI6\nyvvVIESGwXOzhQi6YhwPCred5rFJL9rcUjKoJeqh2c6xR1VPo6jJ+b4BpESPwlvJ\niuleJoGL3PKZ/tlwOqxI5XoGmmUn80UQ1zcje1XuBlchQLDPrbFyj8bHWAspUfBl\n5cyYSMvFlfa2Tljz3x9WJA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@oneshot-c5e23.iam.gserviceaccount.com",
+  "client_id": "117563772918708592588",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40playoneshot-b7bfb.iam.gserviceaccount.com",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40oneshot-c5e23.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
-};
+}
+  ;
 
 const appOneShot = initializeApp({ credential: admin.credential.cert(credJson) },
   'oneshot'
@@ -44,10 +45,11 @@ export const authSignInWithToken = onCall({
         const newToken = await verifyToken(uid);
         return newToken;
       } catch (error) {
-        throw new Error(uid);
+        return error
       }
     }
-    throw new Error('no auth id');
+    // throw new Error('no auth id');
+    return 'no auth id'
   });
 
 
@@ -64,12 +66,18 @@ const verifyToken = async (jwtToken) => {
     measurementId: "G-HE1G6SSR4Y"
   };
 
-  const appPlayAuth = getApp('playauth') ?? initializeApp(firebaseConfigPlayAuth, 'playauth');
+  let appPlayAuth
+  try {
+    appPlayAuth = getApp('playauth')
+  } catch (e) {
+    appPlayAuth = initializeApp(firebaseConfigPlayAuth, 'playauth');
+  }
+
   const authPlay = getAuth(appPlayAuth);
   const authOneShot = getAuth(appOneShot);
 
   const decodedToken = await authPlay
     .verifyIdToken(jwtToken);
   const uid = decodedToken.uid;
-  return await authOneShot.createCustomToken(uid);
+  return await authOneShot.createCustomToken(uid, {email: decodedToken.email, emailVerified: decodedToken.email_verified});
 }

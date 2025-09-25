@@ -27,7 +27,7 @@ export function showSignInOptions(onSuccess, onError) {
         })
         .then((newToken) => {
           console.log('idonSuccessToken', newToken)
-          onSuccess(newToken)
+          onSuccess(newToken, { email: user.email, emailVerified: user.emailVerified, displayName: user.displayName })
           return newToken
         })
         .catch((error) => {
@@ -59,7 +59,7 @@ export function showSignInOptions(onSuccess, onError) {
             })
             .then((newToken) => {
               console.log('idonSuccessToken', newToken)
-              onSuccess(newToken)
+              onSuccess(newToken, { email: user.email, emailVerified: user.emailVerified, displayName: user.displayName })
               return newToken
             })
             .catch((error) => {
@@ -86,6 +86,7 @@ export function showSignInOptions(onSuccess, onError) {
 const authWithNewToken = (newToken) => {
   const functions = getFunctions(appOneShot);
   const myCallableFunction = httpsCallable(functions, 'authSignInWithToken');
+  console.log('functions', myCallableFunction)
 
   return myCallableFunction({ jwtToken: newToken })
     .then((result) => {

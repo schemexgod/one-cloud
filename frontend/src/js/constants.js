@@ -1,13 +1,13 @@
 import { initializeApp } from "@firebase/app";
 
 const firebaseConfigOneShot = {
-  apiKey: "AIzaSyCR3mV_zPeZlg8FSOq_zvqFa30XPyMeUeA",
-  authDomain: "playoneshot-b7bfb.firebaseapp.com",
-  projectId: "playoneshot-b7bfb",
-  storageBucket: "playoneshot-b7bfb.firebasestorage.app",
-  messagingSenderId: "38821773944",
-  appId: "1:38821773944:web:f4210cb2dee00bd67da38d",
-  measurementId: "G-Q64889D91S"
+  apiKey: "AIzaSyAkdn0tCxnJsExw1eYns5QSihmr8UPiNQs",
+  authDomain: "oneshot-c5e23.firebaseapp.com",
+  projectId: "oneshot-c5e23",
+  storageBucket: "oneshot-c5e23.firebasestorage.app",
+  messagingSenderId: "1088307290473",
+  appId: "1:1088307290473:web:f1abd981121378767e1df8",
+  measurementId: "G-1EB9LHCSZ5"
 };
 
 const firebaseConfigPlayAuth = {
