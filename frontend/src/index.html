@@ -5,10 +5,292 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="styles/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+        rel="stylesheet">
     <script type="module" src="js/main.js"></script>
 </head>
 
 <body>
+    <canvas id="shaderCanvas"></canvas>
+
+    <main class="main">
+        <h1>One Shot</h1>
+    </main>
+    <script>
+        class SpaceyBackground {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+                if (!this.gl) {
+                    console.error('WebGL not supported');
+                    return;
+                }
+
+                this.time = 0;
+                this.mouse = { x: 0.5, y: 0.5 };
+
+                this.init();
+                this.animate();
+                this.setupEventListeners();
+            }
+
+            init() {
+                // Vertex shader
+                const vertexShaderSource = `
+                    attribute vec2 position;
+                    void main() {
+                        gl_Position = vec4(position, 0.0, 1.0);
+                    }
+                `;
+
+                // Fragment shader
+                const fragmentShaderSource = `
+                    precision mediump float;
+                    uniform float time;
+                    uniform vec2 resolution;
+                    uniform vec2 mouse;
+                    
+                    // Noise function
+                    float random(vec2 st) {
+                        return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+                    }
+                    
+                    float noise(vec2 st) {
+                        vec2 i = floor(st);
+                        vec2 f = fract(st);
+                        
+                        float a = random(i);
+                        float b = random(i + vec2(1.0, 0.0));
+                        float c = random(i + vec2(0.0, 1.0));
+                        float d = random(i + vec2(1.0, 1.0));
+                        
+                        vec2 u = f * f * (3.0 - 2.0 * f);
+                        
+                        return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+                    }
+                    
+                    // Fractal noise
+                    float fbm(vec2 st) {
+                        float value = 0.0;
+                        float amplitude = 0.5;
+                        float frequency = 0.8;
+                        
+                        for (int i = 0; i < 4; i++) {
+                            value += amplitude * noise(st * frequency);
+                            st *= 2.0;
+                            amplitude *= 0.5;
+                        }
+                        return value;
+                    }
+                    
+                    // Create small particle effect
+                    float particles(vec2 uv, float t) {
+                        float particle = 0.0;
+                        
+                        for (float i = 0.0; i < 20.0; i++) {
+                            vec2 seed = vec2(i * 0.1, i * 0.2);
+                            vec2 pos = vec2(
+                                random(seed) * 2.0 - 1.0,
+                                random(seed + 0.5) * 2.0 - 1.0
+                            );
+                            
+                            // Slow drift
+                            pos.x += sin(t * 0.3 + i * 0.5) * 0.2;
+                            pos.y += cos(t * 0.2 + i * 0.7) * 0.15;
+                            
+                            float dist = length(uv - pos);
+                            float size = 0.002 + random(seed + 1.0) * 0.003;
+                            
+                            particle += size / (dist + size) * 0.3;
+                        }
+                        
+                        return particle;
+                    }
+                    
+                    // Create large faint particles
+                    float largeParticles(vec2 uv, float t) {
+                        float particle = 0.0;
+                        
+                        for (float i = 0.0; i < 5.0; i++) {
+                            vec2 seed = vec2(i * 0.3, i * 0.7);
+                            vec2 pos = vec2(
+                                random(seed) * 3.0 - 1.5,
+                                random(seed + 0.8) * 3.0 - 1.5
+                            );
+                            
+                            // Very slow, organic drift
+                            pos.x += sin(t * 0.08 + i * 1.2) * 0.4;
+                            pos.y += cos(t * 0.06 + i * 0.9) * 0.3;
+                            
+                            float dist = length(uv - pos);
+                            float size = 0.3 + random(seed + 1.5) * 0.4; // Much larger
+                            
+                            // Soft falloff for large, diffuse particles
+                            particle += exp(-dist * dist / (size * size)) * 0.03; // 3% opacity
+                        }
+                        
+                        return particle;
+                    }
+                    
+                    void main() {
+                        vec2 uv = (gl_FragCoord.xy - 0.5 * resolution.xy) / resolution.y;
+                        
+                        // Mouse influence
+                        vec2 mouseUv = (mouse - 0.5) * 2.0;
+                        float mouseInfluence = 1.0 - length(uv - mouseUv * 0.5) * 0.3;
+                        mouseInfluence = clamp(mouseInfluence, 0.0, 1.0);
+                        
+                        // Base gradient
+                        float radial = length(uv) * 1.2;
+                        float gradient = 1.0 - radial;
+                        
+                        // Noise layers for depth
+                        float n1 = fbm(uv * 3.0 + time * 0.1);
+                        float n2 = fbm(uv * 6.0 - time * 0.05);
+                        float n3 = fbm(uv * 12.0 + time * 0.02);
+                        
+                        // Combine noise with gradient
+                        float combined = gradient + n1 * 0.3 + n2 * 0.15 + n3 * 0.1;
+                        combined *= mouseInfluence * 0.3 + 0.7;
+                        
+                        // Animated color transition
+                        float colorTime = sin(time * 0.15) * 0.5 + 0.5; // Smooth 0-1 oscillation
+                        
+                        // Dark space colors - first palette
+                        vec3 deep1 = vec3(0.02, 0.01, 0.05);     // Very dark purple
+                        vec3 mid1 = vec3(0.05, 0.02, 0.1);      // Dark blue-purple
+                        vec3 bright1 = vec3(0.1, 0.05, 0.2);    // Slightly lighter purple
+                        
+                        // Dark space colors - second palette (blue shift)
+                        vec3 deep2 = vec3(0.01, 0.02, 0.08);     // Very dark blue
+                        vec3 mid2 = vec3(0.02, 0.05, 0.12);     // Dark blue
+                        vec3 bright2 = vec3(0.05, 0.1, 0.25);   // Lighter blue
+                        
+                        // Interpolate between color palettes
+                        vec3 deep = mix(deep1, deep2, colorTime);
+                        vec3 mid = mix(mid1, mid2, colorTime);
+                        vec3 bright = mix(bright1, bright2, colorTime);
+                        
+                        // Color mixing
+                        vec3 color = mix(deep, mid, smoothstep(0.2, 0.6, combined));
+                        color = mix(color, bright, smoothstep(0.5, 0.8, combined));
+                        
+                        // Add subtle animated tint
+                        vec3 tintColor = mix(vec3(0.0, 0.02, 0.08), vec3(0.02, 0.0, 0.06), colorTime);
+                        color += tintColor * n2 * 0.5;
+                        
+                        // Add small particles (lower opacity)
+                        float particleLayer = particles(uv, time);
+                        color += vec3(0.4, 0.5, 0.8) * particleLayer * 0.2;
+                        
+                        // Add large faint particles
+                        float largeParticleLayer = largeParticles(uv, time);
+                        color += vec3(0.3, 0.4, 0.7) * largeParticleLayer;
+                        
+                        // Vignette
+                        float vignette = 1.0 - radial * 0.5;
+                        color *= vignette;
+                        
+                        gl_FragColor = vec4(color, 1.0);
+                    }
+                `;
+
+                // Create and compile shaders
+                const vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource);
+                const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+                // Create program
+                this.program = this.gl.createProgram();
+                this.gl.attachShader(this.program, vertexShader);
+                this.gl.attachShader(this.program, fragmentShader);
+                this.gl.linkProgram(this.program);
+
+                if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
+                    console.error('Program link error:', this.gl.getProgramInfoLog(this.program));
+                }
+
+                // Create fullscreen quad
+                const vertices = new Float32Array([
+                    -1, -1,
+                    1, -1,
+                    -1, 1,
+                    1, 1
+                ]);
+
+                const buffer = this.gl.createBuffer();
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+                this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+
+                // Get attribute/uniform locations
+                this.positionLocation = this.gl.getAttribLocation(this.program, 'position');
+                this.timeLocation = this.gl.getUniformLocation(this.program, 'time');
+                this.resolutionLocation = this.gl.getUniformLocation(this.program, 'resolution');
+                this.mouseLocation = this.gl.getUniformLocation(this.program, 'mouse');
+
+                this.resize();
+            }
+
+            createShader(type, source) {
+                const shader = this.gl.createShader(type);
+                this.gl.shaderSource(shader, source);
+                this.gl.compileShader(shader);
+
+                if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                    console.error('Shader compile error:', this.gl.getShaderInfoLog(shader));
+                    this.gl.deleteShader(shader);
+                    return null;
+                }
+
+                return shader;
+            }
+
+            resize() {
+                const rect = this.canvas.getBoundingClientRect();
+                this.canvas.width = rect.width * devicePixelRatio;
+                this.canvas.height = rect.height * devicePixelRatio;
+                this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            setupEventListeners() {
+                window.addEventListener('resize', () => this.resize());
+
+                window.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.clientX / window.innerWidth;
+                    this.mouse.y = 1.0 - e.clientY / window.innerHeight;
+                });
+            }
+
+            animate() {
+                this.time += 0.016; // ~60fps
+
+                this.gl.useProgram(this.program);
+
+                // Set uniforms
+                this.gl.uniform1f(this.timeLocation, this.time);
+                this.gl.uniform2f(this.resolutionLocation, this.canvas.width, this.canvas.height);
+                this.gl.uniform2f(this.mouseLocation, this.mouse.x, this.mouse.y);
+
+                // Set up vertex attribute
+                this.gl.enableVertexAttribArray(this.positionLocation);
+                this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, 0, 0);
+
+                // Draw
+                this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('shaderCanvas');
+            new SpaceyBackground(canvas);
+        });
+    </script>
 </body>
 
-</html> 
+</html>
