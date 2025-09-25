@@ -7,8 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import { onCall, onRequest } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions";
+import { onCall } from "firebase-functions/v2/https";
 import { getApp, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import admin from "firebase-admin";
@@ -25,7 +24,7 @@ const credJson = {
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40playoneshot-b7bfb.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
-}
+};
 
 const appOneShot = initializeApp({ credential: admin.credential.cert(credJson) },
   'oneshot'
