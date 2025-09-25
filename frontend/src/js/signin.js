@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from "firebase/auth";
-import { appPlayAuth } from "./constants";
+import { appOneShot, appPlayAuth } from "./constants"
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 // Initialize Firebase
 const app = appPlayAuth
@@ -16,9 +17,22 @@ export function showSignInOptions(onSuccess, onError) {
   onAuthStateChanged(auth, (user) => {
     // Check if auth already
     console.log("-- already signed in", auth.currentUser)
-    if (user) {
+    if (false && user) {
       console.log("-- already signed in")
-      onSuccess(user.accessToken);
+      // onSuccess(user.accessToken);
+      user.getIdToken()
+        .then((idToken) => {
+          console.log('idToken', idToken)
+          return authWithNewToken(idToken)
+        })
+        .then((newToken) => {
+          console.log('idonSuccessToken', newToken)
+          onSuccess(newToken)
+          return newToken
+        })
+        .catch((error) => {
+          console.error("Error getting ID token:", error);
+        });
       return;
     }
     document.body.innerHTML = `
@@ -37,7 +51,20 @@ export function showSignInOptions(onSuccess, onError) {
           // ...
           console.log('user', user)
           console.log('auth', auth)
-          onSuccess(user.accessToken)
+
+          user.getIdToken()
+            .then((idToken) => {
+              console.log('idToken', idToken)
+              return authWithNewToken(idToken)
+            })
+            .then((newToken) => {
+              console.log('idonSuccessToken', newToken)
+              onSuccess(newToken)
+              return newToken
+            })
+            .catch((error) => {
+              console.error("Error getting ID token:", error);
+            });
         }).catch((error) => {
           // Handle Errors here.
           const errorCode = error.code;
@@ -48,6 +75,7 @@ export function showSignInOptions(onSuccess, onError) {
           const credential = GoogleAuthProvider.credentialFromError(error);
           // ...
           console.log('error', error)
+          throw error
         });
     })
   })
@@ -55,6 +83,19 @@ export function showSignInOptions(onSuccess, onError) {
 
 }
 
+const authWithNewToken = (newToken) => {
+  const functions = getFunctions(appOneShot);
+  const myCallableFunction = httpsCallable(functions, 'authSignInWithToken2');
+
+  return myCallableFunction({ jwtToken: newToken })
+    .then((result) => {
+      console.log('*******', result.data); // Access the data returned by the function
+      return result.data
+    })
+  // .catch((error) => {
+  //   console.error('Error calling function:', error);
+  // });
+}
 
 
 // const auth = getAuth();

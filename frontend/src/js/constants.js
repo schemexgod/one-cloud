@@ -1,14 +1,13 @@
 import { initializeApp } from "@firebase/app";
 
 const firebaseConfigOneShot = {
-    apiKey: "AIzaSyDkreBOODrNhMrKUjM6D4W_wg57UVcPWFQ",
-    authDomain: "lume-d3efc.firebaseapp.com",
-    databaseURL: "https://lume-d3efc-default-rtdb.firebaseio.com",
-    projectId: "lume-d3efc",
-    storageBucket: "lume-d3efc.firebasestorage.app",
-    messagingSenderId: "82475007167",
-    appId: "1:82475007167:web:65d904fa3cd7977207da0a",
-    measurementId: "G-QM4RJSJQQN"
+  apiKey: "AIzaSyCR3mV_zPeZlg8FSOq_zvqFa30XPyMeUeA",
+  authDomain: "playoneshot-b7bfb.firebaseapp.com",
+  projectId: "playoneshot-b7bfb",
+  storageBucket: "playoneshot-b7bfb.firebasestorage.app",
+  messagingSenderId: "38821773944",
+  appId: "1:38821773944:web:f4210cb2dee00bd67da38d",
+  measurementId: "G-Q64889D91S"
 };
 
 const firebaseConfigPlayAuth = {
