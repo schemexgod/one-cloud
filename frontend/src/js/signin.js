@@ -17,7 +17,7 @@ export function showSignInOptions(onSuccess, onError) {
   onAuthStateChanged(auth, (user) => {
     // Check if auth already
     console.log("-- already signed in", auth.currentUser)
-    if (false && user) {
+    if (user) {
       console.log("-- already signed in")
       // onSuccess(user.accessToken);
       user.getIdToken()
@@ -85,7 +85,7 @@ export function showSignInOptions(onSuccess, onError) {
 
 const authWithNewToken = (newToken) => {
   const functions = getFunctions(appOneShot);
-  const myCallableFunction = httpsCallable(functions, 'authSignInWithToken2');
+  const myCallableFunction = httpsCallable(functions, 'authSignInWithToken');
 
   return myCallableFunction({ jwtToken: newToken })
     .then((result) => {
