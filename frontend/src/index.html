@@ -15,11 +15,25 @@
 
 <body>
     <canvas id="shaderCanvas"></canvas>
-
+    <div class="bg-em"></div>
     <main class="main">
         <h1>One Shot</h1>
     </main>
+    <audio id="audio-player" controls autoplay style="display:none;">
+        <source src="em.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
     <script>
+        var didPlay = false
+        document.body.addEventListener("mousedown", () => {
+            if (!didPlay) {
+                didPlay = true
+                console.log(document.getElementById("audio-player"))
+                document.getElementById("audio-player").play();
+            }
+        })
+
+
         class SpaceyBackground {
             constructor(canvas) {
                 this.canvas = canvas;
@@ -130,7 +144,7 @@
                             float size = 0.3 + random(seed + 1.5) * 0.4; // Much larger
                             
                             // Soft falloff for large, diffuse particles
-                            particle += exp(-dist * dist / (size * size)) * 0.03; // 3% opacity
+                            particle += exp(-dist * dist / (size * size)) * 0.01; // 1% opacity
                         }
                         
                         return particle;
@@ -157,39 +171,21 @@
                         float combined = gradient + n1 * 0.3 + n2 * 0.15 + n3 * 0.1;
                         combined *= mouseInfluence * 0.3 + 0.7;
                         
-                        // Animated color transition
-                        float colorTime = sin(time * 0.15) * 0.5 + 0.5; // Smooth 0-1 oscillation
-                        
-                        // Dark space colors - first palette
-                        vec3 deep1 = vec3(0.02, 0.01, 0.05);     // Very dark purple
-                        vec3 mid1 = vec3(0.05, 0.02, 0.1);      // Dark blue-purple
-                        vec3 bright1 = vec3(0.1, 0.05, 0.2);    // Slightly lighter purple
-                        
-                        // Dark space colors - second palette (blue shift)
-                        vec3 deep2 = vec3(0.01, 0.02, 0.08);     // Very dark blue
-                        vec3 mid2 = vec3(0.02, 0.05, 0.12);     // Dark blue
-                        vec3 bright2 = vec3(0.05, 0.1, 0.25);   // Lighter blue
-                        
-                        // Interpolate between color palettes
-                        vec3 deep = mix(deep1, deep2, colorTime);
-                        vec3 mid = mix(mid1, mid2, colorTime);
-                        vec3 bright = mix(bright1, bright2, colorTime);
+                        // Dark space colors
+                        vec3 deep = vec3(0.02, 0.01, 0.05);     // Very dark purple
+                        vec3 mid = vec3(0.05, 0.02, 0.1);      // Dark blue-purple
+                        vec3 bright = vec3(0.1, 0.05, 0.2);    // Slightly lighter purple
                         
                         // Color mixing
                         vec3 color = mix(deep, mid, smoothstep(0.2, 0.6, combined));
                         color = mix(color, bright, smoothstep(0.5, 0.8, combined));
                         
-                        // Add subtle animated tint
-                        vec3 tintColor = mix(vec3(0.0, 0.02, 0.08), vec3(0.02, 0.0, 0.06), colorTime);
-                        color += tintColor * n2 * 0.5;
+                        // Add subtle blue tint in areas
+                        color += vec3(0.0, 0.02, 0.08) * n2 * 0.5;
                         
-                        // Add small particles (lower opacity)
+                        // Add particles
                         float particleLayer = particles(uv, time);
-                        color += vec3(0.4, 0.5, 0.8) * particleLayer * 0.2;
-                        
-                        // Add large faint particles
-                        float largeParticleLayer = largeParticles(uv, time);
-                        color += vec3(0.3, 0.4, 0.7) * largeParticleLayer;
+                        color += vec3(0.4, 0.5, 0.8) * particleLayer * 0.6;
                         
                         // Vignette
                         float vignette = 1.0 - radial * 0.5;
