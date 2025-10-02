@@ -1,0 +1,29 @@
+ Some Notes for prompting and templating and all ideas to build OneShot
+
+
+
+ Element Types
+ - section
+ - map
+ - button
+ - header
+ - footer
+ - 
+
+ Components:
+ - Name
+ - Description of what it is
+ - Properties to customize it
+
+Prebuild Layout Pieces (Lego pieces to put together a whole layout)
+- header
+- footer
+- hero
+- 2 column content
+- 3 column content
+- 4 column content
+- 1 section
+
+ Prompt Logic Order
+ - Figure out basica layout structure
+    - Can it be described by prebuild layout lego pieces
