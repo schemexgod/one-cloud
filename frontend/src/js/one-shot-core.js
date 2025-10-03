@@ -84,10 +84,14 @@ class TestHtmlTemplate {
       if (parts.length > 1) {
         let currentIndex = index
 
+          console.log('dddddddd')
         // add update func
-        _indexToUpdateFunc.push((parms) => {
+        this.#_indexToUpdateFunc.push((parms) => {
+          console.log('PAPPAPPAPA', parts.length, parts)
           let fullStr = ''
           for (let i = 0; i < parts.length - 1; i++) {
+                      console.log('PAPPAPPAPA2', parts[i], parms[i + currentIndex])
+
             fullStr += parts[i] + parms[i + currentIndex]
           }
           fullStr += parts[parts.length - 1]
@@ -95,6 +99,9 @@ class TestHtmlTemplate {
         })
         index += parts.length - 1
       }
+    }
+    for(const child of node.childNodes) {
+      this._recursiveLoopNode2(child, index)
     }
   }
 
