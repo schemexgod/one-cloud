@@ -40,17 +40,27 @@ class TestHtmlTemplate {
   #_indexToUpdateFunc = []
 
   /**
+   * @returns {HTMLElement}
+   */
+  render() {
+
+  }
+
+  /**
    * 
    * @param {[string]} stringParts 
    */
   compileTemplate() {
     this.#_compileTemplate`  
+    <template id="myTemplate">
+
     hello ${null} ${null} two
   <div class="card" data-tag="${null}">
   <script></script>
     <h3>12${null}4</h3>
     <p>${null}</p>
   </div>
+  </template>
     `
     return this
   }
@@ -66,7 +76,8 @@ class TestHtmlTemplate {
     templateHolder.insertAdjacentHTML('beforeend', newStr)
 
     // Create the node
-    const newNode = templateHolder.lastElementChild.cloneNode(true)
+    const newNode = templateHolder.lastElementChild.content.cloneNode(true)
+    console.log('[_compileTemplate] 0::', newNode)
     this._recursiveLoopNode2(newNode)
     document.body.appendChild(newNode)
   }
@@ -77,38 +88,80 @@ class TestHtmlTemplate {
    * @param {Int} index 
    */
   _recursiveLoopNode2(node, index = 0) {
+    console.log('[_recursiveLoopNode2] 0::', node, index)
+
     // Check Attributes
     if (node instanceof Text) {
-      // Look for seperator
-      const parts = node.textContent.split(this.#_stringSeparator)
-      if (parts.length > 1) {
-        let currentIndex = index
+      const updateInfo = this._createBasicStringUpdateFunc(node.textContent, index)
+      if (updateInfo) {
+        const helpFunc = updateInfo.func
+        index = updateInfo.index
 
-          console.log('dddddddd')
-        // add update func
-        this.#_indexToUpdateFunc.push((parms) => {
-          console.log('PAPPAPPAPA', parts.length, parts)
-          let fullStr = ''
-          for (let i = 0; i < parts.length - 1; i++) {
-                      console.log('PAPPAPPAPA2', parts[i], parms[i + currentIndex])
-
-            fullStr += parts[i] + parms[i + currentIndex]
-          }
-          fullStr += parts[parts.length - 1]
-          node.textContent = fullStr
+        this.#_indexToUpdateFunc.push((params) => {
+          const newStr = helpFunc(params)
+          node.textContent = newStr
         })
-        index += parts.length - 1
       }
     }
-    for(const child of node.childNodes) {
-      this._recursiveLoopNode2(child, index)
+    else if (node instanceof HTMLElement) {
+      const length = node.attributes.length ?? 0
+      for (let i = 0; i < length; i++) {
+        const attrName = node.attributes[i].name
+        const attributeVal = node?.getAttribute(attrName) ?? ''
+        const updateInfo = this._createBasicStringUpdateFunc(attributeVal, index)
+
+        if (updateInfo) {
+          const helpFunc = updateInfo.func
+          index = updateInfo.index
+
+          this.#_indexToUpdateFunc.push((params) => {
+            const newStr = helpFunc(params)
+            node.setAttribute(attrName, newStr)
+          })
+        }
+      }
+    }
+    for (const child of node.childNodes) {
+      index = this._recursiveLoopNode2(child, index)
+    }
+    return index
+  }
+  /**
+   * 
+   * @param {string} textToCheck 
+   * @param {Int} index 
+   * @returns {{index: Int, func: (parms: [any]) => string}? }
+   */
+  _createBasicStringUpdateFunc(textToCheck, index) {
+    const parts = textToCheck.split(this.#_stringSeparator)
+    if (parts.length > 1) {
+      let currentIndex = index
+
+      console.log('[_recursiveLoopNode2] 1 ::', textToCheck)
+      // add update func
+      return {
+        index: index + parts.length - 1,
+        func: (parms) => {
+          console.log('[_recursiveLoopNode2] 2 ::', parts.length, parts, currentIndex)
+          let fullStr = ''
+          for (let i = 0; i < parts.length - 1; i++) {
+            console.log('[_recursiveLoopNode2] 3 ::', parts[i], parms[i + currentIndex])
+
+            fullStr += parts[i] + (parms[i + currentIndex] ?? '')
+          }
+          fullStr += parts[parts.length - 1]
+          return fullStr
+        }
+      }
     }
   }
 
   testIt(...params) {
+    console.log('func count', this.#_indexToUpdateFunc.length)
     this.#_indexToUpdateFunc.forEach((func) => {
       func(params)
     })
+    return this
   }
 
   #_compileTemplate2(stringParts) {
