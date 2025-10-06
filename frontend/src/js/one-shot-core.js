@@ -48,17 +48,22 @@ class TestHtmlTemplate {
 
   /**
    * 
-   * @param {[string]} stringParts 
+   * @param {object} props 
    */
-  compileTemplate() {
+  compileTemplate(props) {
     this.#_compileTemplate`  
-    <template id="myTemplate">
-
+<template>
     hello ${null} ${null} two
   <div class="card" data-tag="${null}">
-  <script></script>
     <h3>12${null}4</h3>
     <p>${null}</p>
+    <div>
+    ${() => {
+        for (let i = 0; i < 5; i++) {
+          return `<a>link ${i}</a>`
+        }
+      }}
+    </div>
   </div>
   </template>
     `
@@ -69,7 +74,27 @@ class TestHtmlTemplate {
    * 
    * @param {[string]} stringParts 
    */
-  #_compileTemplate(stringParts) {
+  #_compileTemplate(stringParts, valueParts) {
+    // check for any functions int he values. These will be handled special and kept track
+    valueParts
+    const newStr = stringParts.join(this.#_stringSeparator)
+    console.log(newStr)
+
+    templateHolder.insertAdjacentHTML('beforeend', newStr)
+
+    // Create the node
+    const newNode = templateHolder.lastElementChild.content.cloneNode(true)
+    console.log('[_compileTemplate] 0::', newNode)
+    this._recursiveLoopNode2(newNode)
+    document.body.appendChild(newNode)
+  }
+
+  /**
+   * 
+   * @param {[string]} stringParts 
+   */
+  #_compileTemplate_old(stringParts) {
+
     const newStr = stringParts.join(this.#_stringSeparator)
     console.log(newStr)
 
@@ -164,68 +189,4 @@ class TestHtmlTemplate {
     return this
   }
 
-  #_compileTemplate2(stringParts) {
-
-    /** @type {string} */
-    let fullString = ''
-    /** @type {[number]} */
-    let stringPositions = []
-
-    const length = stringParts.length
-
-    for (let i = 0; i < length; i++) {
-      let stringPart = stringParts[i]
-      // trim the beginning
-      if (i == 0) {
-        stringPart = stringPart.trimStart()
-      }
-      console.log(stringPart);
-      fullString += stringPart
-      stringPositions.push(fullString.length)
-    }
-
-    templateHolder.insertAdjacentHTML('beforeend', fullString)
-
-    // Create the node
-    const newNode = templateHolder.lastElementChild.cloneNode(true)
-
-    console.log('final str ::', fullString)
-    console.log('final str ::', newNode)
-    console.log('stringPositions str ::', stringPositions)
-    _recursiveLoopNode(newNode, stringPositions[1])
-  }
-}
-
-/**
- * 
- * @param {Node} domEl 
- * @param {number} positionToFind 
- * @param {number} curPosition 
- */
-function _recursiveLoopNode(domEl, positionToFind, curPosition = 0) {
-  console.log('itter', domEl, curPosition)
-
-  /** @type {number} */
-  let endOfTagIndex
-
-  // Check text nodes differently
-  if (domEl instanceof Text) {
-    domEl
-
-  }
-  // Normal nodes
-  else if (domEl.outerHTML) {
-    // only check to end of `>`
-    const textHtml = domEl.outerHTML
-    endOfTagIndex = textHtml.indexOf('>') + 1
-    curPosition += endOfTagIndex
-    console.log('its an html!', textHtml.substring(0, endOfTagIndex))
-  }
-
-
-  for (const child of domEl.childNodes) {
-    if (_recursiveLoopNode(child, positionToFind, curPosition)) {
-      return
-    }
-  }
 }
