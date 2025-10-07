@@ -1,4 +1,17 @@
 
+function MockComp() {
+  const tvar = useStateTest()
+  console.log('mock', this)
+}
+
+function useStateTest() {
+  console.log('this', this)
+  return 'hi'
+}
+
+window.MockComp = MockComp
+
+
 window.testLoadTemplate = () => {
   Promise.all([
     loadTemplate('templates/card-a.html'),
@@ -10,9 +23,13 @@ window.testLoadTemplate = () => {
     })
   })
 }
-
+let myTemp
 window.testLoadTemplate2 = (str, ...props) => {
-  return (new TestHtmlTemplate()).compileTemplate()
+  if (myTemp) {
+    return myTemp
+  }
+  myTemp = (new TestHtmlTemplate()).compileTemplate()
+  return myTemp
 }
 
 const templateHolder = document.createElement('div')
@@ -31,13 +48,20 @@ function testTemplate(tempStr) {
   return templateHolder.lastElementChild
 }
 
-
 class TestHtmlTemplate {
+  /** @type {HTMLElement} */
+  domEl
+
   /** @type {string} */
   #_stringSeparator = '@@param@@'
 
   /** @type {[function]} */
   #_indexToUpdateFunc = []
+
+  /** @type {Object<Int, function>} */
+  #_indexToUpdateFunc2 = {}
+
+  #_didCompile = false
 
   /**
    * @returns {HTMLElement}
@@ -51,22 +75,29 @@ class TestHtmlTemplate {
    * @param {object} props 
    */
   compileTemplate(props) {
+    if (this.#_didCompile) {
+      this.#_indexToUpdateFunc.forEach((callback) => {
+        callback(props)
+      })
+      return this
+    }
     this.#_compileTemplate`  
-<template>
     hello ${null} ${null} two
   <div class="card" data-tag="${null}">
     <h3>12${null}4</h3>
     <p>${null}</p>
-    <div>
+    <div id="links">
     ${() => {
+        let html = ''
         for (let i = 0; i < 5; i++) {
-          return `<a>link ${i}</a>`
+          html += `<a href="#">link ${i}</a>`
         }
+        return html
       }}
     </div>
   </div>
-  </template>
     `
+    this.#_didCompile = true
     return this
   }
 
@@ -74,9 +105,24 @@ class TestHtmlTemplate {
    * 
    * @param {[string]} stringParts 
    */
-  #_compileTemplate(stringParts, valueParts) {
-    // check for any functions int he values. These will be handled special and kept track
-    valueParts
+  #_compileTemplate(stringParts2, ...valueParts) {
+    let stringParts = stringParts2.slice(0)
+    // wrap in template tags
+    if (stringParts.length > 0) {
+      console.log('ddd', stringParts)
+      stringParts[0] += '<template>'
+      stringParts[stringParts.length - 1] += '</template>'
+    }
+    console.log('dddvalueParts', valueParts)
+
+    // check for any functions in the values. These will be handled special and kept track
+    for (let i = 0; i < valueParts.length; i++) {
+      const curpPart = valueParts[i]
+      if (typeof curpPart === 'function') {
+        this.#_indexToUpdateFunc2[i] = curpPart
+      }
+    }
+
     const newStr = stringParts.join(this.#_stringSeparator)
     console.log(newStr)
 
@@ -117,16 +163,30 @@ class TestHtmlTemplate {
 
     // Check Attributes
     if (node instanceof Text) {
-      const updateInfo = this._createBasicStringUpdateFunc(node.textContent, index)
-      if (updateInfo) {
-        const helpFunc = updateInfo.func
-        index = updateInfo.index
+      // Check if this is for function value
+      const functionUpdateInfo = this._createFunctionStringUpdateFunc(node.textContent, index)
+      if (functionUpdateInfo) {
+        const helpFunc = functionUpdateInfo.func
+        index = functionUpdateInfo.index
 
         this.#_indexToUpdateFunc.push((params) => {
           const newStr = helpFunc(params)
-          node.textContent = newStr
+          console.log('(((**** testing nodes', newStr)
+          node.replaceWith(newStr)
         })
+      } else {
+        const updateInfo = this._createBasicStringUpdateFunc(node.textContent, index)
+        if (updateInfo) {
+          const helpFunc = updateInfo.func
+          index = updateInfo.index
+
+          this.#_indexToUpdateFunc.push((params) => {
+            const newStr = helpFunc(params)
+            node.textContent = newStr
+          })
+        }
       }
+
     }
     else if (node instanceof HTMLElement) {
       const length = node.attributes.length ?? 0
@@ -152,6 +212,48 @@ class TestHtmlTemplate {
     return index
   }
   /**
+ * 
+ * @param {string} textToCheck 
+ * @param {Int} index 
+ * @returns {{index: Int, func: (parms: [any]) => string}? }
+ */
+  _createFunctionStringUpdateFunc(textToCheck, index) {
+    const parts = textToCheck.split(this.#_stringSeparator)
+    if (parts.length > 1) {
+      let currentIndex = index
+      console.log('[_recursiveLoopNode2] 1 ::', textToCheck)
+
+      // Check if this was for a function value
+      const funcVal = this.#_indexToUpdateFunc2[index]
+      if (funcVal) {
+        console.log('***** index is function', index)
+        let initialVal = funcVal()
+
+        // IF its a string lets create the dom elements
+        if (typeof initialVal === 'string') {
+          initialVal = `<template>${initialVal}</template>`
+          templateHolder.insertAdjacentHTML('beforeend', initialVal)
+
+          // Create the node
+          const newNode = templateHolder.lastElementChild.content.cloneNode(true)
+          return {
+            index: index + 1,
+            func: (parms) => {
+              return newNode
+            }
+          }
+        }
+
+        return {
+          index: index + 1,
+          func: (parms) => {
+            return funcVal()
+          }
+        }
+      }
+    }
+  }
+  /**
    * 
    * @param {string} textToCheck 
    * @param {Int} index 
@@ -161,8 +263,8 @@ class TestHtmlTemplate {
     const parts = textToCheck.split(this.#_stringSeparator)
     if (parts.length > 1) {
       let currentIndex = index
-
       console.log('[_recursiveLoopNode2] 1 ::', textToCheck)
+
       // add update func
       return {
         index: index + parts.length - 1,
@@ -190,3 +292,4 @@ class TestHtmlTemplate {
   }
 
 }
+window.TestHtmlTemplate = TestHtmlTemplate
