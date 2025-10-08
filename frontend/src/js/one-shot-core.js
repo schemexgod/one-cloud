@@ -24,11 +24,11 @@ window.testLoadTemplate = () => {
   })
 }
 let myTemp
-window.testLoadTemplate2 = (str, ...props) => {
+window.testLoadTemplate2 = (props) => {
   if (myTemp) {
-    return myTemp
+    return myTemp.compileTemplate(props)
   }
-  myTemp = (new TestHtmlTemplate()).compileTemplate()
+  myTemp = (new TestHtmlTemplate()).compileTemplate(props)
   return myTemp
 }
 
@@ -47,6 +47,8 @@ function testTemplate(tempStr) {
   templateHolder.insertAdjacentHTML('beforeend', tempStr)
   return templateHolder.lastElementChild
 }
+
+
 
 class TestHtmlTemplate {
   /** @type {HTMLElement} */
@@ -82,15 +84,16 @@ class TestHtmlTemplate {
       return this
     }
     this.#_compileTemplate`  
-    hello ${null} ${null} two
-  <div class="card" data-tag="${null}">
-    <h3>12${null}4</h3>
-    <p>${null}</p>
+    hello ${props.firstName} ${props.lastName} two
+  <div class="card" data-tag="${props.tag}">
+    <h3>12${props.title}4</h3>
+    <p>${props.paragraph}</p>
     <div id="links">
     ${() => {
         let html = ''
-        for (let i = 0; i < 5; i++) {
-          html += `<a href="#">link ${i}</a>`
+        const list = props.links ?? []
+        for (let i = 0; i < list.length; i++) {
+          html += `<a href="#">link ${list[i]}</a>`
         }
         return html
       }}
@@ -293,3 +296,83 @@ class TestHtmlTemplate {
 
 }
 window.TestHtmlTemplate = TestHtmlTemplate
+
+const createProxy = (props, rootObjectInfo) => {
+  const isRoot = !rootObjectInfo
+
+  // Make copy of props
+  props = { ...props }
+
+  // Used to keep track of the top level properties used and any nested object keys
+  rootObjectInfo = rootObjectInfo ?? { propNamesUsed: [] }
+
+  // For convenience
+  let propsThatAreObjects = {}
+  let propNamesUsed = rootObjectInfo.propNamesUsed
+
+  // Check for nested objects and create proxies
+  for (const key in props) {
+    if (typeof props[key] == 'object') {
+      props[key] = createProxy(props[key], rootObjectInfo)
+      propsThatAreObjects[key] = true
+    }
+  }
+
+  // Create proxy object
+  const proxy = new Proxy(props, {
+    get(target, name, receiver) {
+      console.log('--- get::', target, name, receiver)
+      if (name == '__PROPS_USED__') {
+        console.log('--- get __PROPS_USED__::', propNamesUsed)
+        return propNamesUsed
+      }
+
+      // If root level then push a new item
+      if (isRoot) {
+      console.log('--- get1::', target, name, receiver)
+        propNamesUsed.push([name])
+      }
+      // If nested object then append the last item
+      else {
+      console.log('--- get2::', target, name, receiver)
+        let curPath = propNamesUsed[propNamesUsed.length - 1]
+        if (curPath) {
+      console.log('--- get3::', target, name, receiver)
+          curPath.push(name)
+        } else {
+          console.log('shiiiiiit', name)
+        }
+      }
+
+      console.log('--- get4::', target, name, receiver)
+      const returnValue = Reflect.get(target, name, receiver);
+      console.log('--- get5::', returnValue)
+
+      // If the return value is nil and its nested, then we need to create another proxy on the fly to keep track of the paths
+      if (!returnValue) {
+        const nextObj = createProxy({}, rootObjectInfo)
+        return nextObj
+      }
+
+      return returnValue
+    },
+    set(target, name, value, receiver) {
+      return Reflect.set(target, name, value, receiver);
+    }
+  });
+
+  return proxy
+}
+
+window.createProxy = createProxy
+
+const getNestedObject = (obj, path) => {
+  return path.reduce((currentObj, key) => {
+    // Check if currentObj is null or undefined, or if the key doesn't exist
+    // If so, return undefined to prevent errors and indicate the value is not found
+    if (currentObj === null || typeof currentObj === 'undefined' || !(key in currentObj)) {
+      return undefined;
+    }
+    return currentObj[key];
+  }, obj); // Initialize the accumulator with the original object
+};
