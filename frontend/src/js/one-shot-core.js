@@ -234,6 +234,7 @@ class TestHtmlTemplate {
         let initialVal = funcVal()
 
         // IF its a string lets create the dom elements
+        // TODO: change logic so if its a string it is treated like string text content NOT compiled into html
         if (typeof initialVal === 'string') {
           initialVal = `<template>${initialVal}</template>`
           templateHolder.insertAdjacentHTML('beforeend', initialVal)
