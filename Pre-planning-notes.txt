@@ -27,3 +27,9 @@ Prebuild Layout Pieces (Lego pieces to put together a whole layout)
  Prompt Logic Order
  - Figure out basica layout structure
     - Can it be described by prebuild layout lego pieces
+
+
+
+
+
+# PROMPTS
