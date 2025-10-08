@@ -83,6 +83,7 @@ class TestHtmlTemplate {
       })
       return this
     }
+    props = createProxy(props)
     this.#_compileTemplate`  
     hello ${props.firstName} ${props.lastName} two
   <div class="card" data-tag="${props.tag}">
