@@ -1,4 +1,6 @@
-
+/**
+ * Experimenting with framework to use for the app side not the AI Generation 
+ */
 function MockComp() {
   const tvar = useStateTest()
   console.log('mock', this)

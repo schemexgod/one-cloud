@@ -33,3 +33,15 @@ Prebuild Layout Pieces (Lego pieces to put together a whole layout)
 
 
 # PROMPTS
+
+Your job is to generate a web app using Javascript and CSS. You have a specific set of Javascript functions you can use to generate the app.
+
+###
+Javascript Functions:
+/**
+ * 
+ * @param {string} templateId  
+ * @param {object} props 
+ */
+function createElementFromTemplate(templateId, props)
+###
