@@ -8,13 +8,137 @@
 
 <body>
     <script>
-        function createElementFromRawHtml(rawHtml) {
-            const holder = document.createElement('template')
-            holder.innerHTML = rawHtml.trim()
-            console.log('holder', holder.content.cloneNode(true))
-            return holder.content.cloneNode(true).firstChild
+        const Helper = {
+            fromRaw: (rawHtml) => {
+                const holder = document.createElement('template')
+                holder.innerHTML = rawHtml.trim()
+                console.log('holder', holder.content.cloneNode(true))
+                return holder.content.cloneNode(true).firstChild
+            }
         }
+        const HeroA = (title, subtitle, backgroundImage) => {
+return Helper.fromRaw(`<div data-component-id="hero-a" class="hero-a">
+                  <style>
+    .hero-a {
+      position: relative;
+      flex-direction: column;
+      text-align: center;
+      display: flex;
+      justify-content: top;
+      align-items: center;
+      width: 100%;
+      height: 692px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .hero-a .bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: url('${backgroundImage}');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-a .content {
+      position: relative;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      color: white;
+      width: 600px;
+    }
+  </style>
+    <div class="bg"></div>
+    <div class="content">
+      <h1>${title}</h1>
+      <p>${subtitle}</p>
+    </div>
+  </div>`)
+        }
+        const CardA = (title, subtitle, imageUrl) => {
+            return Helper.fromRaw(`
+            <div class="card-a">
+                <h1>${title}</h1>
+                <p>${subtitle}</p>
+            </div>
+            `)
+
+        }
+
     </script>
+    <script>
+      // Hero Section
+const hero = HeroA(
+  "Introducing the Future of Innovation",
+  "Experience cutting-edge technology that transforms the way you work and live",
+  "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920"
+);
+
+// Features Section
+const featuresSection = Helper.fromRaw(`
+  <div style="max-width: 1200px; margin: 0 auto; padding: 80px 20px;">
+    <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 20px; color: #1a1a1a;">
+      Why Choose Our Product
+    </h2>
+    <p style="text-align: center; font-size: 1.2rem; color: #666; margin-bottom: 60px;">
+      Designed with you in mind, built for excellence
+    </p>
+    <div id="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+    </div>
+  </div>
+`);
+
+// Feature Cards
+const feature1 = CardA(
+  "Lightning Fast",
+  "Experience unparalleled speed and performance that keeps you ahead of the competition",
+  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800"
+);
+
+const feature2 = CardA(
+  "Secure & Reliable",
+  "Enterprise-grade security with 99.9% uptime guarantee to keep your data safe",
+  "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=800"
+);
+
+const feature3 = CardA(
+  "Easy Integration",
+  "Seamlessly integrate with your existing tools and workflow in minutes",
+  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800"
+);
+
+// CTA Section
+const ctaSection = Helper.fromRaw(`
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 80px 20px; text-align: center;">
+    <h2 style="color: white; font-size: 2.5rem; margin-bottom: 20px;">
+      Ready to Get Started?
+    </h2>
+    <p style="color: rgba(255,255,255,0.9); font-size: 1.3rem; margin-bottom: 40px;">
+      Join thousands of satisfied customers today
+    </p>
+    <button style="background: white; color: #667eea; padding: 18px 50px; font-size: 1.2rem; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+      Start Free Trial
+    </button>
+  </div>
+`);
+
+// Assemble the page
+document.body.style.margin = "0";
+document.body.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+
+document.body.appendChild(hero);
+document.body.appendChild(featuresSection);
+
+const featuresGrid = document.getElementById("features-grid");
+featuresGrid.appendChild(feature1);
+featuresGrid.appendChild(feature2);
+featuresGrid.appendChild(feature3);
+
+document.body.appendChild(ctaSection);
+    </script>
+
+    <!-- 
     <script>
         // Create 5 squares with different colors
         const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
@@ -56,6 +180,7 @@
 
         document.body.appendChild(container);
     </script>
+    -->
 </body>
 
 </html>

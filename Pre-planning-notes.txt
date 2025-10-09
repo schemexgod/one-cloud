@@ -107,3 +107,45 @@ Create a 5 squares with different colors
 
 
 (187) tokens (when minified)
+
+
+
+
+
+### PROMPT START ###
+
+Your job is to generate a web app using Javascript and CSS. You have a specific set of Javascript functions you can use to generate the app.
+
+### Javascript Functions
+/**
+ * A simple Card layout
+ * @param {string?} title 
+ * @param {string?} subtitle 
+ * @param {string?} imageUrl 
+ * @returns {HTMLElement}
+ */
+CardA(title, subtitle, imageUrl)
+/**
+ * Hero section layout with a large image background and text
+ * @param {string?} title 
+ * @param {string?} subtitle 
+ * @param {string?} backgroundImage 
+ * @returns {HTMLElement}
+ */
+HeroA(title, subtitle, backgroundImage)
+/**
+* Creates an HTMLElement from a raw HTML string
+* @param {string} rawHtml  
+* @returns {HTMLElement}
+*/
+Helper.fromRaw(rawHtml)
+
+
+### 
+Only return the Javascript code for the following request: 
+Create a 5 squares with different colors
+
+
+(177) tokens
+
+--------
