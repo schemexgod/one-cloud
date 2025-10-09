@@ -7,7 +7,55 @@
 </head>
 
 <body>
+    <script>
+        function createElementFromRawHtml(rawHtml) {
+            const holder = document.createElement('template')
+            holder.innerHTML = rawHtml.trim()
+            console.log('holder', holder.content.cloneNode(true))
+            return holder.content.cloneNode(true).firstChild
+        }
+    </script>
+    <script>
+        // Create 5 squares with different colors
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
 
+        const container = createElementFromRawHtml(`
+  <div style="
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-wrap: wrap;
+  ">
+  </div>
+`);
+
+        colors.forEach(color => {
+            const square = createElementFromRawHtml(`
+    <div style="
+      width: 150px;
+      height: 150px;
+      background-color: ${color};
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    "></div>
+  `);
+
+            square.addEventListener('mouseenter', () => {
+                square.style.transform = 'scale(1.1)';
+            });
+
+            square.addEventListener('mouseleave', () => {
+                square.style.transform = 'scale(1)';
+            });
+
+            container.appendChild(square);
+        });
+
+        document.body.appendChild(container);
+    </script>
 </body>
 
 </html>

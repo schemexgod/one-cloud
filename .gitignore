@@ -2,6 +2,7 @@
 **/node_modules
 
 # Build output
+dist
 frontend/dist
 frontend/build
 frontend/public/build # If outputting to a public/build directory
