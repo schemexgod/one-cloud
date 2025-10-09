@@ -34,11 +34,13 @@ Prebuild Layout Pieces (Lego pieces to put together a whole layout)
 
 # PROMPTS
 
+### PROMPT START ###
+
 Your job is to generate a web app using Javascript and CSS. You have a specific set of Javascript functions you can use to generate the app.
 
 ### Javascript Functions
 /**
- * Creates an HTMLElement from a premade template.
+ * Creates an HTMLElement from a premade template
  * @param {string} templateId  
  * @param {object} props 
  * @returns {HTMLElement}
@@ -55,3 +57,53 @@ function createElementFromRawHtml(rawHtml): HTMLElement
 ### 
 Only return the Javascript code for the following request: 
 Create a 5 squares with different colors
+
+
+(183) tokens
+
+
+
+--------
+### PROMPT START ###
+
+Your job is to generate a web app using Javascript and CSS. You have a specific set of Javascript functions you can use to generate the app.
+
+### Javascript Functions
+{
+  "name": "createElementFromRawHtml",
+  "description": "Creates an HTMLElement from a raw HTML string",
+  "parameters": {
+    "type": "array",
+    "prefixItems": [
+      {
+        "type": "string",
+        "description": "Raw HTML"
+      }
+    ]
+  },
+  "returns": "HTMLElement"
+}
+{
+  "name": "createElementFromTemplate",
+  "description": "Creates an HTMLElement from a premade template",
+  "parameters": {
+    "type": "array",
+    "prefixItems": [
+      {
+        "type": "string",
+        "description": "Template ID"
+      },
+      {
+        "type": "object",
+        "description": "Object to configure the template's styles and functionality"
+      }
+    ]
+  },
+  "returns": "HTMLElement"
+}
+### 
+Only return the Javascript code for the following request: 
+Create a 5 squares with different colors
+
+
+(187) tokens (when minified)
