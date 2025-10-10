@@ -1,55 +1,58 @@
 {
-    "title": "Page",
-    "description": "Full Web Page",
-    "properties": {
-        "layout": {
-            "description": "Describes the entire layout for the page or component",
-            "$ref": "#/$defs/Element"
-        },
-        "content": {
-            "description": "An entire dataset of IDs to content that should be displayed in the layout",
-            "type": "object",
-            "patternProperties": {
-                "^[a-zA-Z][a-zA-Z0-9_]*$": {
-                    "type": "string",
-                    "description": "Text or URL to display in HTML layout"
-                }
-            }
-        }
+  "$id": "Element",
+  "title": "Page",
+  "description": "Full Web Page",
+  "properties": {
+    "layout": {
+      "description": "Describes the entire layout for the page or component",
+      "$ref": "#/$defs/Element"
     },
-    "$defs": {
-        "Element": {
-            "description": "DOM Element",
-            "type": "object",
-            "properties": {
-                "type": {
-                    "type": "string",
-                    "enum": ["CardA", "HeroA", "div"],
-                    "description": "Name of the Element template or HTML tag name"
-                },
-                "domProps": {
-                    "type": "object",
-                    "description": "DOM properties and values for the element. Does NOT include javascript interactions."
-                },
-                "templateProps": {
-                    "type": "object",
-                    "description": "Custom template properties to pass to the element"
-                },
-                "children": {
-                    "type": "array",
-                    "items": {
-                        "oneOf": [
-                            {
-                                "$ref": "#/$defs/Element"
-                            },
-                            {
-                                "type": "string",
-                                "description": "Text node"
-                            }
-                        ]
-                    }
-                }
-            }
+    "content": {
+      "description": "An entire dataset of IDs to content that should be displayed in the layout",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "type": "string",
+          "description": "Text or URL to display in HTML layout"
         }
+      }
     }
+  },
+  "$defs": {
+    "Element": {
+      "description": "DOM Element",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Name of the Element template or HTML tag name"
+        },
+        "domProps": {
+          "type": "object",
+          "description": "DOM properties and values for the element. Does NOT include javascript interactions."
+        },
+        "templateProps": {
+          "type": "object",
+          "description": "Custom template properties to pass to the element"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Element"
+              },
+              {
+                "type": "string",
+                "description": "Text node"
+              }
+            ]
+          }
+        }
+      }
+    }
+
+   
+  }
 }
+

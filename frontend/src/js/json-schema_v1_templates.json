@@ -1,0 +1,36 @@
+{
+  "$id": "templates",
+  "description": "Element Template Definitions",
+  "$defs": {
+    "CardA": {
+      "type": "object",
+      "description": "A simple Card template",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "HeroA": {
+      "type": "object",
+      "description": "Hero section layout with a large image background and text",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "backgroundImage": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

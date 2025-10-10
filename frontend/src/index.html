@@ -2,22 +2,22 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <script type="module" src="js/one-shot-core.js"></script>
+  <meta charset="UTF-8">
+  <script type="module" src="js/one-shot-core.js"></script>
 </head>
 
 <body>
-    <script>
-        const Helper = {
-            fromRaw: (rawHtml) => {
-                const holder = document.createElement('template')
-                holder.innerHTML = rawHtml.trim()
-                console.log('holder', holder.content.cloneNode(true))
-                return holder.content.cloneNode(true).firstChild
-            }
-        }
-        const HeroA = (title, subtitle, backgroundImage) => {
-return Helper.fromRaw(`<div data-component-id="hero-a" class="hero-a">
+  <script>
+    const Helper = {
+      fromRaw: (rawHtml) => {
+        const holder = document.createElement('template')
+        holder.innerHTML = rawHtml.trim()
+        console.log('holder', holder.content.cloneNode(true))
+        return holder.content.cloneNode(true).firstChild
+      }
+    }
+    const HeroA = (title, subtitle, backgroundImage) => {
+      return Helper.fromRaw(`<div data-component-id="hero-a" class="hero-a">
                   <style>
     .hero-a {
       position: relative;
@@ -55,18 +55,184 @@ return Helper.fromRaw(`<div data-component-id="hero-a" class="hero-a">
       <p>${subtitle}</p>
     </div>
   </div>`)
-        }
-        const CardA = (title, subtitle, imageUrl) => {
-            return Helper.fromRaw(`
+    }
+    const CardA = (title, subtitle, imageUrl) => {
+      return Helper.fromRaw(`
             <div class="card-a">
                 <h1>${title}</h1>
                 <p>${subtitle}</p>
             </div>
             `)
 
-        }
+    }
 
-    </script>
+  </script>
+
+  <!-- TESTING JSON OUTPUT-->
+
+  <script>
+    const llmJson = {
+      "layout": {
+        "type": "div",
+        "domProps": {
+          "style": "margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;"
+        },
+        "children": [
+          {
+            "type": "HeroA",
+            "templateProps": {
+              "title": "hero_title",
+              "subtitle": "hero_subtitle",
+              "backgroundImage": "hero_bg"
+            }
+          },
+          {
+            "type": "section",
+            "domProps": {
+              "style": "max-width: 1200px; margin: 60px auto; padding: 0 20px;"
+            },
+            "children": [
+              {
+                "type": "h2",
+                "domProps": {
+                  "style": "text-align: center; font-size: 2.5rem; margin-bottom: 20px; color: #333;"
+                },
+                "children": ["features_heading"]
+              },
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "text-align: center; font-size: 1.2rem; color: #666; margin-bottom: 50px;"
+                },
+                "children": ["features_subheading"]
+              },
+              {
+                "type": "div",
+                "domProps": {
+                  "style": "display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;"
+                },
+                "children": [
+                  {
+                    "type": "CardA",
+                    "templateProps": {
+                      "title": "feature1_title",
+                      "subtitle": "feature1_desc",
+                      "imageUrl": "feature1_img"
+                    }
+                  },
+                  {
+                    "type": "CardA",
+                    "templateProps": {
+                      "title": "feature2_title",
+                      "subtitle": "feature2_desc",
+                      "imageUrl": "feature2_img"
+                    }
+                  },
+                  {
+                    "type": "CardA",
+                    "templateProps": {
+                      "title": "feature3_title",
+                      "subtitle": "feature3_desc",
+                      "imageUrl": "feature3_img"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "domProps": {
+              "style": "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 80px 20px; text-align: center; color: white;"
+            },
+            "children": [
+              {
+                "type": "h2",
+                "domProps": {
+                  "style": "font-size: 2.5rem; margin-bottom: 20px;"
+                },
+                "children": ["cta_heading"]
+              },
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "font-size: 1.3rem; margin-bottom: 30px; opacity: 0.95;"
+                },
+                "children": ["cta_text"]
+              },
+              {
+                "type": "button",
+                "domProps": {
+                  "style": "background: white; color: #667eea; border: none; padding: 15px 40px; font-size: 1.1rem; border-radius: 30px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2);"
+                },
+                "children": ["cta_button"]
+              }
+            ]
+          },
+          {
+            "type": "footer",
+            "domProps": {
+              "style": "background: #333; color: white; padding: 40px 20px; text-align: center;"
+            },
+            "children": [
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "margin: 0; opacity: 0.8;"
+                },
+                "children": ["footer_text"]
+              }
+            ]
+          }
+        ]
+      },
+      "content": {
+        "hero_title": "Transform Your Business Today",
+        "hero_subtitle": "The ultimate solution for modern teams to collaborate, innovate, and succeed",
+        "hero_bg": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1600",
+        "features_heading": "Why Choose Our Product",
+        "features_subheading": "Powerful features designed to help you achieve more",
+        "feature1_title": "Lightning Fast",
+        "feature1_desc": "Experience blazing fast performance that keeps you ahead of the competition",
+        "feature1_img": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400",
+        "feature2_title": "Secure & Reliable",
+        "feature2_desc": "Enterprise-grade security with 99.9% uptime guarantee for peace of mind",
+        "feature2_img": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400",
+        "feature3_title": "Easy to Use",
+        "feature3_desc": "Intuitive interface designed for everyone, no technical expertise required",
+        "feature3_img": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400",
+        "cta_heading": "Ready to Get Started?",
+        "cta_text": "Join thousands of satisfied customers and take your business to the next level",
+        "cta_button": "Start Free Trial",
+        "footer_text": "© 2024 Your Company. All rights reserved."
+      }
+    }
+
+    function recursiveBuildLayout(elementModel) {
+      /** @type {Element?} */
+      let newEl
+      if (elementModel.type == "HeroA") {
+        // get props
+        const { title, subtitle, backgroundImage } = elementModel.templateProps
+        newEl = HeroA(title, subtitle, backgroundImage)
+
+      }
+      if (!newEl) { return }
+      for (const next in elementModel.children) {
+        const curChild = recursiveBuildLayout(next)
+        if (curChild) {
+          newEl.append(curChild)
+        }
+      }
+    }
+
+    const rootEl = recursiveBuildLayout(llmJson.layout)
+    document.body.append(rootEl)
+  </script>
+
+
+
+  <!--
     <script>
       // Hero Section
 const hero = HeroA(
@@ -137,8 +303,8 @@ featuresGrid.appendChild(feature3);
 
 document.body.appendChild(ctaSection);
     </script>
-
-    <!-- 
+  -->
+  <!-- 
     <script>
         // Create 5 squares with different colors
         const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];

@@ -161,29 +161,68 @@ This one is for Pure JSON output
 
 Your job is to generate JSON output that represents a web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
 
-### Premade HTML templates and their properties
+### Premade HTML templates. Each property is an ID of the content to use
 /**
- * @typedef {object} CardA
- * @property {string?} title - ID of the content
- * @property {string?} subtitle - ID of the content 
- * @property {string?} imageUrl - ID of the content
+ * @typedef {object} CardA - A simple Card template
+ * @property {string?} title
+ * @property {string?} subtitle 
+ * @property {string?} imageUrl
  */
 /**
- * @typedef {object} HeroA
- * @property {string?} title - ID of the content
- * @property {string?} subtitle - ID of the content
- * @property {string?} backgroundImage - ID of the content
+ * @typedef {object} HeroA - Hero section layout with a large image background and text
+ * @property {string?} title
+ * @property {string?} subtitle
+ * @property {string?} backgroundImage
  */
 
 ### Use the follow JSON schema:
-{"title":"Page","description":"Full Web Page","properties":{"layout":{"description":"Describes the entire layout for the page or component","$ref":"#/$defs/Element"},"content":{"description":"An entire dataset of IDs to content that should be displayed in the layout","type":"object","patternProperties":{"^[a-zA-Z][a-zA-Z0-9_]*$":{"type":"string","description":"Text or URL to display in HTML layout"}}}},"$defs":{"Element":{"description":"DOM Element","type":"object","properties":{"type":{"type":"string","enum":["CardA","HeroA","div"],"description":"Name of the Element template or HTML tag name"},"domProps":{"type":"object","description":"DOM properties and values for the element. Does NOT include javascript interactions."},"templateProps":{"type":"object","description":"Custom template properties to pass to the element"},"children":{"type":"array","items":{"oneOf":[{"$ref":"#/$defs/Element"},{"type":"string","description":"Text node"}]}}}}}}
+{"title":"Page","description":"Full Web Page","properties":{"layout":{"description":"Describes the entire layout for the page or component","$ref":"#/$defs/Element"},"content":{"description":"An entire dataset of IDs to content that should be displayed in the layout","type":"object","patternProperties":{"^[a-zA-Z][a-zA-Z0-9_]*$":{"type":"string","description":"Text or URL to display in HTML layout"}}}},"$defs":{"Element":{"description":"DOM Element","type":"object","properties":{"type":{"type":"string","description":"Name of the Element template or HTML tag name"},"domProps":{"type":"object","description":"DOM properties and values for the element. Does NOT include javascript interactions."},"templateProps":{"type":"object","description":"Custom template properties to pass to the element"},"children":{"type":"array","items":{"oneOf":[{"$ref":"#/$defs/Element"},{"type":"string","description":"Text node"}]}}}}}}
 
+### 
+Only return the JSON for the following request: 
+
+(450) tokens
+--------
+
+
+
+
+
+
+
+
+This one is for Pure JSON output
+### PROMPT START ###
+
+Your job is to generate JSON output that represents a web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
+
+### Use the follow JSON schema:
+{"title":"Page","description":"Full Web Page","properties":{"layout":{"description":"Describes the entire layout for the page or component","$ref":"#/$defs/Element"},"content":{"description":"An entire dataset of IDs to content that should be displayed in the layout","type":"object","patternProperties":{"^[a-zA-Z][a-zA-Z0-9_]*$":{"type":"string","description":"Text or URL to display in HTML layout"}}}},"$defs":{"Element":{"description":"DOM Element","type":"object","properties":{"type":{"type":"string","description":"Name of the Element template or HTML tag name"},"domProps":{"type":"object","description":"DOM properties and values for the element. Does NOT include javascript interactions."},"templateProps":{"type":"object","description":"Custom template properties to pass to the element"},"children":{"type":"array","items":{"oneOf":[{"$ref":"#/$defs/Element"},{"type":"string","description":"Text node"}]}}}},"CardA":{"type":"object","description":"A simple Card template","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"imageUrl":{"type":"string"}}},"HeroA":{"type":"object","description":"frontend/src/js/one-shot_tests.js","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"backgroundImage":{"type":"string"}}}}}
 
 ### 
 Only return the JSON for the following request: 
 
 
+(420) tokens
 --------
 
 
 
+
+This one is for Pure JSON output
+### PROMPT START ###
+
+Your job is to generate JSON output that represents a web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
+
+### Element Templates
+{"$id":"templates","description":"Element Template Definitions","$defs":{"CardA":{"type":"object","description":"A simple Card template","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"imageUrl":{"type":"string"}}},"HeroA":{"type":"object","description":"Hero section layout with a large image background and text","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"backgroundImage":{"type":"string"}}}}}
+
+### Use the follow JSON schema:
+{"$id":"Element","title":"Page","description":"Full Web Page","properties":{"layout":{"description":"Describes the entire layout for the page or component","$ref":"#/$defs/Element"},"content":{"description":"An entire dataset of IDs to content that should be displayed in the layout","type":"object","patternProperties":{"^[a-zA-Z][a-zA-Z0-9_]*$":{"type":"string","description":"Text or URL to display in HTML layout"}}}},"$defs":{"Element":{"description":"DOM Element","type":"object","properties":{"type":{"type":"string","description":"Name of the Element template or HTML tag name"},"domProps":{"type":"object","description":"DOM properties and values for the element. Does NOT include javascript interactions."},"templateProps":{"type":"object","description":"Custom template properties to pass to the element"},"children":{"type":"array","items":{"oneOf":[{"$ref":"#/$defs/Element"},{"type":"string","description":"Text node"}]}}}}}}
+
+### 
+Only return the JSON for the following request: 
+
+
+(420) tokens
+--------
