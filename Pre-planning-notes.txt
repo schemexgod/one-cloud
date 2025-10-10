@@ -24,10 +24,11 @@ Prebuild Layout Pieces (Lego pieces to put together a whole layout)
 - 4 column content
 - 1 section
 
- Prompt Logic Order
- - Figure out basica layout structure
+ Prompt Logic Order 
+ - Figure out basic layout structure
     - Can it be described by prebuild layout lego pieces
-
+- Add content (copy & images)
+- Add interactions
 
 
 
@@ -149,3 +150,40 @@ Create a 5 squares with different colors
 (177) tokens
 
 --------
+
+
+
+
+
+
+This one is for Pure JSON output
+### PROMPT START ###
+
+Your job is to generate JSON output that represents a web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
+
+### Premade HTML templates and their properties
+/**
+ * @typedef {object} CardA
+ * @property {string?} title - ID of the content
+ * @property {string?} subtitle - ID of the content 
+ * @property {string?} imageUrl - ID of the content
+ */
+/**
+ * @typedef {object} HeroA
+ * @property {string?} title - ID of the content
+ * @property {string?} subtitle - ID of the content
+ * @property {string?} backgroundImage - ID of the content
+ */
+
+### Use the follow JSON schema:
+{"title":"Page","description":"Full Web Page","properties":{"layout":{"description":"Describes the entire layout for the page or component","$ref":"#/$defs/Element"},"content":{"description":"An entire dataset of IDs to content that should be displayed in the layout","type":"object","patternProperties":{"^[a-zA-Z][a-zA-Z0-9_]*$":{"type":"string","description":"Text or URL to display in HTML layout"}}}},"$defs":{"Element":{"description":"DOM Element","type":"object","properties":{"type":{"type":"string","enum":["CardA","HeroA","div"],"description":"Name of the Element template or HTML tag name"},"domProps":{"type":"object","description":"DOM properties and values for the element. Does NOT include javascript interactions."},"templateProps":{"type":"object","description":"Custom template properties to pass to the element"},"children":{"type":"array","items":{"oneOf":[{"$ref":"#/$defs/Element"},{"type":"string","description":"Text node"}]}}}}}}
+
+
+### 
+Only return the JSON for the following request: 
+
+
+--------
+
+
+
