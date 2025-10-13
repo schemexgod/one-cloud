@@ -212,7 +212,7 @@ Only return the JSON for the following request:
 This one is for Pure JSON output
 ### PROMPT START ###
 
-Your job is to generate JSON output that represents a web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
+Your job is to generate JSON output that represents a single page web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
 
 ### Element Templates
 {"$id":"templates","description":"Element Template Definitions","$defs":{"CardA":{"type":"object","description":"A simple Card template","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"imageUrl":{"type":"string"}}},"HeroA":{"type":"object","description":"Hero section layout with a large image background and text","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"backgroundImage":{"type":"string"}}}}}
@@ -224,5 +224,5 @@ Your job is to generate JSON output that represents a web app. The web app is bu
 Only return the JSON for the following request: 
 
 
-(420) tokens
+(446) tokens
 --------
