@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from "firebase/auth";
-import { appOneShot, appPlayAuth } from "./constants"
+import { appOneShot, appPlayAuth } from "../constants"
 import { getFunctions, httpsCallable } from 'firebase/functions';
 
 // Initialize Firebase

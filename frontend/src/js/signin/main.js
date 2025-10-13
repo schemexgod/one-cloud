@@ -19,7 +19,7 @@ onAuthStateChanged(auth, (user) => {
 
 async function loadSignin() {
     try {
-        const module = await import('./signin.js');
+        const module = await import('./signin/signin.js');
         module.showSignInOptions((token, otherOptions) => {
             console.log('onSuccess', token)
             signInWithCustomToken(auth, token)
