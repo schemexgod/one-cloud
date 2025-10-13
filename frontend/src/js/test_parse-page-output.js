@@ -25,6 +25,16 @@
  */
 const parseJsonAndReloadDom = (jsonObj) => {
     // Check the type to see if its a template
+    const type = jsonObj.type
+
+    switch (type) {
+        case value:
+            
+            break;
+    
+        default:
+            break;
+    }
 
     jsonObj.layout.children
 }
