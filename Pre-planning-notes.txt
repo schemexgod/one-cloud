@@ -28,6 +28,7 @@ Prebuild Layout Pieces (Lego pieces to put together a whole layout)
  - Figure out basic layout structure
     - Can it be described by prebuild layout lego pieces
 - Add content (copy & images)
+- Add Backend DB logic if needed
 - Add interactions
 
 

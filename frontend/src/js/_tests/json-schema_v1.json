@@ -31,7 +31,7 @@
           "type": "object",
           "description": "DOM properties and values for the element. Does NOT include javascript interactions."
         },
-        "templateProps": {
+        "props": {
           "type": "object",
           "description": "Custom template properties to pass to the element"
         },
