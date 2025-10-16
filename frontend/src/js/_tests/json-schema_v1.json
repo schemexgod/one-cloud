@@ -13,7 +13,17 @@
       "patternProperties": {
         "^[a-zA-Z][a-zA-Z0-9_]*$": {
           "type": "string",
-          "description": "Text or URL to display in HTML layout"
+          "description": "Text, media URL, or SVG string to display in HTML layout"
+        }
+      }
+    },
+    "interactions": {
+      "description": "An entire dataset of IDs to Javascript code that should be added to an element's domProps event callbacks",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "type": "string",
+          "description": "Text, media URL, or SVG string to display in HTML layout"
         }
       }
     }
@@ -27,13 +37,13 @@
           "type": "string",
           "description": "Name of the Element template or HTML tag name"
         },
-        "domProps": {
-          "type": "object",
-          "description": "DOM properties and values for the element. Does NOT include javascript interactions."
-        },
         "props": {
           "type": "object",
-          "description": "Custom template properties to pass to the element"
+          "description": "Custom template properties to pass to the element. This should be an ID wrapped in `{{}}` from the `content` dataset"
+        },
+        "domProps": {
+          "type": "object",
+          "description": "DOM properties and values for the element including any javascript interactions. Javascript should be an ID wrapped in `{{}}` from the `interactions` dataset"
         },
         "children": {
           "type": "array",
@@ -50,9 +60,7 @@
           }
         }
       }
-    }
-
-   
+    }   
   }
 }
 
