@@ -208,6 +208,148 @@
       }
     }
 
+    const llmJson2 = {
+      "layout": {
+        "type": "div",
+        "domProps": {
+          "style": "margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;"
+        },
+        "children": [
+          {
+            "type": "HeroA",
+            "props": {
+              "title": "{{heroTitle}}",
+              "subtitle": "{{heroSubtitle}}",
+              "backgroundImage": "{{heroBackground}}"
+            }
+          },
+          {
+            "type": "section",
+            "domProps": {
+              "style": "padding: 80px 20px; text-align: center; background: #f8f9fa;"
+            },
+            "children": [
+              {
+                "type": "h2",
+                "domProps": {
+                  "style": "font-size: 2.5rem; margin-bottom: 20px; color: #333;"
+                },
+                "children": ["{{featuresTitle}}"]
+              },
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "font-size: 1.2rem; color: #666; margin-bottom: 60px; max-width: 600px; margin-left: auto; margin-right: auto;"
+                },
+                "children": ["{{featuresSubtitle}}"]
+              },
+              {
+                "type": "div",
+                "domProps": {
+                  "style": "display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;"
+                },
+                "children": [
+                  {
+                    "type": "CardA",
+                    "props": {
+                      "title": "{{feature1Title}}",
+                      "subtitle": "{{feature1Desc}}",
+                      "imageUrl": "{{feature1Image}}"
+                    }
+                  },
+                  {
+                    "type": "CardA",
+                    "props": {
+                      "title": "{{feature2Title}}",
+                      "subtitle": "{{feature2Desc}}",
+                      "imageUrl": "{{feature2Image}}"
+                    }
+                  },
+                  {
+                    "type": "CardA",
+                    "props": {
+                      "title": "{{feature3Title}}",
+                      "subtitle": "{{feature3Desc}}",
+                      "imageUrl": "{{feature3Image}}"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "domProps": {
+              "style": "padding: 80px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;"
+            },
+            "children": [
+              {
+                "type": "h2",
+                "domProps": {
+                  "style": "font-size: 2.5rem; margin-bottom: 20px;"
+                },
+                "children": ["{{ctaTitle}}"]
+              },
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9;"
+                },
+                "children": ["{{ctaSubtitle}}"]
+              },
+              {
+                "type": "button",
+                "domProps": {
+                  "id": "ctaButton",
+                  "style": "padding: 18px 48px; font-size: 1.1rem; background: white; color: #667eea; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;",
+                  "onmouseover": "{{buttonHover}}",
+                  "onmouseout": "{{buttonLeave}}",
+                  "onclick": "{{buttonClick}}"
+                },
+                "children": ["{{ctaButtonText}}"]
+              }
+            ]
+          },
+          {
+            "type": "footer",
+            "domProps": {
+              "style": "padding: 40px 20px; text-align: center; background: #333; color: #aaa; font-size: 0.9rem;"
+            },
+            "children": [
+              {
+                "type": "p",
+                "children": ["{{footerText}}"]
+              }
+            ]
+          }
+        ]
+      },
+      "content": {
+        "heroTitle": "Revolutionary Product That Changes Everything",
+        "heroSubtitle": "Experience innovation like never before with our cutting-edge solution",
+        "heroBackground": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1600&h=900&fit=crop",
+        "featuresTitle": "Powerful Features",
+        "featuresSubtitle": "Everything you need to succeed, all in one place",
+        "feature1Title": "Lightning Fast",
+        "feature1Desc": "Optimized performance that delivers results in milliseconds, not seconds",
+        "feature1Image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
+        "feature2Title": "Secure & Reliable",
+        "feature2Desc": "Enterprise-grade security with 99.9% uptime guarantee",
+        "feature2Image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=300&fit=crop",
+        "feature3Title": "Easy Integration",
+        "feature3Desc": "Seamlessly integrate with your existing tools and workflow",
+        "feature3Image": "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop",
+        "ctaTitle": "Ready to Get Started?",
+        "ctaSubtitle": "Join thousands of satisfied customers today",
+        "ctaButtonText": "Start Free Trial",
+        "footerText": "© 2024 Your Company. All rights reserved."
+      },
+      "interactions": {
+        "buttonHover": "this.style.transform = 'scale(1.05)';",
+        "buttonLeave": "this.style.transform = 'scale(1)';",
+        "buttonClick": "alert('Thank you for your interest! Free trial coming soon.');"
+      }
+    }
     function recursiveBuildLayout(elementModel) {
       /** @type {Element?} */
       let newEl

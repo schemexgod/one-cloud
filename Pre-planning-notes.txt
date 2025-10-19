@@ -32,6 +32,12 @@ Prebuild Layout Pieces (Lego pieces to put together a whole layout)
 - Add interactions
 
 
+###
+TESTING USER request
+
+I want to create a website where I can enter in my son's lacrosse games. I should be able to see the date, location, the team they are playing, and also keep track of their wins and losses for the season.
+
+
 
 
 # PROMPTS
