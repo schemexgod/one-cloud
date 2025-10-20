@@ -11,6 +11,8 @@ import { onCall, onRequest } from "firebase-functions/v2/https";
 import { getApp, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import admin from "firebase-admin";
+import { Pool } from 'pg';
+import { Connector } from '@google-cloud/cloud-sql-connector';
 
 const credJson = {
   "type": "service_account",
@@ -82,16 +84,36 @@ const verifyToken = async (jwtToken) => {
   return await authOneShot.createCustomToken(uid, { email: decodedToken.email, emailVerified: decodedToken.email_verified });
 }
 
+
 export const testDB = onRequest({
-  cors: '*'
+  cors: '*',
+  timeoutSeconds: 300,
 },
   async (req, res) => {
-    res
-      .status(200)
-      .json({
-        queryText: req.query.text,
-        body: req.body
-      })
-      
-      return
+    const connector = new Connector();
+    try {
+
+      const pool = new Pool({
+        user: 'postgres',
+        password: 'Oneshot123!',
+        host: '10.124.144.3', // Private IP of Cloud SQL instance
+        database: 'test-cloud-func',
+        port: 5432,
+      });
+
+      const { rows } = await pool.query('SELECT NOW()');
+      res.status(200)
+        .json({
+          data: rows,
+        })
+
+      await pool.end();
+      connector.close();
+
+    } catch (error) {
+      res.status(500)
+        .json({ error: error, otherMsg: otherMsg })
+    }
+
   })
+
