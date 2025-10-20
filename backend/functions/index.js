@@ -7,7 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import { onCall } from "firebase-functions/v2/https";
+import { onCall, onRequest } from "firebase-functions/v2/https";
 import { getApp, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import admin from "firebase-admin";
@@ -79,5 +79,19 @@ const verifyToken = async (jwtToken) => {
   const decodedToken = await authPlay
     .verifyIdToken(jwtToken);
   const uid = decodedToken.uid;
-  return await authOneShot.createCustomToken(uid, {email: decodedToken.email, emailVerified: decodedToken.email_verified});
+  return await authOneShot.createCustomToken(uid, { email: decodedToken.email, emailVerified: decodedToken.email_verified });
 }
+
+export const testDB = onRequest({
+  cors: '*'
+},
+  async (req, res) => {
+    res
+      .status(200)
+      .json({
+        queryText: req.query.text,
+        body: req.body
+      })
+      
+      return
+  })
