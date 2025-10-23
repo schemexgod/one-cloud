@@ -92,11 +92,11 @@ export const testDB = onRequest({
   async (req, res) => {
     const connector = new Connector();
     try {
-
+      
       const pool = new Pool({
         user: 'postgres',
         password: 'Oneshot123!',
-        host: '10.124.144.3', // Private IP of Cloud SQL instance
+        host: '10.124.144.3', // Private IP of your Cloud SQL instance
         database: 'test-cloud-func',
         port: 5432,
       });
