@@ -13,6 +13,7 @@ import { getAuth } from "firebase-admin/auth";
 import admin from "firebase-admin";
 import { Pool } from 'pg';
 import { Connector } from '@google-cloud/cloud-sql-connector';
+import { format } from "node-pg-format";
 
 const credJson = {
   "type": "service_account",
@@ -90,30 +91,46 @@ export const testDB = onRequest({
   timeoutSeconds: 300,
 },
   async (req, res) => {
+      const newDbName = format.ident(my_new_database)
     const connector = new Connector();
-    try {
-      
-      const pool = new Pool({
-        user: 'postgres',
-        password: 'Oneshot123!',
-        host: '10.124.144.3', // Private IP of your Cloud SQL instance
-        database: 'test-cloud-func',
-        port: 5432,
-      });
 
-      const { rows } = await pool.query('SELECT NOW()');
+    const pool = new Pool({
+      user: 'postgres',
+      password: 'Oneshot123!',
+      host: '10.124.144.3', // Private IP of your Cloud SQL instance
+      database: 'postgres',
+      port: 5432,
+    });
+
+    try {
+      /*
+            const { rows } = await pool.query('SELECT NOW()');
+            res.status(200)
+              .json({
+                data: rows,
+              })
+      */
+
+
+      const newDbName = format.ident('my_new_database')
+      const result = await pool.query(`CREATE DATABASE ${newDbName}`);
+
       res.status(200)
         .json({
-          data: rows,
+          result: result,
         })
-
-      await pool.end();
-      connector.close();
-
     } catch (error) {
+      const errorCode = error?.code
+      if (errorCode == '42P04') {
+        res.status(409)
+          .json({ code: '42P04', error: 'Database Exists' })
+        return
+      }
       res.status(500)
-        .json({ error: error, otherMsg: otherMsg })
+        .json({ code: '500', error: newDbName })
     }
 
+    await pool.end();
+    connector.close();
   })
 
