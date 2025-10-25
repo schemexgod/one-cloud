@@ -14,6 +14,7 @@ import admin from "firebase-admin";
 import { Pool } from 'pg';
 import { Connector } from '@google-cloud/cloud-sql-connector';
 import { format } from "node-pg-format";
+import { dbClient } from "./shared/db-connector.js";
 
 const credJson = {
   "type": "service_account",
@@ -91,16 +92,13 @@ export const testDB = onRequest({
   timeoutSeconds: 300,
 },
   async (req, res) => {
-      const newDbName = format.ident(my_new_database)
-    const connector = new Connector();
+    const newDbName = format('my_new_database2')
+    const newUserName = newDbName
 
-    const pool = new Pool({
-      user: 'postgres',
-      password: 'Oneshot123!',
-      host: '10.124.144.3', // Private IP of your Cloud SQL instance
-      database: 'postgres',
-      port: 5432,
-    });
+    // const connector = new Connector();
+
+    const pool = dbClient()
+
 
     try {
       /*
@@ -111,15 +109,24 @@ export const testDB = onRequest({
               })
       */
 
+      // await pool.query('BEGIN'); // Start the transaction
 
-      const newDbName = format.ident('my_new_database')
-      const result = await pool.query(`CREATE DATABASE ${newDbName}`);
+
+      // Create DB with cloudsuperuser owner so its editable in gcloud web console
+      const result = await pool.query(`CREATE DATABASE ${newDbName} OWNER = cloudsqlsuperuser`);
+      const userResult = await pool.query(`CREATE USER ${newUserName}`)
+      const userAssignResult = await pool.query(`GRANT ALL PRIVILEGES ON DATABASE ${newDbName} TO ${newUserName}`);
+
+      // await pool.query('COMMIT'); // Commit the transaction if successful
 
       res.status(200)
         .json({
           result: result,
         })
+
     } catch (error) {
+      // await pool.query('ROLLBACK'); // Rollback the transaction if an error occurs
+
       const errorCode = error?.code
       if (errorCode == '42P04') {
         res.status(409)
@@ -127,10 +134,11 @@ export const testDB = onRequest({
         return
       }
       res.status(500)
-        .json({ code: '500', error: newDbName })
+        .json({ code: '500', error: newDbName, error2: error })
     }
 
-    await pool.end();
-    connector.close();
+
+    // await pool.end();
+    // connector.close();
   })
 
