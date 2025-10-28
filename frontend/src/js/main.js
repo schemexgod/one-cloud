@@ -13,8 +13,8 @@ onAuthStateChanged(auth, async (user) => {
     if (!user) {
         loadSignin()
     } else {
-        console.log('user', auth.currentUser)
-        const jwtId =  await auth.currentUser.getIdToken()
+        console.log('user', user)
+        const jwtId =  await user?.getIdToken()
         const testEndPoint = 'https://us-central1-oneshot-c5e23.cloudfunctions.net/dbConnect'
         const postData = {
             title: 'My New Post',

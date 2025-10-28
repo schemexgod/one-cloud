@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase-admin/app";
 import admin from "firebase-admin";
+import { AppError } from "../common/AppError.js";
+import { getAuth, UserRecord } from "firebase-admin/auth";
 
 const credJson = {
   "type": "service_account",
@@ -18,3 +20,43 @@ const credJson = {
 export const appOneShot = initializeApp({ credential: admin.credential.cert(credJson) },
   'oneshot'
 );
+
+/**
+ * Checks auth
+ * @param {Request} req 
+ * @param {Response} res 
+ * @returns {Promise<UserRecord>} returns the current user id
+ */
+export const getUser = async (req, res) => {
+  try {
+    const authorizationHeader = req.headers?.authorization;
+    const idToken = authorizationHeader?.split('Bearer ')?.[1];
+    if (!idToken) {
+      throw new AppError('Authentication required. Please provide a valid Bearer token.', 401)
+    }
+
+    const authOneShot = getAuth(appOneShot)
+    const decodedToken = await authOneShot.verifyIdToken(idToken)
+    const uid = decodedToken.uid;
+    const user = await authOneShot.getUser(uid)
+    return user
+
+  } catch (error) {
+    throw new AppError("Authentication failed.", 401)
+  }
+}
+
+/**
+ * Checks auth and returns the user object. If not signed in then it will set the response status to an error code and output a json error message, and return undefined
+ * @param {Request} req 
+ * @param {Response} res 
+ * @returns {Promise<UserRecord> | undefined} returns the current user or undefined
+ */
+export const getUserOrFail = async (req, res) => {
+  try {
+    return await getUser(req, res)
+  } catch (error) {
+    res.status(error.code ?? 500).json({ error: error.message })
+    return
+  }
+}

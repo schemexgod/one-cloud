@@ -14,29 +14,38 @@ const auth = getAuth(app)
  * @param {*} onError 
  */
 export function showSignInOptions(onSuccess, onError) {
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     // Check if auth already
     console.log("-- already signed in", auth.currentUser)
     if (user) {
       console.log("-- already signed in")
       // onSuccess(user.accessToken);
-      user.getIdToken()
-        .then((idToken) => {
-          console.log('idToken', idToken)
-          return authWithNewToken(idToken)
-        })
-        .then((newToken) => {
-          console.log('idonSuccessToken', newToken)
-          onSuccess(newToken, { email: user.email, emailVerified: user.emailVerified, displayName: user.displayName })
-          return newToken
-        })
-        .catch((error) => {
-          console.error("Error getting ID token:", error);
-        });
-      return;
+      try {
+        let newToken = await user.getIdToken()
+        newToken = await authWithNewToken(newToken)
+        onSuccess(newToken, { email: user.email, emailVerified: user.emailVerified, displayName: user.displayName })
+        return
+
+      } catch (error) {
+        console.error("Error getting ID token:", error);
+      }
+      // user.getIdToken()
+      //   .then((idToken) => {
+      //     console.log('idToken', idToken)
+      //     return authWithNewToken(idToken)
+      //   })
+      //   .then((newToken) => {
+      //     console.log('idonSuccessToken', newToken)
+      //     onSuccess(newToken, { email: user.email, emailVerified: user.emailVerified, displayName: user.displayName })
+      //     return newToken
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error getting ID token:", error);
+      //   });
+      // return;
     }
     document.body.innerHTML = `
-      <div id="google-btn" style="color: white; cursor: pointer;">sign in with google</div>
+      <div id="google-btn" style="color: white; cursor: pointer; background-color: blue;">sign in with google</div>
     `;
 
     document.getElementById('google-btn').addEventListener('click', () => {

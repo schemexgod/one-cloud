@@ -3,8 +3,8 @@ import { generateId } from "../utils/security-utils.js";
 import { dbClient } from "./db-connector.js";
 import { format } from "node-pg-format";
 import { Client, Pool } from "pg"
-import { appOneShot } from "../auth/user-db-admin.js";
-import { getAuth } from "firebase-admin/auth";
+import { appOneShot, getUser, getUserOrFail } from "../auth/user-db-admin.js";
+import { AppError } from "../common/AppError.js";
 /** 
  * @typedef CreateDBBody
  * @property {string} displayName
@@ -18,27 +18,11 @@ import { getAuth } from "firebase-admin/auth";
  */
 export const createDatabase = async (req, res) => {
   // MUST be signed in
-  let place = 0
-  try {
-    let date = Date.now()
-    const authorizationHeader = req.headers?.authorization;
-    place = 1
-    const idToken = authorizationHeader?.split('Bearer ')?.[1];
-    place = 2
+  const user = await getUserOrFail(req, res)
+  if (!user) { return }
 
-    const authOneShot = getAuth(appOneShot)
-    place = 3
+  // Check rate limits
 
-    const decodedToken = await authOneShot.verifyIdToken(idToken);
-    place = 4
-
-    const uid = decodedToken.uid;
-    place = 5
-
-    return res.status(200).json({ msg: req?.toJSON?.(), idToken: idToken, okay: uid, other: Date.now() - date })
-  } catch (error) {
-    return res.status(200).json({ error: error, place })
-  }
 
   /** @type {CreateDBBody} */
   const reqBody = req.body
@@ -64,15 +48,22 @@ export const createDatabase = async (req, res) => {
     user: 'postgres',
     password: 'Oneshot123!',
     // host: '10.124.144.3', // Private IP of your Cloud SQL instance
-    database: 'postgres',
+    database: 'app',
     port: 5432,
   });
 
   const client = await pool.connect()
+  const uid = user.uid
+  let position = 0 
 
   try {
+    // Insert into our admin
+    await client.query('INSERT INTO user_databases(id, user_id, name) VALUES($1, $2, $3)', [newDbName, uid, reqName])
+    position = 2
+
     // Create DB with cloudsuperuser owner so its editable in gcloud web console
     const result = await client.query(`CREATE DATABASE "${newDbName}" OWNER = cloudsqlsuperuser`);
+     position = 3
     // Create user for this DB
     const userResult = await client.query(`CREATE USER "${newUserName}"`)
     // Give user all privileges for this database
@@ -92,7 +83,7 @@ export const createDatabase = async (req, res) => {
       return
     }
     res.status(500)
-      .json({ code: '500', error: newDbName, error2: error })
+      .json({ code: '500', error: newDbName, error2: error, newDbName, uid, reqName, position })
     return
   }
   finally {
