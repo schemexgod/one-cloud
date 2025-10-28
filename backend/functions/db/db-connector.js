@@ -6,12 +6,12 @@ import { Pool } from 'pg';
 let dbPool
 
 /**
- * Gets the DB Pool to 
- * @returns Pool
+ * Gets a PoolClient from the DB Pool 
+ * @returns {PoolClient}
  */
 export const dbClient = () => {
   if (dbPool) {
-    return dbPool
+    return dbPool.connect()
   }
 
   // TODO: Put credentials in google secrets
@@ -23,5 +23,5 @@ export const dbClient = () => {
     port: 5432,
   });
 
-  return dbPool
+  return dbPool.connect()
 }

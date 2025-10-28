@@ -10,11 +10,11 @@ const app = appOneShot
 const auth = getAuth(app);
 console.log('user', auth.currentUser)
 onAuthStateChanged(auth, (user) => {
-    // if (!user) {
-    //     loadSignin()
-    // } else {
-    //     console.log('user', auth.currentUser)
-    // }
+    if (!user) {
+        loadSignin()
+    } else {
+        console.log('user', auth.currentUser)
+    }
 })
 
 async function loadSignin() {

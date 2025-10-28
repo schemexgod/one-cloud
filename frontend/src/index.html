@@ -3,16 +3,17 @@
 
 <head>
   <meta charset="UTF-8">
-  <script type="module" src="js/one-shot-core.js"></script>
+  <script type="module" src="js/main.js"></script>
 </head>
 
 <body>
   <script>
-    const testEndPoint = 'https://us-central1-oneshot-c5e23.cloudfunctions.net/testDB'
+    const testEndPoint = 'https://us-central1-oneshot-c5e23.cloudfunctions.net/dbConnect'
     const postData = {
       title: 'My New Post',
       body: 'This is the content of my new post.',
-      userId: "some-uid"
+      userId: "some-uid",
+      endpoint: "create-db"
     };
 
     fetch(testEndPoint, {

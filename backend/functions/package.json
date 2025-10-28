@@ -12,6 +12,7 @@
     "node": "22"
   },
   "main": "index.js",
+  "type": "module",
   "dependencies": {
     "@google-cloud/cloud-sql-connector": "^1.8.4",
     "firebase-admin": "^12.6.0",

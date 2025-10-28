@@ -14,8 +14,9 @@ import admin from "firebase-admin";
 import { Pool } from 'pg';
 import { Connector } from '@google-cloud/cloud-sql-connector';
 import { format } from "node-pg-format";
-import { dbClient } from "./shared/db-connector.js";
-
+import { dbClient } from "./db/db-connector.js";
+import { createDatabase } from "./db/db-functions.js";
+/*
 const credJson = {
   "type": "service_account",
   "project_id": "oneshot-c5e23",
@@ -86,59 +87,26 @@ const verifyToken = async (jwtToken) => {
   return await authOneShot.createCustomToken(uid, { email: decodedToken.email, emailVerified: decodedToken.email_verified });
 }
 
-
-export const testDB = onRequest({
+*/
+export const dbConnect = onRequest({
   cors: '*',
   timeoutSeconds: 300,
 },
   async (req, res) => {
-    const newDbName = format('my_new_database2')
-    const newUserName = newDbName
-
-    // const connector = new Connector();
-
-    const pool = dbClient()
-
-
-    try {
-      /*
-            const { rows } = await pool.query('SELECT NOW()');
-            res.status(200)
-              .json({
-                data: rows,
-              })
-      */
-
-      // await pool.query('BEGIN'); // Start the transaction
-
-
-      // Create DB with cloudsuperuser owner so its editable in gcloud web console
-      const result = await pool.query(`CREATE DATABASE ${newDbName} OWNER = cloudsqlsuperuser`);
-      const userResult = await pool.query(`CREATE USER ${newUserName}`)
-      const userAssignResult = await pool.query(`GRANT ALL PRIVILEGES ON DATABASE ${newDbName} TO ${newUserName}`);
-
-      // await pool.query('COMMIT'); // Commit the transaction if successful
-
-      res.status(200)
-        .json({
-          result: result,
-        })
-
-    } catch (error) {
-      // await pool.query('ROLLBACK'); // Rollback the transaction if an error occurs
-
-      const errorCode = error?.code
-      if (errorCode == '42P04') {
-        res.status(409)
-          .json({ code: '42P04', error: 'Database Exists' })
-        return
-      }
-      res.status(500)
-        .json({ code: '500', error: newDbName, error2: error })
+    const route = req.body.endpoint
+    if (!route) {
+      return res.status(404).json({ error: 'Endpoint not found' })
     }
 
+    const reqMethod = req.method.toUpperCase()
+    
+    switch (route) {
+      case 'create-db':
+        if (reqMethod != 'POST') {
+          return res.status(405).json({ error: 'Must use POST method to create db' })
+        }
 
-    // await pool.end();
-    // connector.close();
+        return createDatabase(req, res)
+    }
   })
 
