@@ -18,14 +18,26 @@ import { getAuth } from "firebase-admin/auth";
  */
 export const createDatabase = async (req, res) => {
   // MUST be signed in
+  let place = 0
   try {
+    let date = Date.now()
     const authorizationHeader = req.headers?.authorization;
+    place = 1
     const idToken = authorizationHeader?.split('Bearer ')?.[1];
-    // const authOneShot = getAuth(appOneShot)
+    place = 2
 
-    return res.status(200).json({ msg: authorizationHeader, idToken: idToken, okay: 'here', other: req.headers })
+    const authOneShot = getAuth(appOneShot)
+    place = 3
+
+    const decodedToken = await authOneShot.verifyIdToken(idToken);
+    place = 4
+
+    const uid = decodedToken.uid;
+    place = 5
+
+    return res.status(200).json({ msg: req?.toJSON?.(), idToken: idToken, okay: uid, other: Date.now() - date })
   } catch (error) {
-    return res.status(200).json({ error: error })
+    return res.status(200).json({ error: error, place })
   }
 
   /** @type {CreateDBBody} */
