@@ -1,5 +1,5 @@
 import { Connector } from "@google-cloud/cloud-sql-connector";
-import { generateId } from "../utils/security-utils.js";
+import { generateId } from "../common/security-utils.js";
 import { dbClient } from "./db-connector.js";
 import { format } from "node-pg-format";
 import { Client, Pool } from "pg"
