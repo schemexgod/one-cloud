@@ -10,6 +10,11 @@ import { AppError } from "../common/AppError.js";
  * @property {string} displayName
  */
 
+/** 
+ * @typedef GetDBBody
+ * @property {string?} id
+ */
+
 /**
  * Creates a database for a given user
  * @param {Request} req 
@@ -37,24 +42,9 @@ export const createDatabase = async (req, res) => {
   const newDbName = format(`d${generateId()}_${reqName}`)
   const newUserName = newDbName
 
-  const connector = new Connector()
-  const clientOpts = await connector.getOptions({
-    instanceConnectionName: 'oneshot-c5e23:us-central1:one-shot',
-    authType: 'PASSWORD'
-  });
-
-  const pool = new Pool({
-    ...clientOpts,
-    user: 'postgres',
-    password: 'Oneshot123!',
-    // host: '10.124.144.3', // Private IP of your Cloud SQL instance
-    database: 'app',
-    port: 5432,
-  });
-
-  const client = await pool.connect()
+  const client = await dbClient()
   const uid = user.uid
-  let position = 0 
+  let position = 0
 
   try {
     // Insert into our admin
@@ -63,7 +53,7 @@ export const createDatabase = async (req, res) => {
 
     // Create DB with cloudsuperuser owner so its editable in gcloud web console
     const result = await client.query(`CREATE DATABASE "${newDbName}" OWNER = cloudsqlsuperuser`);
-     position = 3
+    position = 3
     // Create user for this DB
     const userResult = await client.query(`CREATE USER "${newUserName}"`)
     // Give user all privileges for this database
@@ -89,4 +79,24 @@ export const createDatabase = async (req, res) => {
   finally {
     client.release()
   }
+}
+
+
+export const getDatabase = async (req, res) => {
+  // MUST be signed in
+  const user = await getUserOrFail(req, res)
+  if (!user) { return }
+
+  /** @type {GetDBBody} */
+  const reqBody = req.body
+  const dbId = reqBody.id
+
+  // Get specific DB
+  if (dbId) {
+    const client = await dbClient()
+    return
+  }
+
+  // Get All DBs
+
 }
