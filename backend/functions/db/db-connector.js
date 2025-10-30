@@ -3,16 +3,19 @@ import { Connector } from '@google-cloud/cloud-sql-connector';
 import { Pool } from 'pg';
 // import { Connector } from '@google-cloud/cloud-sql-connector';
 
-/** @type {Pool?} */
-let dbPool
+/** @type {Object.<string, Pool>} */
+let dbPool = {}
 
 /**
  * Gets a PoolClient from the DB Pool 
- * @returns {PoolClient}
+ * @param {string} dbName Name of the database to connect to. Default is `app`
+ * @param {string?} uid optionally set the `auth.uid()`
+ * @returns {Promise<PoolClient>}
  */
-export const dbClient = async () => {
-  if (dbPool) {
-    return dbPool.connect()
+export const dbClient = async (dbId = 'app', uid) => {
+  let pool = dbPool[dbId]
+  if (pool) {
+    return configClient(await pool.connect(), uid)
   }
 
   const connector = new Connector()
@@ -22,13 +25,29 @@ export const dbClient = async () => {
   });
 
   // TODO: Put credentials in google secrets
-  const pool = new Pool({
+  pool = new Pool({
     ...clientOpts,
     user: 'postgres',
     password: 'Oneshot123!',
     // host: '10.124.144.3', // Private IP of your Cloud SQL instance
-    database: 'app',
+    database: dbId,
     port: 5432,
   });
-  return dbPool.connect()
+  dbPool[dbId] = pool
+
+  return configClient(await pool.connect(), uid)
+}
+
+/**
+ * 
+ * @param {PoolClient} client 
+ * @param {string?} ui 
+ * @returns {PoolClient}
+ */
+async function configClient(client, uid) {
+  if (!uid) {
+    return client
+  }
+  await client.query(`SET auth.uid='${uid}';`)
+  return client
 }

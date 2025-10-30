@@ -88,15 +88,31 @@ export const getDatabase = async (req, res) => {
   if (!user) { return }
 
   /** @type {GetDBBody} */
-  const reqBody = req.body
+  const reqBody = req.query
   const dbId = reqBody.id
 
   // Get specific DB
-  if (dbId) {
+  if (dbId && false) {
+    // Check if this user has Admin access to this DB
     const client = await dbClient()
     return
   }
 
   // Get All DBs
-
+  const client = await dbClient('app', user.uid)
+  try {
+    const { rows } = await client.query('SELECT * FROM user_databases WHERE user_id=auth.uid()');
+    res.status(200)
+      .json({
+        data: rows,
+      })
+  } catch (error) {
+    const errorCode = error?.code
+    res.status(errorCode ?? 500)
+      .json({ error: error })
+    return
+  }
+  finally {
+    client.release()
+  }
 }

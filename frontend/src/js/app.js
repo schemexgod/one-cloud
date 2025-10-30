@@ -1,4 +1,4 @@
-import { getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signInWithCustomToken, updateCurrentUser, User } from "firebase/auth";
 import { appOneShot } from "./constants";
 import { Router } from "./routes";
 
@@ -12,25 +12,28 @@ const init = async () => {
   // Check if signed in
   const auth = getAuth(fbaseApp);
   const user = await setupAuthState(auth)
-
-  console.log('user', user)
+  const jwtToken = await user.getIdToken()
+  console.log('user', user, jwtToken)
 
   // Go to sign in
   if (!user) {
     loadSignin()
     return
   }
-
+  /** @type {AppContext} */
+  const context = {
+    authToken: jwtToken
+  }
   // Go to route
   // For now just got to database list
-  showDBPage()
+  showDBPage(context)
 }
 
-async function showDBPage() {
-
+/** @param {AppContext} context */
+async function showDBPage(context) {
   try {
     const module = await import('./pages/database.js');
-    module.init()
+    module.init(context)
   } catch (error) {
     console.error("Error loading module:", error);
   }
@@ -40,7 +43,7 @@ async function showDBPage() {
  * Setup the Auth listener when a user signs in or out. returns the user if signed in
  * @param {function(User)?} onSignedIn 
  * @param {function?} onSignedOut 
- * @returns {User?}
+ * @returns {Promise<User>?}
  */
 const setupAuthState = (auth, onSignedIn, onSignedOut) => {
   return new Promise((resolve, reject) => {
@@ -82,8 +85,8 @@ async function loadSignin() {
           user.email = otherOptions.email
           user.emailVerified = otherOptions.emailVerified
           user.displayName = otherOptions.displayName
-          updateCurrentUser(auth, user)
           console.log('SIGN IN WITH CUSTOMTOKEN', userCredential)
+          return updateCurrentUser(auth, user)
           // ...
         })
         .catch((error) => {

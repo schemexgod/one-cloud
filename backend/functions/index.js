@@ -15,7 +15,7 @@ import { Pool } from 'pg';
 import { Connector } from '@google-cloud/cloud-sql-connector';
 import { format } from "node-pg-format";
 import { dbClient } from "./db/db-connector.js";
-import { createDatabase } from "./db/db-functions.js";
+import { createDatabase, getDatabase } from "./db/db-functions.js";
 import { appOneShot } from "./auth/user-db-admin.js";
 
 // Create and deploy your first functions
@@ -75,20 +75,21 @@ export const dbConnect = onRequest({
   timeoutSeconds: 300,
 },
   async (req, res) => {
-    const route = req.body.endpoint
+    const route = req.query.endpoint
     if (!route) {
       return res.status(404).json({ error: 'Endpoint not found' })
     }
 
     const reqMethod = req.method.toUpperCase()
-    
+
     switch (route) {
       case 'create-db':
         if (reqMethod != 'POST') {
           return res.status(405).json({ error: 'Must use POST method to create db' })
         }
-
         return createDatabase(req, res)
+      case 'get-db':
+        return getDatabase(req, res)
     }
   })
 

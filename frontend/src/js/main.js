@@ -2,7 +2,7 @@ import { initializeApp } from "@firebase/app";
 import { getFirestore, collection, getDocs } from "@firebase/firestore";
 import { getAuth, onAuthStateChanged, signInWithCustomToken, updateCurrentUser } from "firebase/auth";
 import { appOneShot } from "./constants.js";
-
+/*
 // Initialize Firebase
 const app = appOneShot
 
@@ -76,3 +76,5 @@ async function loadSignin() {
     }
 }
 
+
+*/
