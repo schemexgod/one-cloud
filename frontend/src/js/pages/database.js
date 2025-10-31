@@ -52,7 +52,7 @@ async function getDatabases(authToken) {
   console.log('authToken', authToken)
 
   // const testEndPoint = 'https://us-central1-oneshot-c5e23.cloudfunctions.net/dbConnect'
-  const testEndPoint = 'http://127.0.0.1:5001/oneshot-c5e23/us-central1/dbConnect?endpoint=get-db'
+  const testEndPoint = 'http://127.0.0.1:5001/oneshot-c5e23/us-central1/userAdmin/db'
 
   try {
     // Fetch DB list

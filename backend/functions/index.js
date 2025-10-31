@@ -69,27 +69,39 @@ const verifyToken = async (jwtToken) => {
   return await authOneShot.createCustomToken(uid, { email: decodedToken.email, emailVerified: decodedToken.email_verified });
 }
 
-
-export const dbConnect = onRequest({
+/**
+ * All functions for User's Admin of their projects and account. (ex: CRUD Dataabase, Auth, Storage)
+ */
+export const userAdmin = onRequest({
   cors: '*',
   timeoutSeconds: 300,
 },
   async (req, res) => {
-    const route = req.query.endpoint
-    if (!route) {
-      return res.status(404).json({ error: 'Endpoint not found' })
+    let path = req.path
+    if (path.startsWith('/')) {
+      path = path.slice(1)
     }
-
+    const pathParts = path.split('/')
+    const rootEndpoint = pathParts[0]
     const reqMethod = req.method.toUpperCase()
 
-    switch (route) {
-      case 'create-db':
-        if (reqMethod != 'POST') {
-          return res.status(405).json({ error: 'Must use POST method to create db' })
+    switch (rootEndpoint) {
+      case 'db':
+
+        const dbId = pathParts[1]
+
+        // If no DB specified then get all databases or create one
+        if (!dbId) {
+          switch (reqMethod) {
+            case 'POST':
+              return createDatabase(req, res)
+            case 'GET':
+              return getDatabase(req, res)
+          }
         }
-        return createDatabase(req, res)
-      case 'get-db':
-        return getDatabase(req, res)
+
     }
+
+    return res.status(404).json({ error: 'Endpoint not found' })
   })
 
