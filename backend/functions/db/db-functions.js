@@ -116,3 +116,40 @@ export const getDatabase = async (req, res) => {
     client.release()
   }
 }
+
+export const deleteDatabase = async (req, res) => {
+  // MUST be signed in
+  const user = await getUserOrFail(req, res)
+  if (!user) { return }
+
+  /** @type {GetDBBody} */
+  const reqBody = req.query
+  const dbIds = reqBody?.ids?.split(',')
+
+  // Check if array of ids
+  if (!Array.isArray(dbIds)) {
+    return
+  }
+
+  // Get All DBs
+  const client = await dbClient('app', user.uid)
+
+  for (const dbId of dbIds) {
+    try {
+      const { rows } = await client.query("DELETE FROM user_databases WHERE user_id=auth.uid() AND id='$1'", [dbId]);
+      if(rows[0])
+      res.status(200)
+        .json({
+          data: rows,
+        })
+    } catch (error) {
+      const errorCode = error?.code
+      res.status(errorCode ?? 500)
+        .json({ error: error })
+      return
+    }
+    finally {
+      client.release()
+    }
+  }
+}

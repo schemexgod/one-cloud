@@ -1,3 +1,15 @@
+### NEW backend play cloud ###
+
+NOTE:
+In the future we may want to use Docker containers to contain each users project environment and resources for their DB, Auth, Functions, etc
+For sake of speed, we are just going to handle each service separately and wrap around existing GCP services
+
+ 
+
+ #### OLD one shot Notes ###
+ 
+ 
+ 
  Some Notes for prompting and templating and all ideas to build OneShot
 
 
