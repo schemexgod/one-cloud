@@ -60,20 +60,27 @@ export const appOneShot = () => {
  * @returns {Promise<UserRecord>} returns the current user id
  */
 export const getUser = async (req, res) => {
+  let place = 0
   try {
     const authorizationHeader = req.headers?.authorization;
     const idToken = authorizationHeader?.split('Bearer ')?.[1];
+    place = '1-' + idToken
     if (!idToken) {
       throw new AppError('Authentication required. Please provide a valid Bearer token.', 401)
     }
 
     const authOneShot = getAuth(appOneShot())
+    place = '2-' + authOneShot
     const decodedToken = await authOneShot.verifyIdToken(idToken)
+    place = '3-' + decodedToken
     const uid = decodedToken.uid;
+    place = '4-' + uid
     const user = await authOneShot.getUser(uid)
+    place = '5-' + user
     return user
 
   } catch (error) {
+    res.json({ dddd: place })
     throw new AppError("Authentication failed.", 401)
   }
 }
