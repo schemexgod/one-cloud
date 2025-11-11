@@ -1,11 +1,4 @@
-import { initializeApp } from "firebase-admin/app";
-import admin from "firebase-admin";
-import { AppError } from "../common/AppError.js";
-import { getAuth, UserRecord } from "firebase-admin/auth";
-import { readFileSync } from "fs"
-import path from "path";
-
-const credJson = {
+{
   "type": "service_account",
   "project_id": "oneshot-c5e23",
   "private_key_id": "3c4c440ad68b19c8d87fa98723b7fb1188528f20",
@@ -17,78 +10,4 @@ const credJson = {
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40oneshot-c5e23.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
-};
-
-let credJson2
-
-const getCreds = () => {
-  if (credJson2) {
-    return credJson2
-  }
-
-  try {
-    const credPath = path.join(process.cwd(), process.env.PLAY_CLOUD_CRED_PATH)
-    const data = readFileSync(credPath, 'utf8');
-
-    if (typeof data === 'string') {
-      const json = JSON.parse(data)
-      credJson2 = json
-    }
-
-  } catch (err) {
-
-  }
-}
-
-let app
-export const appOneShot = () => {
-  if (app) {
-    return app
-  }
-  app = initializeApp({ credential: admin.credential.cert(getCreds()) },
-    'oneshot'
-  );
-  return app
-
-}
-
-
-/**
- * Checks auth
- * @param {Request} req 
- * @param {Response} res 
- * @returns {Promise<UserRecord>} returns the current user id
- */
-export const getUser = async (req, res) => {
-  try {
-    const authorizationHeader = req.headers?.authorization;
-    const idToken = authorizationHeader?.split('Bearer ')?.[1];
-    if (!idToken) {
-      throw new AppError('Authentication required. Please provide a valid Bearer token.', 401)
-    }
-
-    const authOneShot = getAuth(appOneShot())
-    const decodedToken = await authOneShot.verifyIdToken(idToken)
-    const uid = decodedToken.uid;
-    const user = await authOneShot.getUser(uid)
-    return user
-
-  } catch (error) {
-    throw new AppError("Authentication failed.", 401)
-  }
-}
-
-/**
- * Checks auth and returns the user object. If not signed in then it will set the response status to an error code and output a json error message, and return undefined
- * @param {Request} req 
- * @param {Response} res 
- * @returns {Promise<UserRecord> | undefined} returns the current user or undefined
- */
-export const getUserOrFail = async (req, res) => {
-  try {
-    return await getUser(req, res)
-  } catch (error) {
-    res.status(error.code ?? 500).json({ error: error.message })
-    return
-  }
 }

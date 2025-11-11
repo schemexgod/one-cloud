@@ -17,6 +17,8 @@ import { format } from "node-pg-format";
 import { dbClient } from "./db/db-connector.js";
 import { createDatabase, getDatabase } from "./db/db-functions.js";
 import { appOneShot } from "./auth/user-db-admin.js";
+import { readFileSync } from "fs";
+import path from "path";
 
 // Create and deploy your first functions
 // https://firebase.google.com/docs/functions/get-started
@@ -61,7 +63,7 @@ const verifyToken = async (jwtToken) => {
   }
 
   const authPlay = getAuth(appPlayAuth);
-  const authOneShot = getAuth(appOneShot);
+  const authOneShot = getAuth(appOneShot());
 
   const decodedToken = await authPlay
     .verifyIdToken(jwtToken);
@@ -77,11 +79,26 @@ export const userAdmin = onRequest({
   timeoutSeconds: 300,
 },
   async (req, res) => {
-    let path = req.path
-    if (path.startsWith('/')) {
-      path = path.slice(1)
+    // const credPath = path.join(process.cwd(), process.env.PLAY_CLOUD_CRED_PATH)
+    // try {
+    //   const data = readFileSync(credPath, 'utf8');
+    //   if (!typeof data === 'string') {
+    //     return
+    //   }
+    //   const json = JSON.parse(data)
+    //   // credJson = json
+    //       return res.status(200).json({ json});
+
+    // } catch (err) {
+    //   res.status(200).json({ dir: process.cwd(), path: process.env.PLAY_CLOUD_CRED_PATH, credPath: credPath, error: err });
+    // }
+
+    // return res.status(200).json({ dir: process.cwd(), path: process.env.PLAY_CLOUD_CRED_PATH });
+    let reqPath = req.path
+    if (reqPath.startsWith('/')) {
+      reqPath = reqPath.slice(1)
     }
-    const pathParts = path.split('/')
+    const pathParts = reqPath.split('/')
     const rootEndpoint = pathParts[0]
     const reqMethod = req.method.toUpperCase()
 
@@ -96,6 +113,8 @@ export const userAdmin = onRequest({
             case 'POST':
               return createDatabase(req, res)
             case 'GET':
+              return getDatabase(req, res)
+            case 'DELETE':
               return getDatabase(req, res)
           }
         }
