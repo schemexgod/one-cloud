@@ -66,7 +66,7 @@ export const getUser = async (req, res) => {
     return user
 
   } catch (error) {
-    res.json({ dddd: process.env.PLAY_CLOUD_CRED_PATH })
+    // res.json({ dddd: process.env.PLAY_CLOUD_CRED_PATH , place })
     throw new AppError("Authentication failed.", 401)
   }
 }

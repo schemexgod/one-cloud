@@ -66,7 +66,10 @@ async function getDatabases(authToken) {
 
     // Http error
     if (!resp.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if(resp.status == 401) {
+        // window.location.reload()
+      }
+      throw new Error(`HTTP error! status: ${resp.json()}`);
     }
 
     // Show list
