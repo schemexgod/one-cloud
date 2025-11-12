@@ -16,6 +16,10 @@ const init = async () => {
   console.log('user', user, jwtToken)
 
   // Go to sign in
+  const route = location.pathname
+  if (route == '/signout') {
+    auth.signOut()
+  }
   if (!user) {
     loadSignin(auth)
     return

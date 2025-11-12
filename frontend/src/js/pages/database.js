@@ -67,7 +67,7 @@ async function getDatabases(authToken) {
     // Http error
     if (!resp.ok) {
       if(resp.status == 401) {
-        // window.location.reload()
+        window.location = '/signout'
       }
       throw new Error(`HTTP error! status: ${resp.json()}`);
     }
