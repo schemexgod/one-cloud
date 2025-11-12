@@ -3,8 +3,10 @@ import { generateId } from "../common/security-utils.js";
 import { dbClient } from "./db-connector.js";
 import { format } from "node-pg-format";
 import { Client, Pool } from "pg"
-import { appOneShot, getUser, getUserOrFail } from "../auth/user-db-admin.js";
+import { getAppOneShot, getUser, getUserOrFail } from "../auth/user-db-admin.js";
 import { AppError } from "../common/AppError.js";
+import { readFileSync } from "fs"
+
 /** 
  * @typedef CreateDBBody
  * @property {string} displayName
@@ -99,21 +101,24 @@ export const getDatabase = async (req, res) => {
   }
 
   // Get All DBs
-  const client = await dbClient('app', user.uid)
+  let client
   try {
+    client = await dbClient('app', user.uid)
     const { rows } = await client.query('SELECT * FROM user_databases WHERE user_id=auth.uid()');
     res.status(200)
       .json({
         data: rows,
       })
   } catch (error) {
-    const errorCode = error?.code
-    res.status(errorCode ?? 500)
-      .json({ error: error })
-    return
+    const errorCode = error?.code ?? 500
+    if(error instanceof Error) {
+      return res.status(errorCode).json({error: error.message ?? 'Unknown connection error'})
+    }
+    return res.status(errorCode ?? 500)
+      .json({ error: error ?? 'Unknown connection error' })
   }
   finally {
-    client.release()
+    client?.release()
   }
 }
 
@@ -137,7 +142,9 @@ export const deleteDatabase = async (req, res) => {
   for (const dbId of dbIds) {
     try {
       const { rows } = await client.query("DELETE FROM user_databases WHERE user_id=auth.uid() AND id='$1'", [dbId]);
-      if(rows[0])
+      if (rows[0]) {
+        const { rows } = await client.query("DELETE FROM user_databases WHERE user_id=auth.uid() AND id='$1'", [dbId]);
+      }
       res.status(200)
         .json({
           data: rows,
@@ -152,4 +159,12 @@ export const deleteDatabase = async (req, res) => {
       client.release()
     }
   }
+}
+function isPlainObject(value) {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.prototype.toString.call(value) === '[object Object]'
+  );
 }

@@ -16,7 +16,7 @@ import { Connector } from '@google-cloud/cloud-sql-connector';
 import { format } from "node-pg-format";
 import { dbClient } from "./db/db-connector.js";
 import { createDatabase, getDatabase } from "./db/db-functions.js";
-import { appOneShot } from "./auth/user-db-admin.js";
+import { getAppOneShot } from "./auth/user-db-admin.js";
 import { readFileSync } from "fs";
 import path from "path";
 
@@ -63,7 +63,7 @@ const verifyToken = async (jwtToken) => {
   }
 
   const authPlay = getAuth(appPlayAuth);
-  const authOneShot = getAuth(appOneShot());
+  const authOneShot = getAuth(getAppOneShot());
 
   const decodedToken = await authPlay
     .verifyIdToken(jwtToken);
@@ -76,24 +76,9 @@ const verifyToken = async (jwtToken) => {
  */
 export const userAdmin = onRequest({
   cors: '*',
-  timeoutSeconds: 300,
+  timeoutSeconds: 300
 },
   async (req, res) => {
-    // const credPath = path.join(process.cwd(), process.env.PLAY_CLOUD_CRED_PATH)
-    // try {
-    //   const data = readFileSync(credPath, 'utf8');
-    //   if (!typeof data === 'string') {
-    //     return
-    //   }
-    //   const json = JSON.parse(data)
-    //   // credJson = json
-    //       return res.status(200).json({ json});
-
-    // } catch (err) {
-    //   res.status(200).json({ dir: process.cwd(), path: process.env.PLAY_CLOUD_CRED_PATH, credPath: credPath, error: err });
-    // }
-
-    // return res.status(200).json({ dir: process.cwd(), path: process.env.PLAY_CLOUD_CRED_PATH });
     let reqPath = req.path
     if (reqPath.startsWith('/')) {
       reqPath = reqPath.slice(1)
@@ -123,4 +108,3 @@ export const userAdmin = onRequest({
 
     return res.status(404).json({ error: 'Endpoint not found' })
   })
-

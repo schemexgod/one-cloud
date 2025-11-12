@@ -1,6 +1,8 @@
 
 import { Connector } from '@google-cloud/cloud-sql-connector';
 import { Pool } from 'pg';
+import { readFileSync } from "fs"
+
 // import { Connector } from '@google-cloud/cloud-sql-connector';
 
 /** @type {Object.<string, Pool>} */
@@ -13,31 +15,65 @@ let dbPool = {}
  * @returns {Promise<PoolClient>}
  */
 export const dbClient = async (dbId = 'app', uid) => {
+
   let pool = dbPool[dbId]
   if (pool) {
     return configClient(await pool.connect(), uid)
   }
+  let creds = _getCreds()
+  let temp = {
+      ...creds,
+      // user: 'postgres',
+      // password: 'Oneshot123!',
+      // host: '10.124.144.3', // Private IP of your Cloud SQL instance
+      database: dbId,
+      port: 5432,
+    }
+    let prog = 0
+  try {
+    const connector = new Connector()
+    const clientOpts = await connector.getOptions({
+      instanceConnectionName: 'oneshot-c5e23:us-central1:one-shot',
+      authType: 'PASSWORD',
+    });
+prog = 1
+    // TODO: Put credentials in google secrets
+    pool = new Pool({
+      ...clientOpts,
+      ..._getCreds(),
+      // user: 'postgres',
+      // password: 'Oneshot123!',
+      // host: '10.124.144.3', // Private IP of your Cloud SQL instance
+      database: dbId,
+      port: 5432,
+    });
+    prog = 2
+    dbPool[dbId] = pool
+    const _cli = await pool.connect()
+    prog = 3
+    return configClient(_cli, uid)
+  } catch (error) {
+    throw new Error(JSON.stringify(temp) + '-' + JSON.stringify(creds))
+  }
 
-  const connector = new Connector()
-  const clientOpts = await connector.getOptions({
-    instanceConnectionName: 'oneshot-c5e23:us-central1:one-shot',
-    authType: 'PASSWORD'
-  });
-
-  // TODO: Put credentials in google secrets
-  pool = new Pool({
-    ...clientOpts,
-    user: 'postgres',
-    password: 'Oneshot123!',
-    // host: '10.124.144.3', // Private IP of your Cloud SQL instance
-    database: dbId,
-    port: 5432,
-  });
-  dbPool[dbId] = pool
-
-  return configClient(await pool.connect(), uid)
 }
-
+/**
+ * Gets the PlayCloud Postgres Credentials
+ * @returns {object} Credential object
+ */
+const _getCreds = () => {
+  try {
+    const credPath = process.env.PLAY_CLOUD_POSTGRES_PATH
+    const data = readFileSync(credPath, 'utf8');
+    if (typeof data === 'string') {
+      const json = JSON.parse(data)
+      return json
+    }
+  } catch (err) {
+    return {error: err.message ?? 'whooo'}
+   }
+  return {}
+}
 /**
  * 
  * @param {PoolClient} client 

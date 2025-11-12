@@ -12,12 +12,12 @@ const init = async () => {
   // Check if signed in
   const auth = getAuth(fbaseApp);
   const user = await setupAuthState(auth)
-  const jwtToken = await user.getIdToken()
+  const jwtToken = await user?.getIdToken()
   console.log('user', user, jwtToken)
 
   // Go to sign in
   if (!user) {
-    loadSignin()
+    loadSignin(auth)
     return
   }
   /** @type {AppContext} */
@@ -73,7 +73,7 @@ if (document.readyState === "loading") {
 
 
 // REMOVE ME LATER
-async function loadSignin() {
+async function loadSignin(auth) {
   try {
     const module = await import('./signin/signin.js');
     module.showSignInOptions((token, otherOptions) => {
