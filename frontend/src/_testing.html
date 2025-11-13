@@ -4,7 +4,22 @@
 <head>
   <title>Oneshot - TESTING</title>
   <meta charset="UTF-8">
-  <script type="module" src="js/PlayUIFramework/View.js"></script>
+  <script type="module">
+    import { DatabasePage } from "./js/pages/database.js";
+    const init = () => {
+      const dbPage = new DatabasePage()
+      if (dbPage.domEl?.length) {
+        document.body.append(...dbPage.domEl)
+      } else {
+        document.body.append(dbPage.domEl)
+      }
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  </script>
 </head>
 
 <body>

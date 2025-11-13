@@ -1,8 +1,52 @@
-import { View } from "../PlayUIFramework/View";
+import { view, View } from "../PlayUIFramework/View";
 
 
 export class DatabasePage extends View {
   render(props) {
     super.render(props)
+  }
+
+  loadTemplate() {
+    super.loadTemplate`
+      <style>
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+          font-family: Arial, Helvetica, sans-serif;
+          user-select: none;
+        }
+
+        .list {
+          display: flex;
+          flex-direction: column;
+          padding: 5px;
+          list-style-type: none;
+          margin: 0;
+        }
+
+        .list .row {
+          display: flex;
+          flex-direction: row;
+          padding: 5px 15px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+        }
+
+        .list .row>* {
+          flex-grow: 1;
+        }
+      </style>
+
+      <section id="db-section">
+        <h1>Databases</h1>
+        <div>${'title'}</div>
+        <ul class="list">
+        ${
+          view`<li class="row">Database 1</li>`
+        }
+        </ul>
+      </section>
+`
+    this.render()
   }
 }

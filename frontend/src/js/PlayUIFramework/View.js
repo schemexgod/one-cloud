@@ -41,6 +41,10 @@ export class View {
 
   #_didCompile = false
 
+  constructor() {
+    this.loadTemplate`<div></div>`
+  }
+
   /**
    * Updates the view with the given props
    * @param {object} props Object to use for updating the DOM ELement
@@ -59,6 +63,7 @@ export class View {
    * @returns {View}
    */
   loadTemplate(stringParts, ...valueParts) {
+    console.log('stringParts', stringParts)
     stringParts = stringParts.slice(0)
 
     // Save the template values
@@ -72,7 +77,7 @@ export class View {
 
     // Create the node
     let newNode = _templateHolder.content.cloneNode(true)
-    
+
     // Loop through DocumentFragment and create the update functions
     this.#_buildUpdateFuncs(newNode)
 
@@ -168,34 +173,33 @@ export class View {
 
       // Check if this was for a function value
       const funcVal = this.#_indexToTemplateValue[index]
-      if (typeof funcVal === 'function') {
-        let initialVal = funcVal()
 
-        if (initialVal instanceof View) {
-          return {
-            index: index + 1,
-            func: (parms) => {
-              initialVal.loadTemplate(parms)
-              return initialVal.domEl
-            }
+      if (funcVal instanceof View) {
+        return {
+          index: index + 1,
+          func: (parms) => {
+            funcVal.render(parms)
+            return funcVal.domEl
           }
         }
+      }
+      else if(typeof funcVal === 'function') {
 
         // IF its a string lets create the dom elements
         // TODO: change logic so if its a string it is treated like string text content NOT compiled into html
-        if (typeof initialVal === 'string') {
-          initialVal = `<template>${initialVal}</template>`
-          _templateHolder.insertAdjacentHTML('beforeend', initialVal)
+        // if (typeof funcVal === 'string') {
+        //   funcVal = `<template>${funcVal}</template>`
+        //   _templateHolder.insertAdjacentHTML('beforeend', funcVal)
 
-          // Create the node
-          const newNode = _templateHolder.lastElementChild.content.cloneNode(true)
-          return {
-            index: index + 1,
-            func: (parms) => {
-              return newNode
-            }
-          }
-        }
+        //   // Create the node
+        //   const newNode = _templateHolder.lastElementChild.content.cloneNode(true)
+        //   return {
+        //     index: index + 1,
+        //     func: (parms) => {
+        //       return newNode
+        //     }
+        //   }
+        // }
 
         return {
           index: index + 1,
@@ -223,7 +227,7 @@ export class View {
             const keyName = this.#_indexToTemplateValue[index + i]
             fullStr += parts[i]
             if (keyName) {
-              fullStr += parms[keyName] ?? ''
+              fullStr += parms?.[keyName] ?? ''
             }
           }
           fullStr += parts[parts.length - 1]
