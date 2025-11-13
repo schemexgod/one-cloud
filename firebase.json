@@ -48,9 +48,9 @@
       "port": 4000
     },
     "singleProjectMode": true,
-    "auth": {
-      "port": 9099
-    },
+    // "auth": {
+    //   "port": 9099
+    // },
     "hosting": {
       "port": 5002
     }
