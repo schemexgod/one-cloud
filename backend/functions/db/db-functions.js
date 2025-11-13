@@ -5,7 +5,6 @@ import { format } from "node-pg-format";
 import { Client, Pool } from "pg"
 import { getAppOneShot, getUser, getUserOrFail } from "../auth/user-db-admin.js";
 import { AppError } from "../common/AppError.js";
-import { readFileSync } from "fs"
 
 /** 
  * @typedef CreateDBBody
