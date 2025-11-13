@@ -2,12 +2,15 @@ import { view, View } from "../PlayUIFramework/View";
 
 
 export class DatabasePage extends View {
+  constructor() {
+    super()
+  }
   render(props) {
     super.render(props)
   }
 
-  loadTemplate() {
-    super.loadTemplate`
+  compileTemplate() {
+    super.compileTemplate`
       <style>
         body,
         html {

@@ -1,35 +1,9 @@
-/** 
- * Used for temporarily creating DOM elements from template strings
- * @type {HTMLTemplateElement} 
- */
-const _templateHolder = document.createElement('template')
-
-/**
- * Helper that builds a View from a template literal
- * @param {[string]} strings 
- * @param  {...(string | View)} values 
- * @returns {View}
- */
-export function view(strings, ...values) {
-  return (new View()).compileTemplate(strings, ...values)
-}
-export class View {
-  static compiler = new TemplateCompiler``
-
-  constructor() {
-    this.compileTemplate`<div></div>`
-  }
-}
-
-/**
- * View Model that represents a DOM element
- */
-export class View2 {
+export class TemplateCompiler {
   /** 
-   * The DOM element or elements associated with this View
-   * @type {HTMLElement? | [HTMLElement]?}
+   * Used for creating DOM elements from template strings
+   * @type {HTMLTemplateElement} 
    */
-  domEl
+  #_templateHolder = document.createElement('template')
   /** 
    * Used to find and replace values in the View template
    * @type {string} 
@@ -46,22 +20,22 @@ export class View2 {
    */
   #_indexToTemplateValue = {}
 
-  #_didCompile = false
-
-  constructor() {
-    this.compileTemplate`<div></div>`
-  }
-
   /**
-   * Updates the view with the given props
-   * @param {object} props Object to use for updating the DOM ELement
-   * @returns {View}
+   * Create a new DOM element(s) from the template
+   * @returns {HTMLElement | [HTMLElement]}
    */
-  render(props) {
-    this.#_indexToUpdateFunc.forEach((callback) => {
-      callback(props)
-    })
-    return this
+  createView() {
+    let newView = this.#_templateHolder.content
+    if (newView.childNodes.length == 1) {
+      newView = newView.childNodes[0]
+    } else {
+      let arr = []
+      newView.childNodes.forEach((node) => {
+        arr.push(node)
+      })
+      newView = arr
+    }
+    return newView
   }
 
   /**
@@ -69,7 +43,7 @@ export class View2 {
    * @param {[string]} stringParts 
    * @returns {View}
    */
-  compileTemplate(stringParts, ...valueParts) {
+  compile(stringParts, valueParts) {
     console.log('stringParts', stringParts)
     stringParts = stringParts.slice(0)
 
@@ -80,35 +54,34 @@ export class View2 {
     const newStr = stringParts.join(this.#_stringSeparator)
 
     // Load new HTML String into our temporary template holder
-    _templateHolder.innerHTML = newStr
+    this.#_templateHolder.innerHTML = newStr
 
     // Create the node
-    let newNode = _templateHolder.content.cloneNode(true)
+    let newNode = this.#_templateHolder.content// this.#_templateHolder.content.cloneNode(true)
 
     // Loop through DocumentFragment and create the update functions
     this.#_buildUpdateFuncs(newNode)
 
     // Set the DOM Element(s) to the model
-    if (newNode.childNodes.length == 1) {
-      newNode = newNode.childNodes[0]
-    } else {
-      let arr = []
-      newNode.childNodes.forEach((node) => {
-        arr.push(node)
-      })
-      newNode = arr
-    }
+    // if (newNode.childNodes.length == 1) {
+    //   newNode = newNode.childNodes[0]
+    // } else {
+    //   let arr = []
+    //   newNode.childNodes.forEach((node) => {
+    //     arr.push(node)
+    //   })
+    //   newNode = arr
+    // }
 
-    this.domEl = newNode
+    // this.domEl = newNode
 
     return this
   }
-
   /**
-   * Recursively builds the View functions needed to render/update the DOM 
-   * @param {Node} node The Node to process
-   * @param {Int} index the index of the Values from the View template
-   */
+  * Recursively builds the View functions needed to render/update the DOM 
+  * @param {Node} node The Node to process
+  * @param {Int} index the index of the Values from the View template
+  */
   #_buildUpdateFuncs(node, index = 0) {
 
     // Editing HTML Element content
@@ -167,7 +140,7 @@ export class View2 {
 
     return index
   }
-/**
+  /**
  * 
  * @param {string} textToCheck 
  * @param {Int} index 
@@ -190,7 +163,7 @@ export class View2 {
           }
         }
       }
-      else if(typeof funcVal === 'function') {
+      else if (typeof funcVal === 'function') {
 
         // IF its a string lets create the dom elements
         // TODO: change logic so if its a string it is treated like string text content NOT compiled into html
@@ -243,18 +216,4 @@ export class View2 {
       }
     }
   }
-}
-
-
-/**
- * NOT USING NOW
- * @param {string} str 
- */
-function convertStringLiteralToTemplate(str) {
-  let stringParts = []
-  let values = []
-  let currentPos = 0
-  str.matchAll(/\$\{([^}]+)\}/g).forEach((curMatch) => {
-    // curMatch.index
-  })
 }
