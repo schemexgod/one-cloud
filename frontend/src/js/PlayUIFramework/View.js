@@ -152,7 +152,7 @@ export class View {
           }
           // Update View
           else if (valuePart instanceof View) {
-            if (valuePart.domEl.length) {
+            if (Array.isArray(valuePart.domEl)) {
               newChildren.push(...valuePart.domEl)
             } else {
               newChildren.push(valuePart.domEl)
