@@ -13,18 +13,18 @@ const _templateHolder = document.createElement('template')
 export function view(strings, ...values) {
   return (new View()).compileTemplate(strings, ...values)
 }
-export class View {
-  static compiler = new TemplateCompiler``
+// export class View {
+//   static compiler = new TemplateCompiler``
 
-  constructor() {
-    this.compileTemplate`<div></div>`
-  }
-}
+//   constructor() {
+//     this.compileTemplate`<div></div>`
+//   }
+// }
 
 /**
  * View Model that represents a DOM element
  */
-export class View2 {
+export class View {
   /** 
    * The DOM element or elements associated with this View
    * @type {HTMLElement? | [HTMLElement]?}
@@ -113,31 +113,86 @@ export class View2 {
 
     // Editing HTML Element content
     if (node instanceof Text) {
+      // Parse the text for template placeholders
+      const textToParse = node.textContent
+      const textParts = textToParse.split(this.#_stringSeparator)
+
+      // Check if text had any placeholders
+      if (textParts.length > 1) {
+
+        // New children to insert into the node
+        const newChildren = []
+
+        // Check each part if its a a property or function
+        for (let i = 0; i < textParts.length - 1; i++) {
+          // Create text node for current part
+          const curTextString = textParts[i]
+          const textNode = document.createTextNode(curTextString)
+
+          // Add to new children
+          newChildren.push(textNode)
+
+          // Template placeholder value
+          const valuePart = this.#_indexToTemplateValue[index]
+
+          if (typeof valuePart === 'function') {
+
+          }
+          // Placeholder property name
+          else if (typeof valuePart === 'string') {
+            // Create a text node 
+            const placeholderTextNode = document.createTextNode('')
+            newChildren.push(placeholderTextNode)
+
+            this.#_indexToUpdateFunc.push((props) => {
+              const textValue = props?.[valuePart] ?? ''
+              placeholderTextNode.textContent = textValue
+              return placeholderTextNode
+            })
+          }
+          // Update View
+          else if (valuePart instanceof View) {
+            if (valuePart.domEl.length) {
+              newChildren.push(...valuePart.domEl)
+            } else {
+              newChildren.push(valuePart.domEl)
+            }
+            this.#_indexToUpdateFunc.push((props) => {
+              valuePart.render(props)
+              return valuePart
+            })
+          }
+
+          // Increment index
+          index += 1
+        }
+        node.replaceWith(...newChildren)
+      }
 
       // Check if this is for function value
-      const functionUpdateInfo = this.#_createFunctionStringUpdateFunc(node.textContent, index)
-      if (functionUpdateInfo) {
-        const helpFunc = functionUpdateInfo.func
-        index = functionUpdateInfo.index
+      // const functionUpdateInfo = this.#_createFunctionStringUpdateFunc(node.textContent, index)
+      // if (functionUpdateInfo) {
+      //   const helpFunc = functionUpdateInfo.func
+      //   index = functionUpdateInfo.index
 
-        this.#_indexToUpdateFunc.push((params) => {
-          const newStr = helpFunc(params)
-          node.replaceWith(newStr)
-        })
-      }
-      // Normal Value
-      else {
-        const updateInfo = this.#_createBasicStringUpdateFunc(node.textContent, index)
-        if (updateInfo) {
-          const helpFunc = updateInfo.func
-          index = updateInfo.index
-          let cur = this.#_indexToUpdateFunc.length
-          this.#_indexToUpdateFunc.push((params) => {
-            const newStr = helpFunc(params)
-            node.textContent = newStr
-          })
-        }
-      }
+      //   this.#_indexToUpdateFunc.push((params) => {
+      //     const newStr = helpFunc(params)
+      //     node.replaceWith(newStr)
+      //   })
+      // }
+      // // Normal Value
+      // else {
+      //   const updateInfo = this.#_createBasicStringUpdateFunc(node.textContent, index)
+      //   if (updateInfo) {
+      //     const helpFunc = updateInfo.func
+      //     index = updateInfo.index
+      //     let cur = this.#_indexToUpdateFunc.length
+      //     this.#_indexToUpdateFunc.push((params) => {
+      //       const newStr = helpFunc(params)
+      //       node.textContent = newStr
+      //     })
+      //   }
+      // }
 
     }
     // Editing HTML Element Attribute
@@ -167,12 +222,12 @@ export class View2 {
 
     return index
   }
-/**
- * 
- * @param {string} textToCheck 
- * @param {Int} index 
- * @returns {{index: Int, func: (parms: [any]) => string}? }
- */
+  /**
+   * 
+   * @param {string} textToCheck 
+   * @param {Int} index 
+   * @returns {{index: Int, func: (parms: [any]) => string}? }
+   */
   #_createFunctionStringUpdateFunc(textToCheck, index) {
     const parts = textToCheck.split(this.#_stringSeparator)
     if (parts.length > 1) {
@@ -190,7 +245,7 @@ export class View2 {
           }
         }
       }
-      else if(typeof funcVal === 'function') {
+      else if (typeof funcVal === 'function') {
 
         // IF its a string lets create the dom elements
         // TODO: change logic so if its a string it is treated like string text content NOT compiled into html

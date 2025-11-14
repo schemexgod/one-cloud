@@ -42,7 +42,7 @@ export class DatabasePage extends View {
 
       <section id="db-section">
         <h1>Databases</h1>
-        <div>${'title'}</div>
+        <div>${'title'} ${view`<span class="row">inline view</span>`}</div>
         <ul class="list">
         ${
           view`<li class="row">Database 1</li>`

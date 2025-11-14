@@ -8,17 +8,40 @@
     import { DatabasePage } from "./js/pages/database.js";
     const init = () => {
       const dbPage = new DatabasePage()
+      dbPage.render({ title: 'my title' })
       if (dbPage.domEl?.length) {
         document.body.append(...dbPage.domEl)
       } else {
         document.body.append(dbPage.domEl)
       }
+      window.dbPage = dbPage
+
     }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", init);
     } else {
       init();
     }
+    // const templ = document.createElement('template')
+    // templ.innerHTML = '<div style="width: 50px; height: 50px"></div>'
+    // const div = templ.content.querySelector('div')
+
+    // const oldClone = Node.prototype.cloneNode
+    // Node.prototype.cloneNode = (deep) => {
+    //   console.log('--- clone', this)
+    //   const newNode = oldClone.apply(this,deep)
+    //   newNode._playCustom = node._playCustom
+    //   return newNode
+    // }
+    // if (div) {
+    //   console.log('found div', div)
+    //   div._playCustom = () => {
+    //     console.log('play custom worked')
+    //   }
+    // }
+    // let newNode = templ.content.cloneNode(true)
+    // console.log(newNode.childNodes[0]._playCustom?.())
+
   </script>
 </head>
 
