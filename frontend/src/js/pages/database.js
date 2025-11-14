@@ -46,7 +46,14 @@ export class DatabasePage extends View {
         ${view`BEFORE IT`}
 
         <ul class="list">
-        ${view`<li class="row">Database 1</li>`}
+      ${(props) => {
+        let nodes = []
+        for (let i = 0; i < 5; i++) {
+          const newV = view`<li class="row">Database ${'num'} here</li>`.render({num: i})
+          nodes.push(newV)
+        }
+        return nodes
+      }}
         </ul>
       </section>
 `
