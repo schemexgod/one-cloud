@@ -287,3 +287,13 @@ function convertStringLiteralToTemplate(str) {
     // curMatch.index
   })
 }
+
+
+
+/**
+ * NEW ATTEMPT AT VIEW
+ */
+
+export class View2 {
+
+}
