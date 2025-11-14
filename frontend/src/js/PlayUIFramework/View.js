@@ -168,32 +168,6 @@ export class View {
         }
         node.replaceWith(...newChildren)
       }
-
-      // Check if this is for function value
-      // const functionUpdateInfo = this.#_createFunctionStringUpdateFunc(node.textContent, index)
-      // if (functionUpdateInfo) {
-      //   const helpFunc = functionUpdateInfo.func
-      //   index = functionUpdateInfo.index
-
-      //   this.#_indexToUpdateFunc.push((params) => {
-      //     const newStr = helpFunc(params)
-      //     node.replaceWith(newStr)
-      //   })
-      // }
-      // // Normal Value
-      // else {
-      //   const updateInfo = this.#_createBasicStringUpdateFunc(node.textContent, index)
-      //   if (updateInfo) {
-      //     const helpFunc = updateInfo.func
-      //     index = updateInfo.index
-      //     let cur = this.#_indexToUpdateFunc.length
-      //     this.#_indexToUpdateFunc.push((params) => {
-      //       const newStr = helpFunc(params)
-      //       node.textContent = newStr
-      //     })
-      //   }
-      // }
-
     }
     // Editing HTML Element Attribute
     else if (node instanceof HTMLElement) {
