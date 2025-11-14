@@ -6,6 +6,8 @@
  * @returns 
  */
 
+import { View } from "./View";
+
 export const createDomNode = (tag, props, ...children) => {
   // console.log('build1 --', tag, typeof tag, props, children)
 
@@ -13,6 +15,10 @@ export const createDomNode = (tag, props, ...children) => {
     props = props ?? {}
     props.children = children
     tag = tag(props)
+  }
+
+  if (tag instanceof View) {
+    return tag.domEl
   }
 
   if (typeof tag === 'object') {
@@ -35,12 +41,13 @@ export const createDomNode = (tag, props, ...children) => {
     // CSS Classes
     if (key === 'className') { // Handle className for HTML classes
       element.setAttribute('class', value);
-    } 
+    }
     // Event Listeners
     else if (key.startsWith('on') && typeof value === 'function') { // Handle event listeners
       const eventName = key.toLowerCase().substring(2);
+      console.log('adding event', eventName)
       element.addEventListener(eventName, value);
-    } 
+    }
     // Attributes
     else {
       element.setAttribute(key, value);
@@ -64,7 +71,13 @@ export const createDomNode = (tag, props, ...children) => {
 const _processChild = (parent, child, props) => {
 
   // Text Node
-  if (typeof child === 'string' || typeof child === 'number') {
+
+  // Play View
+  if (child instanceof View) {
+    parent.appendChild(child.domEl);
+  }
+  // Text content
+  else if (typeof child === 'string' || typeof child === 'number') {
     parent.appendChild(document.createTextNode(child));
   }
   // Normal Node
@@ -83,6 +96,7 @@ const _processChild = (parent, child, props) => {
     }
   }
 }
+
 
 export const Fragment = (props) => {
   const frag = new DocumentFragment()

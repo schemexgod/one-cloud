@@ -295,5 +295,33 @@ function convertStringLiteralToTemplate(str) {
  */
 
 export class View2 {
+  /** 
+   * The DOM element or elements associated with this View
+   * @type {HTMLElement? | [HTMLElement]?}
+   */
+  domEl
 
+
+
+  /**
+   * Put your View logic here. It shoudl return an HTML Element
+   * @returns {HTMLElement}
+   */
+  compile() {
+
+  }
+  /**
+   * Renders/Updates the dom element
+   * @returns {View2}
+   */
+  render() {
+    
+    return this
+  }
+}
+
+class DBPage extends View2 {
+  compile() {
+    return (<div />)
+  }
 }
