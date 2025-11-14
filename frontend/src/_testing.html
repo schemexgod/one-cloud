@@ -4,17 +4,21 @@
 <head>
   <title>Oneshot - TESTING</title>
   <meta charset="UTF-8">
+  <script type="module" src="./js/pages/testJsx.jsx"></script>
   <script type="module">
-    import { DatabasePage } from "./js/pages/database.js";
+    // import { testJSX } from "./js/pages/testJSX.jsx";
+    // import { jsxToDomNode } from "play-web-ui";
     const init = () => {
-      const dbPage = new DatabasePage()
-      dbPage.render({ title: 'my title' })
-      if (dbPage.domEl?.length) {
-        document.body.append(...dbPage.domEl)
-      } else {
-        document.body.append(dbPage.domEl)
-      }
-      window.dbPage = dbPage
+      // console.log(testJSX)
+      // document.body.appendChild(testJSX)
+      // const dbPage = new DatabasePage()
+      // dbPage.render({ title: 'my title' })
+      // if (dbPage.domEl?.length) {
+      //   document.body.append(...dbPage.domEl)
+      // } else {
+      //   document.body.append(dbPage.domEl)
+      // }
+      // window.dbPage = dbPage
 
     }
     if (document.readyState === "loading") {

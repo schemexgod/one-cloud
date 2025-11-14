@@ -1,4 +1,4 @@
-import { view, View } from "../PlayUIFramework/View";
+import { view, View, jsxToDomNode } from "play-web-ui";
 
 
 export class DatabasePage extends View {
@@ -46,10 +46,10 @@ export class DatabasePage extends View {
         ${view`BEFORE IT`}
 
         <ul class="list">
-      ${(props) => {
+        ${(props) => {
         let nodes = []
         for (let i = 0; i < 5; i++) {
-          const newV = view`<li class="row">Database ${'num'} here</li>`.render({num: i})
+          const newV = view`<li class="row">Database ${'num'} here</li>`.render({ num: i })
           nodes.push(newV)
         }
         return nodes
