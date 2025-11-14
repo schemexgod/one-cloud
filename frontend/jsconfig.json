@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "jsx": "preserve", 
-    "jsxFactory": "jsxToDomNode" 
+    "jsxFactory": "PlayWebUI.createDomNode" ,
+    "jsxFragmentFactory": "PlayWebUI.Fragment"
   }
 }
