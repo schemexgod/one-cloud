@@ -21,6 +21,8 @@ export const testJSX = (
         <TestCustomEl custom-in-prop="fine">ddd</TestCustomEl>
       </div>
 
+      <button className="btn btn-primary">My Button</button>
+
       {() => {
         // Testing loops
         const rNodes = []
