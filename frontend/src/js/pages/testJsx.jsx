@@ -19,7 +19,11 @@ export function testJSX2() {
   let ret
   // try {
   ret = (
-    <button className="btn btn-primary" what="testing name">My Button <span>{prop('what')}</span></button>
+    <>
+      <div> ddd</div>
+
+    </>
+    // <button className="btn btn-primary" what="testing name">My Button {prop('what')}</button>
 
     // <>
     //   <div id="hello2" onClick={(event) => {
@@ -54,5 +58,5 @@ export function testJSX2() {
 
 export const testJSX = new testJSX2()
 
-console.log('testJSX', testJSX)
-document.body.appendChild(testJSX)
+console.log('testJSX', testJSX.domEl)
+document.body.appendChild(testJSX.domEl)

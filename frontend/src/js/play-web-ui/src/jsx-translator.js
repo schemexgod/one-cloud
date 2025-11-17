@@ -1,42 +1,64 @@
 
+import { JsxBindProp, JsxElementInfo } from "./play-types";
 import { view, View } from "./View";
 
 /**
+ * The core JSX factor method. 
+ * Creates a `JsxElementInfo` for each element. 
+ * Creates DOM Elements and heirarchy.
+ * Creates a render function that when called updates the DOM elements based on the based in props object
  * 
- * @param {string | Node} tag 
+ * @param {any} tag 
  * @param {object} props 
  * @param  {...any} children 
- * @returns 
+ * @returns {JsxElementInfo}
  */
 export const createDomNode = (tag, props, ...children) => {
   console.log('build1 --', tag, typeof tag, props, children)
-  console.log('build2 --', Array.from(arguments))
 
+  // Process function
   if (typeof tag === 'function') {
     props = props ?? {}
     props.children = children
     tag = tag(props)
   }
 
-  if (tag instanceof View) {
-    // if (Array.isArray(tag.domEl)) {
-    //   const frag = new DocumentFragment()
-    //   frag.append(...tag.domEl)
-    //   return frag
-    // }
-    return tag.domEl
+  // Figure out the element type
+  if (typeof tag == 'object') {
+    // Already correct
+    if (JsxElementInfo.is(tag)) {
+      // TODO: Check if we need to pass this down to the properties section
+      return tag
+    }
+    // Create update function for binding
+    if (JsxBindProp.is(tag)) {
+      // Element type needs to be a Text Node
+      const domEl = document.createTextNode('')
+      const propKey = tag.key ?? ''
+
+      // Return new info
+      return JsxElementInfo({
+        domEl: domEl,
+        render: (props) => {
+          domEl.textContent = props ?? [propKey] ?? ''
+          return domEl
+        }
+      })
+    }
+
+    // Unknown type of object
+    console.warn('ERROR unsporrted type', tag)
   }
 
-  if (typeof tag === 'object') {
-    return tag
-  }
-
-  if (!typeof tag === 'string') {
-    return
-  }
+  // Continue with default logic
+  if (!(typeof tag === 'string')) { return }
 
   // Create DOM Node
   const element = document.createElement(tag);
+
+  // Return Info
+  /** @type {JsxElementInfo} */
+  const returnInfo = { domEl: element }
 
   // Loop through and process props
   Object.entries(props || {}).forEach(([key, value]) => {
@@ -63,28 +85,27 @@ export const createDomNode = (tag, props, ...children) => {
 
   // Process children and add to DOM Node
   children.flat().forEach(child => {
-    _processChild(element, child, props)
+    _processChild(returnInfo, child, props)
   });
 
-  return element;
+  return JsxElementInfo(returnInfo);
 };
 
 /**
  * Processes the node child value
- * @param {Node} parent 
+ * @param {JsxElementInfo} parent 
  * @param {any} child 
  */
 const _processChild = (parent, child, props) => {
 
   // Text Node
 
-  // Function to make nodes
+  // Function run to check 
   if (typeof child === 'function') {
-    console.log('--child', child, props)
     const result = child(props)
 
     if (Array.isArray(result)) {
-      parent.append(...result);
+      parent.domEl.append(...result);
       return
     }
     else if (result) {
@@ -92,32 +113,49 @@ const _processChild = (parent, child, props) => {
     }
   }
 
-  // Play View
-  if (child instanceof View) {
-
+  // Already correct
+  if (JsxElementInfo.is(child)) {
     if (Array.isArray(child.domEl)) {
-      parent.append(...child.domEl)
+      parent.domEl.append(...child.domEl)
     } else {
-      parent.appendChild(child.domEl);
+      parent.domEl.appendChild(child.domEl);
     }
+  }
+  // Create update function for binding
+  else if (JsxBindProp.is(child)) {
+    // Element type needs to be a Text Node
+    const domEl = document.createTextNode('')
+    const propKey = child.key ?? ''
+
+    // Return new info
+    const childInfo = JsxElementInfo({
+      domEl: domEl,
+      render: (props) => {
+        domEl.textContent = props ?? [propKey] ?? ''
+        return domEl
+      }
+    })
+
+    // Append render logic up
+    parent.domEl.appendChild(domEl);
   }
   // Text content
   else if (typeof child === 'string' || typeof child === 'number') {
-    parent.appendChild(document.createTextNode(child));
+    console.log('-- creating child',child, parent.domEl)
+    parent.domEl.appendChild(document.createTextNode(child));
   }
-  // Normal Node
-  else if (child instanceof Node) {
-    parent.appendChild(child);
-  }
+
 }
 
 
 export const Fragment = (props) => {
   const frag = new DocumentFragment()
+  const returnInfo = JsxElementInfo({ domEl: frag })
   props?.children?.forEach((child) => {
-    _processChild(frag, child)
+    _processChild(returnInfo, child)
   })
-  return frag
+  console.log('final child', returnInfo.children)
+  return returnInfo
 };
 
 export const prop = (name) => {
