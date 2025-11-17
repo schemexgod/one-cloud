@@ -1,3 +1,6 @@
+
+import { view, View } from "./View";
+
 /**
  * 
  * @param {string | Node} tag 
@@ -5,11 +8,9 @@
  * @param  {...any} children 
  * @returns 
  */
-
-import { View } from "./View";
-
 export const createDomNode = (tag, props, ...children) => {
-  // console.log('build1 --', tag, typeof tag, props, children)
+  console.log('build1 --', tag, typeof tag, props, children)
+  console.log('build2 --', Array.from(arguments))
 
   if (typeof tag === 'function') {
     props = props ?? {}
@@ -18,6 +19,11 @@ export const createDomNode = (tag, props, ...children) => {
   }
 
   if (tag instanceof View) {
+    // if (Array.isArray(tag.domEl)) {
+    //   const frag = new DocumentFragment()
+    //   frag.append(...tag.domEl)
+    //   return frag
+    // }
     return tag.domEl
   }
 
@@ -72,9 +78,28 @@ const _processChild = (parent, child, props) => {
 
   // Text Node
 
+  // Function to make nodes
+  if (typeof child === 'function') {
+    console.log('--child', child, props)
+    const result = child(props)
+
+    if (Array.isArray(result)) {
+      parent.append(...result);
+      return
+    }
+    else if (result) {
+      child = result
+    }
+  }
+
   // Play View
   if (child instanceof View) {
-    parent.appendChild(child.domEl);
+
+    if (Array.isArray(child.domEl)) {
+      parent.append(...child.domEl)
+    } else {
+      parent.appendChild(child.domEl);
+    }
   }
   // Text content
   else if (typeof child === 'string' || typeof child === 'number') {
@@ -83,17 +108,6 @@ const _processChild = (parent, child, props) => {
   // Normal Node
   else if (child instanceof Node) {
     parent.appendChild(child);
-  }
-  // Function to make nodes
-  else if (typeof child === 'function') {
-    const result = child(props)
-
-    if (Array.isArray(result)) {
-      parent.append(...result);
-    }
-    else if (result) {
-      parent.appendChild(result);
-    }
   }
 }
 
@@ -105,3 +119,9 @@ export const Fragment = (props) => {
   })
   return frag
 };
+
+export const prop = (name) => {
+  return (props) => {
+    return props[name] ?? 'cant find'
+  }
+}

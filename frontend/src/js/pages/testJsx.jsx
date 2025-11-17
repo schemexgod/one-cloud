@@ -1,4 +1,5 @@
 import PlayWebUI from 'play-web-ui'
+import { prop } from '../play-web-ui'
 
 const TestCustomEl = (innProps) => {
   return (
@@ -15,32 +16,40 @@ const TestCustomEl = (innProps) => {
 
 export function testJSX2() {
   console.log('this', this)
-  return (
-    <>
-      <div id="hello2" onClick={(event) => {
-        /** @type {HTMLElement} */
-        const el = event.target
-        el.style.backgroundColor = 'red'
-        console.log('event', event, event.target, event.currentTarget)
-      }}>
-        <span>ttddd</span>
-        <div>
-          <TestCustomEl custom-in-prop="fine">ddd</TestCustomEl>
-        </div>
+  let ret
+  // try {
+  ret = (
+    <button className="btn btn-primary" what="testing name">My Button <span>{prop('what')}</span></button>
 
-        <button className="btn btn-primary">My Button</button>
+    // <>
+    //   <div id="hello2" onClick={(event) => {
+    //     /** @type {HTMLElement} */
+    //     const el = event.target
+    //     el.style.backgroundColor = 'red'
+    //     console.log('event', event, event.target, event.currentTarget)
+    //   }}>
+    //     <span>ttddd</span>
+    //     <div>
+    //       <TestCustomEl custom-in-prop="fine" name="eric eng">dhereee{bind('name')}</TestCustomEl>
+    //     </div>
 
-        {() => {
-          // Testing loops
-          const rNodes = []
-          for (let i = 0; i < 10; i++) {
-            rNodes.push(<div>loop {i}</div>)
-          }
-          return rNodes
-        }}
-      </div>
-    </>
+    //     <button className="btn btn-primary" name="testing name">My Button<span>{bind('name')}</span></button>
+
+    //     {() => {
+    //       // Testing loops
+    //       const rNodes = []
+    //       for (let i = 0; i < 10; i++) {
+    //         rNodes.push(<div>loop {i}</div>)
+    //       }
+    //       return rNodes
+    //     }}
+    //   </div>
+    // </>
   )
+  // } catch(err) {
+
+  // }
+  return ret
 }
 
 export const testJSX = new testJSX2()

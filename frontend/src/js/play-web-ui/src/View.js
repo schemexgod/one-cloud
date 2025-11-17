@@ -84,6 +84,7 @@ export class View {
 
     // Create the node
     let newNode = _templateHolder.content.cloneNode(true)
+    console.log('newstr', newStr, newNode)
 
     // Loop through DocumentFragment and create the update functions
     this.#_buildUpdateFuncs(newNode)
@@ -98,6 +99,7 @@ export class View {
       })
       newNode = arr
     }
+    console.log('newstr2', newStr, newNode)
 
     this.domEl = newNode
 
@@ -304,7 +306,7 @@ export class View2 {
 
 
   /**
-   * Put your View logic here. It shoudl return an HTML Element
+   * Put your Initial View logic here. It should return an HTML Element
    * @returns {HTMLElement}
    */
   compile() {
@@ -317,6 +319,21 @@ export class View2 {
   render() {
     
     return this
+  }
+
+  /**
+   * Appends this view to another view's DOM Element
+   * @param {View2} parent 
+   */
+  appendTo(parent) {
+    // Must be single element
+    if(parent.domEl instanceof Element) {
+      if(Array.isArray(this.domEl)) {
+        parent.domEl.append(...this.domEl)
+      } else {
+        parent.domEl.append(this.domEl)
+      }
+    }
   }
 }
 
