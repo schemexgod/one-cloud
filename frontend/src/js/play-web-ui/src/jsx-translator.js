@@ -40,7 +40,7 @@ export const createDomNode = (tag, props, ...children) => {
       return JsxElementInfo({
         domEl: domEl,
         render: (props) => {
-          domEl.textContent = props ?? [propKey] ?? ''
+          domEl.textContent = props?.[propKey] ?? ''
           return domEl
         }
       })
@@ -99,6 +99,7 @@ export const createDomNode = (tag, props, ...children) => {
 const _processChild = (parent, child, props) => {
 
   // Text Node
+  let parentRenderFunc = parent.render
 
   // Function run to check 
   if (typeof child === 'function') {
@@ -120,6 +121,14 @@ const _processChild = (parent, child, props) => {
     } else {
       parent.domEl.appendChild(child.domEl);
     }
+    const childRender = child.render
+    if (childRender) {
+      parentRenderFunc = (props) => {
+        parentRenderFunc?.(props)
+        childRender(props)
+      }
+    }
+
   }
   // Create update function for binding
   else if (JsxBindProp.is(child)) {
@@ -136,15 +145,20 @@ const _processChild = (parent, child, props) => {
       }
     })
 
+    parentRenderFunc = (props) => {
+      parentRenderFunc?.(props)
+      domEl.textContent = props?.[propKey] ?? ''
+    }
+
     // Append render logic up
     parent.domEl.appendChild(domEl);
   }
   // Text content
   else if (typeof child === 'string' || typeof child === 'number') {
-    console.log('-- creating child',child, parent.domEl)
+    console.log('-- creating child', child, parent.domEl)
     parent.domEl.appendChild(document.createTextNode(child));
   }
-
+  parent.render = parentRenderFunc
 }
 
 

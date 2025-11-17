@@ -1,5 +1,6 @@
 import PlayWebUI from 'play-web-ui'
 import { prop } from '../play-web-ui'
+import { JsxBindProp } from '../play-web-ui/src/play-types'
 
 const TestCustomEl = (innProps) => {
   return (
@@ -20,7 +21,7 @@ export function testJSX2() {
   // try {
   ret = (
     <>
-      <div> ddd</div>
+      <div> ddd {JsxBindProp('firstName')}</div>
 
     </>
     // <button className="btn btn-primary" what="testing name">My Button {prop('what')}</button>
@@ -60,3 +61,4 @@ export const testJSX = new testJSX2()
 
 console.log('testJSX', testJSX.domEl)
 document.body.appendChild(testJSX.domEl)
+testJSX.render({firstName: 'eric'})
