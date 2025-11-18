@@ -1,5 +1,5 @@
 import PlayWebUI from 'play-web-ui'
-import { prop, View2 } from '../play-web-ui'
+import { prop, View } from '../play-web-ui'
 
 const TestCustomEl = (innProps) => {
   return (
@@ -14,7 +14,7 @@ const TestCustomEl = (innProps) => {
 
   )
 }
-class TestCustomClass extends View2 {
+class TestCustomClass extends View {
   compile() {
     return (
       <section>i did it {prop('firstName')}</section>

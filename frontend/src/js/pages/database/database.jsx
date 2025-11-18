@@ -1,8 +1,8 @@
-import PlayWebUI, { View2 } from "play-web-ui";
+import PlayWebUI, { View } from "play-web-ui";
+import './database.css' 
 
 
-
-export class DatabasePage extends View2 {
+export class DatabasePage extends View {
   /** @type {AppContext} */
   context
 
@@ -94,7 +94,7 @@ async function getDatabases(authToken) {
     // Http error
     if (!resp.ok) {
       if (resp.status == 401) {
-        window.location = '/signout'
+        // window.location = '/signout'
       }
       throw new Error(`HTTP error! status: ${resp.json()}`);
     }
@@ -113,7 +113,7 @@ async function getDatabases(authToken) {
 export default DatabasePage
 
 
-// export class DatabasePage extends View2 {
+// export class DatabasePage extends View {
 //   constructor() {
 //     super()
 //   }

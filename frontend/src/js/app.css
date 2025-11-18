@@ -1,0 +1,57 @@
+:root {
+    --header-height: 48px;
+    --max-width: 1200px;
+    /* Defines a primary color variable */
+}
+
+
+:root body,
+:root html {
+    background-color: rgb(22, 22, 22);
+}
+
+h1 {
+    color: red;
+}
+
+#header {
+    display: flex;
+    position: fixed;
+    background-color: rgb(51, 51, 51);
+    width: 100vw;
+    color: aliceblue;
+    justify-content: center;
+    height: var(--header-height);
+}
+
+#header * {
+    display: flex;
+}
+
+#header a {
+    display: block;
+    margin-left: 12px;
+}
+
+#header .header-content {
+    max-width: var(--max-width);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+#main {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--header-height);
+}
+
+#main>* {
+    width: 100%;
+    max-width: var(--max-width);
+
+}
+
+#modal-container {
+    display: none;
+}

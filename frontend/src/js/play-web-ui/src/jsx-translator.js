@@ -1,6 +1,9 @@
 
 import { JsxBindProp, JsxElementInfo, JsxElementInfoType } from "./play-types";
-import { view, View2 } from "./View";
+import { view, View } from "./View";
+
+// disable console log
+const console = { log: () => { } }
 
 /**
  * The core JSX factor method. 
@@ -20,7 +23,7 @@ export const createDomNode = (tag, props, ...children) => {
   if (typeof tag === 'function') {
     props = props ?? {}
     props.children = children
-    if (tag.prototype instanceof View2) {
+    if (tag.prototype instanceof View) {
       console.log('View2 !!! ********', props, tag)
       isView = true
       tag = new tag(props)
@@ -152,7 +155,7 @@ const _processChild = (parent, child, props) => {
     const domEl = document.createTextNode('')
     const propKey = child.key ?? ''
     console.log('00000000000', domEl, props, child)
-    const oldProps = {...props}
+    const oldProps = { ...props }
 
     parent.render = (props) => {
       parentRenderFunc?.(props)

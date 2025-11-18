@@ -1,58 +1,31 @@
+import { View } from "./play-web-ui";
+import { Router } from "./play-web-ui/src/router";
 
-class Route {
-  /** @type {string} path of the url (ex: '/page1') */
-  path
-  /** @type {string} URL of the script to run when that route is matched */
-  scriptUrl
 
-  /**
-   * 
-   * @param {string} path path of the url (ex: '/page1')
-   * @param {string} scriptUrl URL of the script to run when that route is matched
-   */
-  constructor(path, scriptUrl) {
-    this.path = path;
-    this.scriptUrl = scriptUrl;
-  }
+class AppRouter extends Router {
+
 }
 
+export const appRouter = new AppRouter({
+  '/databases': pageRoute(() => { return import('./pages/database/database.jsx') })
+})
 
-// Cached regular expressions for matching named param parts and splatted
-// parts of route strings.
-const optionalParam = /\((.*?)\)/g;
-const namedParam = /(\(\?)?:\w+/g;
-const splatParam = /\*\w+/g;
-const escapeRegExp = /[\-{}\[\]+?.,\\\^$|#\s]/g;
 
 /**
- * Routes can contain parameter parts, :param, which match a single URL component between slashes; and splat parts *splat, which can match any number of URL components. Part of a route can be made optional by surrounding it in parentheses (/:optional).
+ * @param {function() => View} loadPageFunction The url to dynamically load
+ * @returns {(params, path) => void} The route function to run
  */
-export class Router {
-  /** @type {Object.<string, Route>} an object map of route paths to the route (ex: {'/page1': new Route()}) */
-  routes = {}
-
-  /**
-   * 
-   * @param {string} path path of the url (ex: '/page1') 
-   * @returns {Route?} returns the route if it exists
-   */
-  matchRoute(path) {
-    return routes[path]
-  }
-
-  /**
-   * 
-   * @param {string} route 
-   * @returns {RegExp}
-   */
-  _routeToRegExp(route) {
-    route = route.replace(escapeRegExp, '\\$&')
-      .replace(optionalParam, '(?:$1)?')
-      .replace(namedParam, function (match, optional) {
-        return optional ? match : '([^/?]+)';
-      })
-      .replace(splatParam, '([^?]*?)');
-
-    return new RegExp('^' + route + '(?:\\?([\\s\\S]*))?$');
+function pageRoute(loadPageFunction) {
+  return async (params, path) => {
+    if(!loadPageFunction) { return }
+    try {
+      const pageView = (await loadPageFunction()).default;
+      /** @type {pageView} */
+      console.log('pageView', pageView)
+      const page = new pageView()
+      page.mountTo(document.getElementById('app'))
+    } catch (error) {
+      console.error("Error loading module:", error);
+    }
   }
 }

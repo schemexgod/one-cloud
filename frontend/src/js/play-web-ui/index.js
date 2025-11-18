@@ -3,8 +3,8 @@ import * as View from "./src/View";
 
 export * from './src/jsx-translator'
 export * from "./src/View";
-export default {
+export const PlayWebUI = {
   ...View,
   ...translator
-
 }
+export default PlayWebUI
