@@ -1,3 +1,5 @@
+import { jsxTypeId, PlayIdentifiedType, playKeyType } from './play-types'
+
 /** 
  * Used for temporarily creating DOM elements from template strings
  * @type {HTMLTemplateElement} 
@@ -295,14 +297,18 @@ function convertStringLiteralToTemplate(str) {
 /**
  * NEW ATTEMPT AT VIEW
  */
-
+/**
+ * @type {PlayIdentifiedType}
+ */
 export class View2 {
+  /** @type {string} Identifies this class as a play view */
+  [playKeyType] = jsxTypeId
+
   /** 
    * The DOM element or elements associated with this View
    * @type {HTMLElement? | [HTMLElement]?}
    */
-  domEl
-
+  domEl = document.createElement('div')
 
 
   /**
@@ -316,8 +322,8 @@ export class View2 {
    * Renders/Updates the dom element
    * @returns {View2}
    */
-  render() {
-    
+  render(props) {
+
     return this
   }
 
@@ -327,8 +333,8 @@ export class View2 {
    */
   appendTo(parent) {
     // Must be single element
-    if(parent.domEl instanceof Element) {
-      if(Array.isArray(this.domEl)) {
+    if (parent.domEl instanceof Element) {
+      if (Array.isArray(this.domEl)) {
         parent.domEl.append(...this.domEl)
       } else {
         parent.domEl.append(this.domEl)

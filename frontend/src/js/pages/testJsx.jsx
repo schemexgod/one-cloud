@@ -1,18 +1,21 @@
 import PlayWebUI from 'play-web-ui'
-import { prop } from '../play-web-ui'
-import { JsxBindProp } from '../play-web-ui/src/play-types'
+import { prop, View2 } from '../play-web-ui'
 
 const TestCustomEl = (innProps) => {
   return (
-    <>
-      <main>
-        <h3 custom-prop="hi">i am custom</h3>
-        {innProps?.children}
-      </main>
-      <section>new section</section>
-    </>
+    <section {...innProps}><span>{prop('firstName')}</span></section>
+    // <>
+    //   <main>
+    //     <h3 custom-prop="hi">i am custom</h3>
+    //     {innProps?.children}
+    //   </main>
+    //   <section>prop will go here {prop('firstName')}</section>
+    // </>
 
   )
+}
+class TestCustomClass extends View2 {
+
 }
 
 export function testJSX2() {
@@ -20,11 +23,9 @@ export function testJSX2() {
   let ret
   // try {
   ret = (
-    <>
-      <div> ddd {JsxBindProp('firstName')}</div>
+      <TestCustomEl firstName='bob'></TestCustomEl>
 
-    </>
-    // <button className="btn btn-primary" what="testing name">My Button {prop('what')}</button>
+    // <button className="btn btn-primary" what="testing name">My Button {prop('firstName')}</button>
 
     // <>
     //   <div id="hello2" onClick={(event) => {
@@ -35,10 +36,10 @@ export function testJSX2() {
     //   }}>
     //     <span>ttddd</span>
     //     <div>
-    //       <TestCustomEl custom-in-prop="fine" name="eric eng">dhereee{bind('name')}</TestCustomEl>
+    //       <TestCustomEl custom-in-prop="fine" name="eric eng">dhereee{prop('name')}</TestCustomEl>
     //     </div>
 
-    //     <button className="btn btn-primary" name="testing name">My Button<span>{bind('name')}</span></button>
+    //     <button className="btn btn-primary" name="testing name">My Button<span>{prop('name')}</span></button>
 
     //     {() => {
     //       // Testing loops
@@ -59,6 +60,6 @@ export function testJSX2() {
 
 export const testJSX = new testJSX2()
 
-console.log('testJSX', testJSX.domEl)
+console.log('testJSX', testJSX)
 document.body.appendChild(testJSX.domEl)
-testJSX.render({firstName: 'eric'})
+testJSX.render({ firstName: 'eric' })

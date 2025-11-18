@@ -1,6 +1,6 @@
 
-import { JsxBindProp, JsxElementInfo } from "./play-types";
-import { view, View } from "./View";
+import { JsxBindProp, JsxElementInfo, JsxElementInfoType } from "./play-types";
+import { view, View2 } from "./View";
 
 /**
  * The core JSX factor method. 
@@ -11,16 +11,24 @@ import { view, View } from "./View";
  * @param {any} tag 
  * @param {object} props 
  * @param  {...any} children 
- * @returns {JsxElementInfo}
+ * @returns {JsxElementInfoType}
  */
 export const createDomNode = (tag, props, ...children) => {
   console.log('build1 --', tag, typeof tag, props, children)
-
+  let isView = false
   // Process function
   if (typeof tag === 'function') {
     props = props ?? {}
     props.children = children
-    tag = tag(props)
+    if (tag.prototype instanceof View2) {
+      isView = true
+      tag = new tag(props)
+    } else {
+      console.log('tag ********', tag)
+      tag = tag(props)
+      console.log('tag2 ********', tag, props)
+
+    }
   }
 
   // Figure out the element type
@@ -41,6 +49,7 @@ export const createDomNode = (tag, props, ...children) => {
         domEl: domEl,
         render: (props) => {
           domEl.textContent = props?.[propKey] ?? ''
+          console.log('{{{{{ inside child render 1::', domEl, props, propKey)
           return domEl
         }
       })
@@ -57,7 +66,7 @@ export const createDomNode = (tag, props, ...children) => {
   const element = document.createElement(tag);
 
   // Return Info
-  /** @type {JsxElementInfo} */
+  /** @type {JsxElementInfoType} */
   const returnInfo = { domEl: element }
 
   // Loop through and process props
@@ -85,7 +94,21 @@ export const createDomNode = (tag, props, ...children) => {
 
   // Process children and add to DOM Node
   children.flat().forEach(child => {
-    _processChild(returnInfo, child, props)
+    // Function run to check 
+    if (typeof child === 'function') {
+      const result = child(props)
+      if (result) {
+        child = result
+      }
+    }
+    if (Array.isArray(child)) {
+      child.forEach((child) => {
+        _processChild(returnInfo, child, props)
+      })
+    }
+    else {
+      _processChild(returnInfo, child, props)
+    }
   });
 
   return JsxElementInfo(returnInfo);
@@ -93,26 +116,15 @@ export const createDomNode = (tag, props, ...children) => {
 
 /**
  * Processes the node child value
- * @param {JsxElementInfo} parent 
+ * @param {JsxElementInfoType} parent 
  * @param {any} child 
  */
 const _processChild = (parent, child, props) => {
 
   // Text Node
-  let parentRenderFunc = parent.render
+  const parentRenderFunc = parent.render
+  console.log('[[[[[[ parent render 1]]', parentRenderFunc)
 
-  // Function run to check 
-  if (typeof child === 'function') {
-    const result = child(props)
-
-    if (Array.isArray(result)) {
-      parent.domEl.append(...result);
-      return
-    }
-    else if (result) {
-      child = result
-    }
-  }
 
   // Already correct
   if (JsxElementInfo.is(child)) {
@@ -123,7 +135,10 @@ const _processChild = (parent, child, props) => {
     }
     const childRender = child.render
     if (childRender) {
-      parentRenderFunc = (props) => {
+      console.log('[[[[[[ parent render 1.5]]', child, parentRenderFunc)
+
+      parent.render = (props) => {
+        console.log('[[[[[[ parent render 2]]', props, childRender)
         parentRenderFunc?.(props)
         childRender(props)
       }
@@ -135,19 +150,13 @@ const _processChild = (parent, child, props) => {
     // Element type needs to be a Text Node
     const domEl = document.createTextNode('')
     const propKey = child.key ?? ''
+    console.log('00000000000', domEl, props, child)
+    const oldProps = {...props}
 
-    // Return new info
-    const childInfo = JsxElementInfo({
-      domEl: domEl,
-      render: (props) => {
-        domEl.textContent = props ?? [propKey] ?? ''
-        return domEl
-      }
-    })
-
-    parentRenderFunc = (props) => {
+    parent.render = (props) => {
       parentRenderFunc?.(props)
-      domEl.textContent = props?.[propKey] ?? ''
+      domEl.textContent = oldProps?.[propKey] ?? props?.[propKey] ?? ''
+      console.log('[[[[[[ parent render3]]', domEl, props, child, oldProps)
     }
 
     // Append render logic up
@@ -158,7 +167,7 @@ const _processChild = (parent, child, props) => {
     console.log('-- creating child', child, parent.domEl)
     parent.domEl.appendChild(document.createTextNode(child));
   }
-  parent.render = parentRenderFunc
+
 }
 
 
@@ -172,8 +181,4 @@ export const Fragment = (props) => {
   return returnInfo
 };
 
-export const prop = (name) => {
-  return (props) => {
-    return props[name] ?? 'cant find'
-  }
-}
+export const prop = JsxBindProp
