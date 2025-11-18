@@ -21,6 +21,7 @@ export const createDomNode = (tag, props, ...children) => {
     props = props ?? {}
     props.children = children
     if (tag.prototype instanceof View2) {
+      console.log('View2 !!! ********', props, tag)
       isView = true
       tag = new tag(props)
     } else {

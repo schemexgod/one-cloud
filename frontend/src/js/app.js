@@ -1,6 +1,7 @@
 import { getAuth, onAuthStateChanged, signInWithCustomToken, updateCurrentUser, User } from "firebase/auth";
 import { appOneShot } from "./constants";
 import { Router } from "./routes";
+import DatabasePage from "./pages/database.jsx";
 
 
 
@@ -36,8 +37,11 @@ const init = async () => {
 /** @param {AppContext} context */
 async function showDBPage(context) {
   try {
-    const module = await import('./pages/database.js');
-    module.init(context)
+    const DatabasePage = (await import('./pages/database.jsx')).default;
+    /** @type {DatabasePage} */
+    console.log('DatabasePage', DatabasePage)
+    const page = new DatabasePage(context)
+    page.mountTo(document.getElementById('app'))
   } catch (error) {
     console.error("Error loading module:", error);
   }

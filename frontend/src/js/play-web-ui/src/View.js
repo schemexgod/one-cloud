@@ -308,33 +308,42 @@ export class View2 {
    * The DOM element or elements associated with this View
    * @type {HTMLElement? | [HTMLElement]?}
    */
-  domEl = document.createElement('div')
+  get domEl() { return this._jsxInfo?.domEl }
 
   /** @type {JsxElementInfoType?} */
-  _jsxInfo
+  get _jsxInfo() {
+    if (this.__jsxInfo) {
+      return this.__jsxInfo
+    }
+    this.__jsxInfo = this.compile()
+    return this.__jsxInfo
+  }
+  /** @type {JsxElementInfoType?} */
+  __jsxInfo
 
-  
+  /** @type {object?} */
+  _overrideProps
+
+  constructor(initProps) {
+    this._overrideProps = initProps
+  }
+
   /**
    * Put your Initial View logic here. It should return an HTML Element
    * @returns {JsxElementInfoType}
    */
-  compile() {
+  compile() { }
 
-  }
   /**
    * Renders/Updates the dom element
    * @returns {View2}
    */
   render(props) {
+    props = { ...props, ...this._overrideProps }
     this.willRender(props)
-    if(this._jsxInfo) {
-      this._jsxInfo.render(props)
-    }
-    else {
-      this._jsxInfo = this.compile()
-      this._jsxInfo?.render(props)
-    }
+    this._jsxInfo.render?.(props)
     this.didRender(props)
+    return this
   }
 
   willRender(props) { }
@@ -355,10 +364,18 @@ export class View2 {
       }
     }
   }
-}
+  /**
+   * 
+   * @param {HTMLElement} domEl 
+   * @param {boolean} doReplace 
+   */
+  mountTo(domEl, doReplace = true) {
+    this.render()
 
-class DBPage extends View2 {
-  compile() {
-    return (<div />)
+    if (doReplace) {
+      domEl.replaceChildren(this.domEl)
+    } else {
+      domEl.append(this.domEl)
+    }
   }
 }
