@@ -1,4 +1,4 @@
-import { jsxTypeId, PlayIdentifiedType, playKeyType } from './play-types'
+import { jsxTypeId, PlayIdentifiedType, playKeyType, JsxElementInfoType } from './play-types'
 
 /** 
  * Used for temporarily creating DOM elements from template strings
@@ -310,10 +310,13 @@ export class View2 {
    */
   domEl = document.createElement('div')
 
+  /** @type {JsxElementInfoType?} */
+  _jsxInfo
 
+  
   /**
    * Put your Initial View logic here. It should return an HTML Element
-   * @returns {HTMLElement}
+   * @returns {JsxElementInfoType}
    */
   compile() {
 
@@ -323,9 +326,20 @@ export class View2 {
    * @returns {View2}
    */
   render(props) {
-
-    return this
+    this.willRender(props)
+    if(this._jsxInfo) {
+      this._jsxInfo.render(props)
+    }
+    else {
+      this._jsxInfo = this.compile()
+      this._jsxInfo?.render(props)
+    }
+    this.didRender(props)
   }
+
+  willRender(props) { }
+  didRender(props) { }
+
 
   /**
    * Appends this view to another view's DOM Element

@@ -15,7 +15,11 @@ const TestCustomEl = (innProps) => {
   )
 }
 class TestCustomClass extends View2 {
-
+  compile() {
+    return (
+      <section>i did it {prop('firstName')}</section>
+    )
+  }
 }
 
 export function testJSX2() {
@@ -23,7 +27,7 @@ export function testJSX2() {
   let ret
   // try {
   ret = (
-      <TestCustomEl firstName='bob'></TestCustomEl>
+    <TestCustomClass firstName='bob'></TestCustomClass>
 
     // <button className="btn btn-primary" what="testing name">My Button {prop('firstName')}</button>
 
