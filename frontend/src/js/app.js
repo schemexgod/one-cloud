@@ -4,6 +4,7 @@ import DatabasePage from "./pages/database/database.jsx";
 import { View, PlayWebUI } from "./play-web-ui";
 import { Router } from "./play-web-ui/src/router";
 import './app.css'
+import NotFoundPage from "./pages/404";
 
 class AppView extends View {
   /** Main app router */
@@ -33,7 +34,9 @@ class AppView extends View {
 
     // Check if signed in
     const auth = getAuth(fbaseApp);
-    const user = await this.setupAuthState(auth)
+    const user = await this.setupAuthState(auth, undefined, () => {
+      this.router.navigate('/signout')
+    })
     const jwtToken = await user?.getIdToken()
     console.log('user', user, jwtToken)
 
@@ -55,7 +58,12 @@ class AppView extends View {
       '/': () => {
         console.log("root page")
       },
-      '/databases': this.pageRoute(() => { return import('./pages/database/database.jsx') })
+      '/databases': this.pageRoute(() => { return import('./pages/database/database.jsx') }),
+    })
+
+    this.router.notFound(() => {
+      const page = new NotFoundPage()
+      this.domEl.querySelector('main').replaceChildren(page.domEl)
     })
   }
 
@@ -91,7 +99,7 @@ class AppView extends View {
         const pageView = (await loadPageFunction()).default;
         /** @type {pageView} */
         console.log('pageView', pageView, this.mainEl)
-        const page = new pageView()
+        const page = new pageView(this.context)
         page.mountTo(this.mainEl)
       } catch (error) {
         console.error("Error loading module:", error);

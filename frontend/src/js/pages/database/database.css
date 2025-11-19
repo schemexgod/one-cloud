@@ -13,8 +13,5 @@
     flex-direction: row;
     padding: 5px 15px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.07);
-}
-
-.list .row>* {
-    flex-grow: 1;
+    justify-content: space-between;
 }

@@ -25,7 +25,7 @@ export class DatabasePage extends View {
   compile() {
     return (
       <section id="db-section">
-        <h1>Databases</h1>
+        <h3>Databases</h3>
         <ul class="list">
           {/** List goes here */}
         </ul>
