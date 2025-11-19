@@ -4,7 +4,7 @@ import { prop, View } from '../play-web-ui'
 class TestCustomClass extends View {
   compile() {
     return (
-      <section>i did it {prop('firstName')} {prop('children')}</section>
+      <section>i did it {prop('firstName')} {prop('children')}  </section>
     )
   }
 }
@@ -56,5 +56,5 @@ document.body.appendChild(testJSX.domEl)
 console.log('BREAKING_--')
 testJSX.render({ firstName: 'eric', subobj: { lastName: 'eng' } })
 testJSX.domEl.addEventListener('click', () => {
-  testJSX.render({ firstName: 'dddddaaa', subobj: { lastName: 'aaaaa' }, children: [<div>replaced me baby{prop('firstName')}</div>] })
+  testJSX.render({ firstName: 'dddddaaa', subobj: { lastName: 'aaaaa' } })
 })
