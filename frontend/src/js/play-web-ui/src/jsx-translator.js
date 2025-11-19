@@ -3,7 +3,7 @@ import { JsxBindProp, JsxElementInfo, JsxElementInfoType } from "./play-types";
 import { view, View } from "./View";
 
 // disable console log
-const console = { log: () => { } }
+// const console = { log: () => { } }
 
 /**
  * The core JSX factor method. 
@@ -18,7 +18,9 @@ const console = { log: () => { } }
  */
 export const createDomNode = (tag, props, ...children) => {
   console.log('build1 --', tag, typeof tag, props, children)
+  let propsToPassToChild
   let isView = false
+
   // Process function
   if (typeof tag === 'function') {
     props = props ?? {}
@@ -31,8 +33,10 @@ export const createDomNode = (tag, props, ...children) => {
       console.log('tag ********', tag)
       tag = tag(props)
       console.log('tag2 ********', tag, props)
-
     }
+
+    // Pass these props to its children
+    propsToPassToChild = props
   }
 
   // Figure out the element type
@@ -47,12 +51,15 @@ export const createDomNode = (tag, props, ...children) => {
       // Element type needs to be a Text Node
       const domEl = document.createTextNode('')
       const propKey = tag.key ?? ''
+      const propKeyPath = propKey.split('.')
+      const needsPath = propKeyPath.length > 1
 
       // Return new info
       return JsxElementInfo({
         domEl: domEl,
         render: (props) => {
-          domEl.textContent = props?.[propKey] ?? ''
+          domEl.textContent = (needsPath ? getValueByArrayPath(props, propKeyPath) : props?.[propKey]) ?? ''
+
           console.log('{{{{{ inside child render 1::', domEl, props, propKey)
           return domEl
         }
@@ -151,20 +158,80 @@ const _processChild = (parent, child, props) => {
   }
   // Create update function for binding
   else if (JsxBindProp.is(child)) {
-    // Element type needs to be a Text Node
-    const domEl = document.createTextNode('')
     const propKey = child.key ?? ''
-    console.log('00000000000', domEl, props, child)
-    const oldProps = { ...props }
+    const overrideProps = { ...props }
 
-    parent.render = (props) => {
-      parentRenderFunc?.(props)
-      domEl.textContent = oldProps?.[propKey] ?? props?.[propKey] ?? ''
-      console.log('[[[[[[ parent render3]]', domEl, props, child, oldProps)
+    const propKeyPath = propKey.split('.')
+    const needsPath = propKeyPath.length > 1
+
+    if (propKey == 'children') {
+      console.log('BINDING CHILDREN!', propKey)
+      // Create a placeholder element for insert
+      let domEls = [document.createElement('template')]
+
+      parent.render = (props) => {
+        parentRenderFunc?.(props)
+        // check for children
+        const children = props?.children
+        console.log('**** render my children', children, overrideProps, props)
+        if (children) {
+
+          if (children.length === 0) {
+            let newDomEl = document.createElement('template')
+            let lastItem = domEls[domEls.length - 1]
+            parent.domEl.insertBefore(newDomEl, lastItem.nextSibling)
+            domEls.forEach((cur) => {
+              cur.remove()
+            })
+            domEls = [newDomEl]
+          } else {
+            let nodes = []
+            children.forEach((cur) => {
+              nodes.push(cur.domEl)
+              cur.render?.(props)
+            })
+
+            let lastItem = domEls[domEls.length - 1]
+            nodes.forEach((curChild) => {
+              /** @type {HTMLElement} */
+              parent.domEl.insertBefore(curChild, lastItem.nextSibling)
+              lastItem = curChild
+            })
+            domEls.forEach((cur) => {
+              cur.remove()
+            })
+            domEls = nodes
+          }
+        }
+        console.log('&&&& the most special children render', props)
+      }
+      parent.domEl.appendChild(...domEls);
+    }
+    else {
+      // Element type needs to be a Text Node
+      const domEl = document.createTextNode('')
+      console.log('00000000000', domEl, props, child)
+      parent.render = (props) => {
+        parentRenderFunc?.(props)
+        let content
+
+        // Try override props first
+        if (overrideProps) {
+          content = needsPath ? getValueByArrayPath(overrideProps, propKeyPath) : overrideProps?.[propKey]
+        }
+        // Try new props
+        if (!content) {
+          content = needsPath ? getValueByArrayPath(props, propKeyPath) : props?.[propKey]
+        }
+
+        domEl.textContent = content ?? ''
+        console.log('[[[[[[ parent render3]]', domEl, props, child, overrideProps)
+      }
+      // Append render logic up
+      parent.domEl.appendChild(domEl);
     }
 
-    // Append render logic up
-    parent.domEl.appendChild(domEl);
+
   }
   // Text content
   else if (typeof child === 'string' || typeof child === 'number') {
@@ -174,6 +241,30 @@ const _processChild = (parent, child, props) => {
 
 }
 
+/**
+ * Gets the Objects data from the given array of nested keys
+ * @param {object} obj Object to access data from
+ * @param {[string]} pathArr array of keys to access nested data in the given object
+ * @returns 
+ */
+const getValueByArrayPath = (obj, pathArr) => {
+  if (!obj) { return }
+  console.log('start reduce +++', pathArr, obj)
+  const len = pathArr.length
+
+  let currentVal = obj
+  for (let i = 0; i < len; i++) {
+    const curKey = pathArr[i]
+    const curVal = currentVal[curKey]
+    console.log('inside reduce +++', curKey)
+    if (currentVal[curKey]) {
+      currentVal = curVal
+    } else {
+      return
+    }
+  }
+  return currentVal
+}
 
 export const Fragment = (props) => {
   const frag = new DocumentFragment()

@@ -32,7 +32,7 @@ export class View {
   _overrideProps
 
   constructor(initProps) {
-    this._overrideProps = initProps
+    this._overrideProps = { ...initProps }
   }
 
   /**
@@ -46,7 +46,11 @@ export class View {
    * @returns {View}
    */
   render(props) {
+    const { children } = props
     props = { ...props, ...this._overrideProps }
+    if (children) {
+      props.children = children
+    }
     this.willRender(props)
     this._jsxInfo.render?.(props)
     this.didRender(props)
