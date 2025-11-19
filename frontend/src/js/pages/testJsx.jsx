@@ -4,7 +4,7 @@ import { prop, View } from '../play-web-ui'
 class TestCustomClass extends View {
   compile() {
     return (
-      <section>i did it {prop('firstName')} {prop('children')}  </section>
+      <section custom-prop={prop('firstName')}>i did it {prop('firstName')} {prop('children')} <div custom-prop={prop('firstName')}>oh shit</div> </section>
     )
   }
 }

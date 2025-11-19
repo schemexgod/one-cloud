@@ -56,7 +56,7 @@ export class View {
     //   props.children = children
     //   console.log('propschild', children)
     // }
-    console.log('sssssssss', props)
+    console.log('sssssssss', props, this._overrideProps)
     this.willRender(props)
     this._jsxInfo.render?.(props, this._overrideProps)
     this.didRender(props)

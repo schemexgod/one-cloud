@@ -3,7 +3,7 @@ import { JsxBindProp, JsxElementInfo, JsxElementInfoType } from "./play-types";
 import { view, View } from "./View";
 
 // disable console log
-const console = { log: () => { } }
+// const console = { log: () => { } }
 
 /**
  * The core JSX factor method. 
@@ -99,6 +99,27 @@ export const createDomNode = (tag, props, ...children) => {
     }
     // Attributes
     else {
+      if (typeof value === 'function') {
+        value = value()
+      }
+      // Create update function for binding
+      if (JsxBindProp.is(value)) {
+        // Element type needs to be a Text Node
+        const propKey = value.key ?? ''
+        const propKeyPath = propKey.split('.')
+        const needsPath = propKeyPath.length > 1
+
+        // Update parent functon
+        let curParentfunc = returnInfo.render
+        returnInfo.render = (props, inlineProps) => {
+          console.log('aaaaaaaaaa test', curParentfunc, propKeyPath, props, inlineProps)
+          const newProps = { ...props, ...inlineProps }
+          const newVal = (needsPath ? getValueByArrayPath(newProps, propKeyPath) : newProps?.[propKey]) ?? ''
+          element.setAttribute(key, newVal);
+          curParentfunc?.(props, inlineProps)
+        }
+      }
+
       element.setAttribute(key, value);
       console.log('--  attr', key, value)
     }
@@ -149,10 +170,10 @@ const _processChild = (parent, child, props) => {
     if (childRender) {
       console.log('[[[[[[ parent render 1.5]]', child, parentRenderFunc)
 
-      parent.render = (props) => {
+      parent.render = (props, inlineProps) => {
         console.log('[[[[[[ parent render 2]]', props, childRender)
-        parentRenderFunc?.(props)
-        childRender(props)
+        parentRenderFunc?.(props, inlineProps)
+        childRender(props, inlineProps)
       }
     }
 
