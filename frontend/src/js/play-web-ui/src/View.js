@@ -46,13 +46,19 @@ export class View {
    * @returns {View}
    */
   render(props) {
-    const { children } = props
-    props = { ...props, ...this._overrideProps }
-    if (children) {
-      props.children = children
+    // const { children } = props
+    props = { ...props }
+    if (!props.children) {
+      props.children = this._overrideProps.children
     }
+    // props = { ...props, ...this._overrideProps }
+    // if (children) {
+    //   props.children = children
+    //   console.log('propschild', children)
+    // }
+    console.log('sssssssss', props)
     this.willRender(props)
-    this._jsxInfo.render?.(props)
+    this._jsxInfo.render?.(props, this._overrideProps)
     this.didRender(props)
     return this
   }

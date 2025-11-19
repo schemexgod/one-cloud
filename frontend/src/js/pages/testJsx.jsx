@@ -1,23 +1,10 @@
 import PlayWebUI from 'play-web-ui'
 import { prop, View } from '../play-web-ui'
 
-const TestCustomEl = (innProps) => {
-  return (
-    <section {...innProps}><span>{prop('firstName')} {prop('subobj.lastName')}!</span></section>
-    // <>
-    //   <main>
-    //     <h3 custom-prop="hi">i am custom</h3>
-    //     {innProps?.children}
-    //   </main>
-    //   <section>prop will go here {prop('firstName')}</section>
-    // </>
-
-  )
-}
 class TestCustomClass extends View {
   compile() {
     return (
-      <section>i did it {prop('firstName')} {prop('subobj.lastName')}!{(prop('children'))}</section>
+      <section>i did it {prop('firstName')} {prop('children')}</section>
     )
   }
 }
@@ -66,7 +53,8 @@ export const testJSX = new testJSX2()
 
 console.log('testJSX', testJSX)
 document.body.appendChild(testJSX.domEl)
+console.log('BREAKING_--')
 testJSX.render({ firstName: 'eric', subobj: { lastName: 'eng' } })
 testJSX.domEl.addEventListener('click', () => {
-  testJSX.render({ firstName: 'dddddaaa', subobj: { lastName: 'aaaaa' }, children: [<div>replaced me baby</div>] })
+  testJSX.render({ firstName: 'dddddaaa', subobj: { lastName: 'aaaaa' }, children: [<div>replaced me baby{prop('firstName')}</div>] })
 })

@@ -14,7 +14,7 @@
 /** 
  * @typedef JsxElementInfoType
  * @property {HTMLElement} domEl
- * @property {function(object)} [render]
+ * @property {(passedProps: object, inlineProps: object) => void} [render]
  */
 /** 
  * @typedef JsxBindPropInfoType
@@ -42,7 +42,7 @@ function _createTypeBuilder(typeId, customPropLogic) {
     if (customPropLogic) {
       props = customPropLogic(props)
     }
-    
+
     return {
       [playKeyType]: typeId,
       ...props

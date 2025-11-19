@@ -58,6 +58,7 @@ export const createDomNode = (tag, props, ...children) => {
       return JsxElementInfo({
         domEl: domEl,
         render: (props) => {
+          console.log('^^^^ bind function', props)
           domEl.textContent = (needsPath ? getValueByArrayPath(props, propKeyPath) : props?.[propKey]) ?? ''
 
           console.log('{{{{{ inside child render 1::', domEl, props, propKey)
@@ -107,18 +108,18 @@ export const createDomNode = (tag, props, ...children) => {
   children.flat().forEach(child => {
     // Function run to check 
     if (typeof child === 'function') {
-      const result = child(props)
+      const result = child(propsToPassToChild)
       if (result) {
         child = result
       }
     }
     if (Array.isArray(child)) {
       child.forEach((child) => {
-        _processChild(returnInfo, child, props)
+        _processChild(returnInfo, child, propsToPassToChild)
       })
     }
     else {
-      _processChild(returnInfo, child, props)
+      _processChild(returnInfo, child, propsToPassToChild)
     }
   });
 
@@ -134,7 +135,7 @@ const _processChild = (parent, child, props) => {
 
   // Text Node
   const parentRenderFunc = parent.render
-  console.log('[[[[[[ parent render 1]]', parentRenderFunc)
+  console.log('[[[[[[ parent render 1]]', props, parentRenderFunc)
 
 
   // Already correct
@@ -169,11 +170,13 @@ const _processChild = (parent, child, props) => {
       // Create a placeholder element for insert
       let domEls = [document.createElement('template')]
 
-      parent.render = (props) => {
-        parentRenderFunc?.(props)
+      parent.render = (props, inlineProps) => {
+        parentRenderFunc?.({ ...props, ...inlineProps })
+        console.log('^^^^ bind function222', props, overrideProps)
         // check for children
         const children = props?.children
         console.log('**** render my children', children, overrideProps, props)
+        console.log('**** render my children inlineProps', inlineProps)
         if (children) {
 
           if (children.length === 0) {
@@ -210,7 +213,7 @@ const _processChild = (parent, child, props) => {
     else {
       // Element type needs to be a Text Node
       const domEl = document.createTextNode('')
-      console.log('00000000000', domEl, props, child)
+      console.log('00000000000', domEl, props, child, overrideProps)
       parent.render = (props) => {
         parentRenderFunc?.(props)
         let content
