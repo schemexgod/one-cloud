@@ -58,6 +58,7 @@ class AppView extends View {
         console.log("root page")
       },
       '/databases': this.pageRoute(() => { return import('./pages/database/database.jsx') }),
+      '/databases/:id': this.pageRoute(() => { return import('./pages/database/database-edit.jsx') }),
       '/signin': this.pageRoute(() => { return import('./pages/signin/signin.jsx') }),
     })
 
@@ -99,6 +100,13 @@ class AppView extends View {
         const pageView = (await loadPageFunction()).default;
 
         console.log('pageView', pageView, this.mainEl)
+
+        // update context route
+        this.context.route = {
+          path: this.router.path,
+          params: this.router.params,
+          query: this.router.query
+        }
 
         // Init page and pass in AppContext
         /** @type {pageView} */

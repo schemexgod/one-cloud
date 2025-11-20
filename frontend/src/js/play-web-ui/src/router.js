@@ -17,6 +17,8 @@
  * Main Router Class
  */
 export class Router {
+    params = {}
+    query = {}
     routes = []
     /**
      * Sets the routes
@@ -116,12 +118,31 @@ export class Router {
     // Handle current route
     handleRoute() {
         const path = window.location.pathname;
+        const searchParams = new URLSearchParams(window.location.search)
+        const newQuery = {}
+
+        for (const [key, value] of searchParams.entries()) {
+            let existing = newQuery[key]
+            if (existing) {
+                if (Array.isArray(existing)) {
+                    existing.push(value)
+                } else {
+                    newQuery[key] = [existing, value]
+                }
+            }
+            else {
+                newQuery[key] = value
+            }
+        }
+
+        this.query = newQuery
 
         for (const route of this.routes) {
             const match = path.match(route.regex);
 
             if (match) {
                 const params = this.extractParams(route.paramNames, match.slice(1));
+                this.params = params
                 route.handler(params, path);
                 return;
             }
