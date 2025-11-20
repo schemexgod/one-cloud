@@ -187,13 +187,13 @@ const _processChild = (parent, child, props) => {
     const needsPath = propKeyPath.length > 1
 
     if (propKey == 'children') {
-      console.log('BINDING CHILDREN!', propKey)
+      console.log('BINDING CHILDREN!', props, overrideProps)
       // Create a placeholder element for insert
       let domEls = [document.createElement('template')]
 
       parent.render = (props, inlineProps) => {
         parentRenderFunc?.({ ...props, ...inlineProps })
-        console.log('^^^^ bind function222', props, overrideProps)
+        console.log('^^^^ bind function222', domEls, props, overrideProps)
         // check for children
         const children = props?.children
         console.log('**** render my children', children, overrideProps, props)
@@ -208,6 +208,7 @@ const _processChild = (parent, child, props) => {
               cur.remove()
             })
             domEls = [newDomEl]
+            console.log('GGGGGGGGGGG`::', domEls)
           } else {
             let nodes = []
             children.forEach((cur) => {
@@ -225,6 +226,7 @@ const _processChild = (parent, child, props) => {
               cur.remove()
             })
             domEls = nodes
+            console.log('GGGGGGGGGGG2`::', domEls, children)
           }
         }
         console.log('&&&& the most special children render', props)

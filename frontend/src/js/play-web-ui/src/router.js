@@ -17,15 +17,15 @@
  * Main Router Class
  */
 export class Router {
+    routes = []
     /**
      * Sets the routes
      * @param {RouteMap} routes 
      */
     constructor(routes = {}) {
-        this.routes = [];
         this.addRoutes(routes);
         this.notFoundHandler = null;
-        // this.handleRoute = this.handleRoute.bind(this)
+        this.handleRoute = this.handleRoute.bind(this)
         this._handleClick = this._handleClick.bind(this)
     }
 

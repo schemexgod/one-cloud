@@ -59,9 +59,6 @@ export class DatabasePage extends View {
     listEl.innerHTML = html
   }
 
-
-
-
   async _fetchUserDBs() {
     this.status = 'loading'
     console.log('fetching db', this.context)
