@@ -56,7 +56,7 @@ export const createDatabase = async (req, res) => {
     const result = await client.query(`CREATE DATABASE "${newDbName}" OWNER = cloudsqlsuperuser`);
     position = 3
     // Create user for this DB
-    const userResult = await client.query(`CREATE USER "${newUserName}"`)
+    const userResult = await client.query(`CREATE USER "${newUserName}" WITH ENCRYPTED PASSWORD "Oneshot123!"`)
     // Give user all privileges for this database
     const userAssignResult = await client.query(`GRANT ALL PRIVILEGES ON DATABASE "${newDbName}" TO "${newUserName}"`);
 
@@ -102,7 +102,7 @@ export const getDatabase = async (req, res) => {
   // Get All DBs
   let client
   try {
-    client = await dbClient('app', user.uid)
+    client = await dbClient({ dbId: 'app', uid: user.uid })
     const { rows } = await client.query('SELECT * FROM user_databases WHERE user_id=auth.uid()');
     res.status(200)
       .json({
@@ -110,8 +110,8 @@ export const getDatabase = async (req, res) => {
       })
   } catch (error) {
     const errorCode = error?.code ?? 500
-    if(error instanceof Error) {
-      return res.status(errorCode).json({error: error.message ?? 'Unknown connection error'})
+    if (error instanceof Error) {
+      return res.status(errorCode).json({ error: error.message ?? 'Unknown connection error' })
     }
     return res.status(errorCode ?? 500)
       .json({ error: error ?? 'Unknown connection error' })
@@ -136,7 +136,7 @@ export const deleteDatabase = async (req, res) => {
   }
 
   // Get All DBs
-  const client = await dbClient('app', user.uid)
+    client = await dbClient({ dbId: 'app', uid: user.uid })
 
   for (const dbId of dbIds) {
     try {
@@ -159,6 +159,82 @@ export const deleteDatabase = async (req, res) => {
     }
   }
 }
+
+/**
+ * Gets tables and
+ * @param {Request} req 
+ * @param {Response} res 
+ * @param {string} dbId 
+ * @returns 
+ */
+export const getTables = async (req, res, dbId) => {
+  // MUST be signed in
+  const user = await getUserOrFail(req, res)
+  if (!user) { return }
+
+  /** @type {GetDBBody} */
+  const reqBody = req.query
+
+  // Query
+  const queryStr = `SELECT 
+    t.table_name,
+    c.column_name,
+    CASE 
+        WHEN c.data_type = 'character varying' THEN 
+            'varchar(' || c.character_maximum_length || ')'        
+        WHEN c.data_type = 'timestamp without time zone' THEN 
+            'timestamp_ntz'        
+        WHEN c.data_type = 'timestamp with time zone' THEN 
+            'timestamp_tz'
+        WHEN c.data_type = 'character' THEN 
+            'char(' || c.character_maximum_length || ')'
+        WHEN c.data_type = 'numeric' AND c.numeric_precision IS NOT NULL THEN
+            'numeric(' || c.numeric_precision || ',' || c.numeric_scale || ')'
+        ELSE c.data_type
+    END AS column_type,
+    CASE 
+        WHEN c.is_nullable = 'NO' THEN true
+        ELSE false
+    END AS is_not_null
+FROM 
+    information_schema.tables t
+JOIN 
+    information_schema.columns c 
+    ON t.table_schema = c.table_schema 
+    AND t.table_name = c.table_name
+WHERE 
+    t.table_schema NOT IN ('pg_catalog', 'information_schema')
+    AND t.table_type = 'BASE TABLE'
+ORDER BY 
+    t.table_schema,
+    t.table_name,
+    c.ordinal_position;`
+
+  // Get data
+  let client
+  try {
+
+    client = await dbClient({ dbId: dbId, uid: user.uid, dbUser: dbId })
+    const { rows } = await client.query(queryStr);
+    res.status(200)
+      .json({
+        data: rows,
+      })
+  } catch (error) {
+    const errorCode = error?.code ?? 500
+    if (error instanceof Error) {
+      return res.status(errorCode).json({ error: error.message ?? 'Unknown connection error' })
+    }
+    return res.status(errorCode ?? 500)
+      .json({ error: error ?? 'Unknown connection error' })
+  }
+  finally {
+    client?.release()
+  }
+}
+
+
+
 function isPlainObject(value) {
   return (
     typeof value === 'object' &&

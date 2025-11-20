@@ -40,13 +40,54 @@ export class DatbaseEditPage extends View {
         )
     }
 
-    didRender(props) {
-
-
+    async didRender(props) {
+        const { authToken, route } = this.context
+        const tables = await getTables(authToken, route.params.id)
+        console.log('tables', tables)
     }
 
     onGoogleClick() {
         console.log('clicked')
+    }
+}
+/**
+ * Gets DB
+ * @param {string} authToken 
+ * @param {string} dbId 
+ * @returns {Promise<[Object]?>} array of db objects
+ */
+async function getTables(authToken, dbId) {
+    console.log('authToken', authToken)
+
+    // const testEndPoint = 'https://us-central1-oneshot-c5e23.cloudfunctions.net/userAdmin/db'
+    const testEndPoint = `http://127.0.0.1:5001/oneshot-c5e23/us-central1/userAdmin/db/${dbId}`
+
+    try {
+        // Fetch DB list
+        const resp = await fetch(testEndPoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            }
+        })
+
+        // Http error
+        if (!resp.ok) {
+            if (resp.status == 401) {
+                // window.location = '/signout'
+            }
+            throw new Error(`HTTP error! status: ${resp.json()}`);
+        }
+
+        // Show list
+        const json = await resp.json()
+        console.log('json', json)
+        return json.data ?? []
+
+    }
+    catch (error) {
+        console.error('Error GettingDB:', error);
     }
 }
 

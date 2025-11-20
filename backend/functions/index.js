@@ -15,7 +15,7 @@ import { Pool } from 'pg';
 import { Connector } from '@google-cloud/cloud-sql-connector';
 import { format } from "node-pg-format";
 import { dbClient } from "./db/db-connector.js";
-import { createDatabase, getDatabase } from "./db/db-functions.js";
+import { createDatabase, getDatabase, getTables } from "./db/db-functions.js";
 import { getAppOneShot } from "./auth/user-db-admin.js";
 import { readFileSync } from "fs";
 import path from "path";
@@ -72,7 +72,7 @@ const verifyToken = async (jwtToken) => {
 }
 
 /**
- * All functions for User's Admin of their projects and account. (ex: CRUD Dataabase, Auth, Storage)
+ * All functions for User's Admin of their projects and account. (ex: CRUD Database, Auth, Storage)
  */
 export const userAdmin = onRequest({
   cors: '*',
@@ -83,28 +83,41 @@ export const userAdmin = onRequest({
     if (reqPath.startsWith('/')) {
       reqPath = reqPath.slice(1)
     }
+
     const pathParts = reqPath.split('/')
     const rootEndpoint = pathParts[0]
-    const reqMethod = req.method.toUpperCase()
+
+    // TODO: Separate by request types vs endpoints. Might be better easier for pointing to read replicas
 
     switch (rootEndpoint) {
       case 'db':
-
-        const dbId = pathParts[1]
-
-        // If no DB specified then get all databases or create one
-        if (!dbId) {
-          switch (reqMethod) {
-            case 'POST':
-              return createDatabase(req, res)
-            case 'GET':
-              return getDatabase(req, res)
-            case 'DELETE':
-              return getDatabase(req, res)
-          }
-        }
-
+        return _processDBEndpoint(pathParts, req, res)
     }
 
     return res.status(404).json({ error: 'Endpoint not found' })
   })
+
+
+const _processDBEndpoint = (pathParts, req, res) => {
+  const reqMethod = req.method.toUpperCase()
+  let dbId = pathParts[1]
+
+  // If no DB specified then get all databases or create one
+  if (!dbId) {
+    switch (reqMethod) {
+      case 'POST':
+        return createDatabase(req, res)
+      case 'GET':
+        return getDatabase(req, res)
+      case 'DELETE':
+        return getDatabase(req, res)
+    }
+  }
+  // Get database schema
+  else {
+    dbId = decodeURIComponent(dbId)
+    // return res.status(200).json({ e: dbId })
+    return getTables(req, res, dbId)
+  }
+
+}

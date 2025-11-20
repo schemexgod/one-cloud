@@ -12,9 +12,11 @@ let dbPool = {}
  * Gets a PoolClient from the DB Pool 
  * @param {string} dbName Name of the database to connect to. Default is `app`
  * @param {string?} uid optionally set the `auth.uid()`
+ * @param {{dbId: string, uid: string?, dbUser: string?}} config
  * @returns {Promise<PoolClient>}
  */
-export const dbClient = async (dbId = 'app', uid) => {
+export const dbClient = async (config = { dbId: 'app' }) => {
+  const { dbId, uid, dbUser } = config
 
   let pool = dbPool[dbId]
   if (pool) {
@@ -22,25 +24,26 @@ export const dbClient = async (dbId = 'app', uid) => {
   }
   let creds = _getCreds()
   let temp = {
-      ...creds,
-      // user: 'postgres',
-      // password: 'Oneshot123!',
-      // host: '10.124.144.3', // Private IP of your Cloud SQL instance
-      database: dbId,
-      port: 5432,
-    }
-    let prog = 0
+    ...creds,
+    // user: 'postgres',
+    // password: 'Oneshot123!',
+    // host: '10.124.144.3', // Private IP of your Cloud SQL instance
+    database: dbId,
+    port: 5432,
+  }
+  let prog = 0
   try {
     const connector = new Connector()
     const clientOpts = await connector.getOptions({
       instanceConnectionName: 'oneshot-c5e23:us-central1:one-shot',
       authType: 'PASSWORD',
     });
-prog = 1
+    prog = 1
     // TODO: Put credentials in google secrets
+    const creds = dbUser ? { user: dbUser, password: 'Oneshot123!' } : _getCreds()
     pool = new Pool({
       ...clientOpts,
-      ..._getCreds(),
+      ...creds,
       // user: 'postgres',
       // password: 'Oneshot123!',
       // host: '10.124.144.3', // Private IP of your Cloud SQL instance
@@ -53,7 +56,7 @@ prog = 1
     prog = 3
     return configClient(_cli, uid)
   } catch (error) {
-    throw new Error(JSON.stringify(temp) + '-' + JSON.stringify(creds))
+    throw new Error(JSON.stringify(creds))
   }
 
 }
@@ -70,8 +73,8 @@ const _getCreds = () => {
       return json
     }
   } catch (err) {
-    return {error: err.message ?? 'whooo'}
-   }
+    return { error: err.message ?? 'whooo' }
+  }
   return {}
 }
 /**
