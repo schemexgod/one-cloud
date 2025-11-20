@@ -74,11 +74,13 @@ export class DatabasePage extends View {
     let row = this.#_rows[index]
     if (row) { return row }
 
-    row = (<li class="row">
-      <div><a href="/databases/{}">{prop('name')}</a></div>
-      <div>{prop('date')}</div>
-      <div><input type="checkbox"/></div>
-    </li>)
+    row = (
+      <li class="row">
+        <div><a href={(props) => `/databases/${props.id}`}>{prop('name')}</a></div>
+        <div>{prop('date')}</div>
+        <div><input type="checkbox" /></div>
+      </li>
+    )
 
     this.#_rows.push(row)
 
@@ -91,7 +93,7 @@ export class DatabasePage extends View {
     console.log('fetching db', this.context)
     const result = await getDatabases(this.context.authToken)
     console.log('fetching db result', result)
-    this.status = 'complate'
+    this.status = 'complete'
     this.dbList = result
     this.renderDBList()
   }
