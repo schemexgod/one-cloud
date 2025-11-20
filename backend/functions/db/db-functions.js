@@ -59,6 +59,9 @@ export const createDatabase = async (req, res) => {
     const userResult = await client.query(`CREATE USER "${newUserName}" WITH ENCRYPTED PASSWORD "Oneshot123!"`)
     // Give user all privileges for this database
     const userAssignResult = await client.query(`GRANT ALL PRIVILEGES ON DATABASE "${newDbName}" TO "${newUserName}"`);
+    const userSchemaAssignResult = await client.query(`GRANT ALL ON SCHEMA public TO "${newUserName}"`);
+    
+
 
     res.status(200)
       .json({

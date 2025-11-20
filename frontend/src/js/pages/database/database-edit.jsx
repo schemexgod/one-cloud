@@ -44,6 +44,19 @@ export class DatbaseEditPage extends View {
         const { authToken, route } = this.context
         const tables = await getTables(authToken, route.params.id)
         console.log('tables', tables)
+        // Combine columbs by tables
+        const returnData = {}
+        for (let i = 0; i < tables.length; i++) {
+            const columnData = tables[i]
+            const { table_name, ...otherData } = columnData
+            const curTableData = returnData[table_name] ?? {}
+            const columnInfo = otherData
+            returnData[table_name] = columnInfo
+        }
+        console.log('data', returnData)
+        const pre = document.createElement('pre')
+        pre.innerHTML = JSON.stringify(returnData, null, "\t")
+        this.domEl.append(pre)
     }
 
     onGoogleClick() {
