@@ -82,8 +82,10 @@ export const createDomNode = (tag, props, ...children) => {
   const returnInfo = { domEl: element }
 
   // Loop through and process props
+  console.log('-- function valiue', props)
   Object.entries(props || {}).forEach(([key, value]) => {
 
+    console.log('-- function valiue', value)
     // Block some internal props
     if (key.startsWith('__')) { return }
 
@@ -98,10 +100,10 @@ export const createDomNode = (tag, props, ...children) => {
       element.addEventListener(eventName, value);
     }
     // Attributes
-    else {
-      if (typeof value === 'function') {
-        value = value()
-      }
+    else if (value) {
+      console.log('-- function valiue', key, value)
+      console.log('-- function valiue2', value)
+
       // Create update function for binding
       if (JsxBindProp.is(value)) {
         // Element type needs to be a Text Node
@@ -115,12 +117,25 @@ export const createDomNode = (tag, props, ...children) => {
           console.log('aaaaaaaaaa test', curParentfunc, propKeyPath, props, inlineProps)
           const newProps = { ...props, ...inlineProps }
           const newVal = (needsPath ? getValueByArrayPath(newProps, propKeyPath) : newProps?.[propKey]) ?? ''
+          console.log('aaaaaaaaaa test2', newVal)
           element.setAttribute(key, newVal);
           curParentfunc?.(props, inlineProps)
         }
       }
-
-      element.setAttribute(key, value);
+      // Custom function
+      else if (typeof value === 'function') {
+        let curParentfunc = returnInfo.render
+        returnInfo.render = (props, inlineProps) => {
+          const newProps = { ...props, ...inlineProps }
+          console.log('dddddd test', value, newProps)
+          const newVal = value(newProps)
+          element.setAttribute(key, newVal);
+          curParentfunc?.(props, inlineProps)
+        }
+      }
+      else {
+        element.setAttribute(key, value);
+      }
       console.log('--  attr', key, value)
     }
   });
@@ -212,13 +227,17 @@ const _processChild = (parent, child, props) => {
           } else {
             let nodes = []
             children.forEach((cur) => {
+              if (!cur.domEl) { return }
+
               nodes.push(cur.domEl)
               cur.render?.(props)
             })
 
             let lastItem = domEls[domEls.length - 1]
+            console.log('nodes', nodes, parent)
             nodes.forEach((curChild) => {
               /** @type {HTMLElement} */
+              console.log('curChild', curChild)
               parent.domEl.insertBefore(curChild, lastItem.nextSibling)
               lastItem = curChild
             })

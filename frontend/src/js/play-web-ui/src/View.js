@@ -1,4 +1,4 @@
-import { jsxTypeId, PlayIdentifiedType, playKeyType, JsxElementInfoType } from './play-types'
+import { jsxTypeId, PlayIdentifiedType, playKeyType, JsxElementInfoType, JsxBindProp } from './play-types'
 
 
 /**
@@ -32,7 +32,15 @@ export class View {
   _overrideProps
 
   constructor(initProps) {
-    this._overrideProps = { ...initProps }
+    const newInlineProps = {}
+    // Strip any Prop Binding functions
+    for (let key in initProps) {
+      const val = initProps[key]
+      if (!JsxBindProp.is(val)) {
+        newInlineProps[key] = val
+      }
+    }
+    this._overrideProps = newInlineProps
   }
 
   /**

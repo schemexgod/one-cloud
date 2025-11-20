@@ -1,6 +1,8 @@
 import PlayWebUI, { View } from "play-web-ui";
 import './database.css'
+import { prop } from "../../play-web-ui";
 
+/** @typedef {import("../../play-web-ui/src/play-types").JsxElementInfoType} JsxElementInfoType */
 
 export class DatabasePage extends View {
   /** @type {AppContext} */
@@ -11,6 +13,9 @@ export class DatabasePage extends View {
 
   /** @type {[object]} */
   dbList = []
+
+  /** @type {[JsxElementInfoType]} */
+  #_rows = []
 
   /**
    * Initialize with AppContext
@@ -51,16 +56,38 @@ export class DatabasePage extends View {
       return
     }
 
-    let html = ''
-    this.dbList.forEach((info) => {
+    const rows = []
+    this.dbList.forEach((info, index) => {
       const nDate = (new Date(info.date_created)).toLocaleString()
-      html += `<li class="row"><div>${info.name}</div><div>${nDate}</div></li>`
+      const row = this.buildRow(index)
+      row.render({ ...info, date: nDate })
+      rows.push(row.domEl)
     })
-    listEl.innerHTML = html
+    listEl.replaceChildren(...rows)
+  }
+
+  /**
+   * @param {number} index
+   * @returns {JsxElementInfoType}
+   */
+  buildRow(index) {
+    let row = this.#_rows[index]
+    if (row) { return row }
+
+    row = (<li class="row">
+      <div><a href="/databases/{}">{prop('name')}</a></div>
+      <div>{prop('date')}</div>
+      <div><input type="checkbox"/></div>
+    </li>)
+
+    this.#_rows.push(row)
+
+    return row
   }
 
   async _fetchUserDBs() {
     this.status = 'loading'
+    this.domEl.querySelector('.list').textContent = 'loading...'
     console.log('fetching db', this.context)
     const result = await getDatabases(this.context.authToken)
     console.log('fetching db result', result)

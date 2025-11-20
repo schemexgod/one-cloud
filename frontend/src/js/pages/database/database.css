@@ -1,5 +1,3 @@
-
-
 .list {
     display: flex;
     flex-direction: column;
@@ -14,4 +12,13 @@
     padding: 5px 15px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.07);
     justify-content: space-between;
+}
+
+.list .row>* {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+.list .row>:last-child {
+    text-align: right;
 }

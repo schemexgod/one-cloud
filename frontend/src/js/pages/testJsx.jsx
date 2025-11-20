@@ -4,7 +4,7 @@ import { prop, View } from '../play-web-ui'
 class TestCustomClass extends View {
   compile() {
     return (
-      <section custom-prop={prop('firstName')}>
+      <section custom-prop={prop('firstName')} myfunc={(props) => props.firstName}>
         i did it {prop('firstName')} {prop('children')}
         <div custom-prop={prop('firstName')}>oh shit</div>
         {prop('children')}
@@ -18,7 +18,7 @@ export function testJSX2() {
   let ret
   // try {
   ret = (
-    <TestCustomClass firstName='bob'><span>inline child {prop('firstName')}!</span></TestCustomClass>
+    <TestCustomClass firstName='mike'> <span>inline child {prop('firstName')}!</span></TestCustomClass >
 
     // <button className="btn btn-primary" what="testing name">My Button {prop('firstName')}</button>
 
@@ -60,5 +60,5 @@ document.body.appendChild(testJSX.domEl)
 console.log('BREAKING_--')
 testJSX.render({ firstName: 'eric', subobj: { lastName: 'eng' } })
 testJSX.domEl.addEventListener('click', () => {
-  testJSX.render({ firstName: 'dddddaaa', subobj: { lastName: 'aaaaa2' } , children: [<div>hello {prop('firstName')}</div>]})
+  testJSX.render({ firstName: 'dddddaaa', subobj: { lastName: 'aaaaa2' }, children: [<div>hello {prop('firstName')}</div>] })
 })

@@ -1,6 +1,5 @@
 import { getAuth, onAuthStateChanged, signInWithCustomToken, updateCurrentUser, User } from "firebase/auth";
 import { appOneShot } from "./constants";
-import DatabasePage from "./pages/database/database.jsx";
 import { View, PlayWebUI } from "./play-web-ui";
 import { Router } from "./play-web-ui/src/router";
 import './app.css'
@@ -59,6 +58,7 @@ class AppView extends View {
         console.log("root page")
       },
       '/databases': this.pageRoute(() => { return import('./pages/database/database.jsx') }),
+      '/signin': this.pageRoute(() => { return import('./pages/signin/signin.jsx') }),
     })
 
     this.router.notFound(() => {
@@ -97,10 +97,16 @@ class AppView extends View {
       if (!loadPageFunction) { return }
       try {
         const pageView = (await loadPageFunction()).default;
-        /** @type {pageView} */
+
         console.log('pageView', pageView, this.mainEl)
+
+        // Init page and pass in AppContext
+        /** @type {pageView} */
         const page = new pageView(this.context)
+
+        // Inser into DOM
         page.mountTo(this.mainEl)
+
       } catch (error) {
         console.error("Error loading module:", error);
       }
