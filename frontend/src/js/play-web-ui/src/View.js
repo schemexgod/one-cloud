@@ -55,6 +55,7 @@ export class View {
    */
   render(props) {
     console.log('sssssssss before', props, this._overrideProps)
+    console.log('sssssssss before1', this)
     // const { children } = props
     props = { ...props }
     if (!props.children) {

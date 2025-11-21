@@ -10,6 +10,7 @@
     "firebase": "^12.3.0"
   },
   "devDependencies": {
+    "@parcel/transformer-sass": "^2.16.0",
     "buffer": "^6.0.3",
     "parcel": "^2.16.0",
     "parcel-reporter-static-files-copy": "^1.5.3"

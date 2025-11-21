@@ -1,6 +1,5 @@
-import PlayWebUI, { View } from "play-web-ui";
-import './database.css'
-import { prop } from "../../play-web-ui";
+import PlayWebUI, { View, prop } from "play-web-ui";
+import './database.scss'
 
 /** @typedef {import("../../play-web-ui/src/play-types").JsxElementInfoType} JsxElementInfoType */
 

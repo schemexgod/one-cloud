@@ -60,7 +60,7 @@ export const createDatabase = async (req, res) => {
     // Give user all privileges for this database
     const userAssignResult = await client.query(`GRANT ALL PRIVILEGES ON DATABASE "${newDbName}" TO "${newUserName}"`);
     const userSchemaAssignResult = await client.query(`GRANT ALL ON SCHEMA public TO "${newUserName}"`);
-    
+
 
 
     res.status(200)
@@ -139,7 +139,7 @@ export const deleteDatabase = async (req, res) => {
   }
 
   // Get All DBs
-    client = await dbClient({ dbId: 'app', uid: user.uid })
+  client = await dbClient({ dbId: 'app', uid: user.uid })
 
   for (const dbId of dbIds) {
     try {
@@ -181,12 +181,12 @@ export const getTables = async (req, res, dbId) => {
   // Query
   const queryStr = `SELECT 
     t.table_name,
-    c.column_name,
+    c.column_name AS name,
     CASE 
         WHEN c.data_type = 'character varying' THEN 
             'varchar(' || c.character_maximum_length || ')'        
         WHEN c.data_type = 'timestamp without time zone' THEN 
-            'timestamp_ntz'        
+            'timestamp'        
         WHEN c.data_type = 'timestamp with time zone' THEN 
             'timestamp_tz'
         WHEN c.data_type = 'character' THEN 
@@ -194,11 +194,11 @@ export const getTables = async (req, res, dbId) => {
         WHEN c.data_type = 'numeric' AND c.numeric_precision IS NOT NULL THEN
             'numeric(' || c.numeric_precision || ',' || c.numeric_scale || ')'
         ELSE c.data_type
-    END AS column_type,
+    END AS type,
     CASE 
         WHEN c.is_nullable = 'NO' THEN true
         ELSE false
-    END AS is_not_null
+    END AS not_null
 FROM 
     information_schema.tables t
 JOIN 
@@ -219,10 +219,25 @@ ORDER BY
 
     client = await dbClient({ dbId: dbId, uid: user.uid, dbUser: dbId })
     const { rows } = await client.query(queryStr);
+    const returnData = {}
+    const len = rows.length
+
+    // Transform data to output format
+    for (let i = 0; i < len; i++) {
+      const resultColumnData = rows[i]
+      const { table_name, ...columnData } = resultColumnData
+
+      /** @type {DBTableInfo} */
+      const curTableData = returnData[table_name] ?? { columns: [] }
+      curTableData.columns.push(columnData)
+      returnData[table_name] = curTableData
+    }
+
     res.status(200)
       .json({
-        data: rows,
+        data: returnData,
       })
+
   } catch (error) {
     const errorCode = error?.code ?? 500
     if (error instanceof Error) {

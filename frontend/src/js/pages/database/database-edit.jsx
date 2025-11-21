@@ -1,6 +1,23 @@
 import PlayWebUI, { View } from "play-web-ui";
-// import './database.css'
+import './database.scss'
 
+/** 
+ * @typedef {string: DBTableInfo} DBAllTableInfo 
+ * 
+*/
+
+/** 
+ * @typedef DBTableInfo 
+ * @property {[DBColumnInfo]} columns
+ * 
+*/
+
+/** 
+ * @typedef DBColumnInfo 
+ * @property {string} name column name
+ * @property {string} type value type
+ * @property {boolean} not_null Whether the value cannot be NULL
+*/
 
 export class DatbaseEditPage extends View {
     /** @type {AppContext} */
@@ -8,6 +25,8 @@ export class DatbaseEditPage extends View {
 
     /** @type {'loading' | 'complete'} */
     status = 'loading'
+    /** */
+    tableData
 
     /**
      * Initialize with AppContext
@@ -21,46 +40,73 @@ export class DatbaseEditPage extends View {
     compile() {
         return (
             <section>
-                <h3>Edit Database</h3>
-                <div>
-                    params: {'{'}
-                    <br />
-                    &nbsp; &nbsp; &nbsp; {() => `${Object.entries(this.context.route.params).map(([key, value]) => `${key} : ${value}`)}`}
-                    <br />
-                    {'}'}
-                    <br />
-                    query: {'{'}
-                    <br />
-                    &nbsp; &nbsp; &nbsp; {() => `${Object.entries(this.context.route.query).map(([key, value]) => `${key} : ${value}`)}`}
-                    <br />
-                    {'}'}
+                <h2>Edit Database</h2>
+                <div class="section-tables">
+                    <div class="tables-grid">
+                    </div>
                 </div>
-
             </section>
         )
     }
 
     async didRender(props) {
         const { authToken, route } = this.context
-        const tables = await getTables(authToken, route.params.id)
-        console.log('tables', tables)
-        // Combine columbs by tables
-        const returnData = {}
-        for (let i = 0; i < tables.length; i++) {
-            const columnData = tables[i]
-            const { table_name, ...otherData } = columnData
-            const curTableData = returnData[table_name] ?? {}
-            const columnInfo = otherData
-            returnData[table_name] = columnInfo
-        }
-        console.log('data', returnData)
+        const resultTables = await getTables(authToken, route.params.id)
+
+        console.log('tables', resultTables)
         const pre = document.createElement('pre')
-        pre.innerHTML = JSON.stringify(returnData, null, "\t")
+        pre.innerHTML = JSON.stringify(resultTables, null, "  ")
         this.domEl.append(pre)
+        this.tableData = resultTables
+        this._loadTableViews()
     }
 
-    onGoogleClick() {
-        console.log('clicked')
+    _loadTableViews() {
+        console.log("--", this.tableData)
+        if (Object.keys(this.tableData).length === 0) {
+            this.domEl.querySelector('.tables-grid').textContent = 'No Tables'
+            return
+        }
+        const len = this.tableData
+
+        var nodes = []
+        for (let key in this.tableData) {
+            const curInfo = this.tableData[key]
+            const headerEls = (
+                <div class="table-card">
+                    <h3 class="table-header">{key}</h3>
+                    <div class="columns-list"></div>
+                </div>
+            )
+            nodes.push(headerEls.domEl)
+            const listEl = headerEls.domEl.querySelector('.columns-list')
+            curInfo.columns.forEach((curColumn) => {
+                const newEl = (
+                    <div class="column-row">
+                        <span class="column-name">{curColumn.name}</span>
+                        <span class="column-type">{curColumn.type}</span>
+                    </div>
+                )
+
+                listEl.append(newEl.domEl)
+            })
+            this.domEl.querySelector('.tables-grid').replaceChildren(...nodes)
+        }
+
+
+        // const newEl = (
+        //     <div class="table-card">
+        //         <h3 class="table-header">orders</h3>
+        //         <div class="columns-list">
+        //             <div class="column-row"><span class="column-name">prop('id')</span><span class="column-type">INTEGER</span></div>
+        //             <div class="column-row"><span class="column-name">user_id</span><span class="column-type">INTEGER</span></div>
+        //             <div class="column-row"><span class="column-name">order_date</span><span class="column-type">TIMESTAMP</span></div>
+        //             <div class="column-row"><span class="column-name">total_amount</span><span class="column-type">DECIMAL(10,2)</span></div>
+        //             <div class="column-row"><span class="column-name">status</span><span class="column-type">VARCHAR(20)</span></div>
+        //         </div>
+        //     </div>
+        // )
+
     }
 }
 /**

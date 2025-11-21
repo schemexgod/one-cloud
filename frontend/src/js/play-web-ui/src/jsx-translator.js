@@ -202,7 +202,7 @@ const _processChild = (parent, child, props) => {
     const needsPath = propKeyPath.length > 1
 
     if (propKey == 'children') {
-      console.log('BINDING CHILDREN!', props, overrideProps)
+      console.log('BINDING CHILDREN!', child, props, overrideProps)
       // Create a placeholder element for insert
       let domEls = [document.createElement('template')]
 
@@ -212,6 +212,7 @@ const _processChild = (parent, child, props) => {
         // check for children
         const children = props?.children
         console.log('**** render my children', children, overrideProps, props)
+        console.log('**** render my children2', parent, child)
         console.log('**** render my children inlineProps', inlineProps)
         if (children) {
 

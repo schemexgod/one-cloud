@@ -1,6 +1,7 @@
 :root {
     --header-height: 48px;
     --max-width: 1280px;
+    --padding-header: 8px 12px;
     /* Defines a primary color variable */
 }
 
@@ -17,6 +18,8 @@
 /* 2. Remove default margin */
 * {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* 3. Enable keyword animations */
@@ -91,7 +94,9 @@ h6 {
 :root body,
 :root html {
     color: white;
-    background-color: rgb(22, 22, 22);
+    /* background-color: rgb(22, 22, 22); */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
@@ -145,4 +150,11 @@ h3 {
 
 a {
     color: white;
+}
+
+h3 {
+    color: white;
+    padding: var(--padding-header);
+    font-size: 1em;
+    font-weight: 600;
 }

@@ -7,8 +7,17 @@ class TestCustomClass extends View {
       <section custom-prop={prop('firstName')} myfunc={(props) => props.firstName}>
         i did it {prop('firstName')} {prop('children')}
         <div custom-prop={prop('firstName')}>oh shit</div>
-        {prop('children')}
+        {/* {prop('children')} */}
       </section>
+    )
+  }
+}
+
+class TestList extends View {
+  compile() {
+    return (
+
+      <ul>{prop('children')}</ul>
     )
   }
 }
@@ -18,7 +27,9 @@ export function testJSX2() {
   let ret
   // try {
   ret = (
-    <TestCustomClass firstName='mike'> <span>inline child {prop('firstName')}!</span></TestCustomClass >
+    <TestList>
+      <TestCustomClass firstName='mike'> <span>inline child {prop('firstName')}!</span></TestCustomClass >
+    </TestList>
 
     // <button className="btn btn-primary" what="testing name">My Button {prop('firstName')}</button>
 
