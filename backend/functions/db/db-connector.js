@@ -2,6 +2,7 @@
 import { Connector } from '@google-cloud/cloud-sql-connector';
 import { Pool } from 'pg';
 import { readFileSync } from "fs"
+import { AppError } from '../common/AppError.js';
 
 // import { Connector } from '@google-cloud/cloud-sql-connector';
 
@@ -33,14 +34,15 @@ export const dbClient = async (config = { dbId: 'app' }) => {
   }
   let prog = 0
   try {
+    const creds = dbUser ? { user: dbUser, password: 'Oneshot123!' } : _getCreds()
     const connector = new Connector()
     const clientOpts = await connector.getOptions({
       instanceConnectionName: 'oneshot-c5e23:us-central1:one-shot',
       authType: 'PASSWORD',
+      ...creds
     });
     prog = 1
     // TODO: Put credentials in google secrets
-    const creds = dbUser ? { user: dbUser, password: 'Oneshot123!' } : _getCreds()
     pool = new Pool({
       ...clientOpts,
       ...creds,
@@ -56,7 +58,7 @@ export const dbClient = async (config = { dbId: 'app' }) => {
     prog = 3
     return configClient(_cli, uid)
   } catch (error) {
-    throw new Error(JSON.stringify(creds))
+    throw new AppError(error.message ?? 'Cannot connect to DB', 502)
   }
 
 }

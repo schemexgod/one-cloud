@@ -15,10 +15,11 @@ import { Pool } from 'pg';
 import { Connector } from '@google-cloud/cloud-sql-connector';
 import { format } from "node-pg-format";
 import { dbClient } from "./db/db-connector.js";
-import { createDatabase, getDatabase, getTables } from "./db/db-functions.js";
-import { getAppOneShot } from "./auth/user-db-admin.js";
+import { createDatabase, getDatabase, getTables, hasAccess, runSql } from "./db/db-functions.js";
+import { getAppOneShot, getUserOrFail } from "./auth/user-db-admin.js";
 import { readFileSync } from "fs";
 import path from "path";
+import { AppError } from "./common/AppError.js";
 
 // Create and deploy your first functions
 // https://firebase.google.com/docs/functions/get-started
@@ -92,13 +93,39 @@ export const userAdmin = onRequest({
     switch (rootEndpoint) {
       case 'db':
         return _processDBEndpoint(pathParts, req, res)
+      case 'sql':
+        return _processSqlEndpoint(pathParts, req, res)
     }
 
     return res.status(404).json({ error: 'Endpoint not found' })
   })
 
+const _processSqlEndpoint = async (pathParts, req, res) => {
+  try {
+    let dbId = pathParts[1]
+    if (!dbId) {
+      throw new AppError('Missing database id', 404)
+    }
+    dbId = decodeURIComponent(dbId)
+    const user = await getUserOrFail(req, res)
+    if (!user) {
+      throw new AppError('Not signed in')
+    }
+    const isAllowed = hasAccess(user.uid, dbId)
+    if (!isAllowed) {
+      throw new AppError('Access not allowed', 501)
+    }
+    const result = await runSql(user, dbId, req.body.sqlCmd)
 
-const _processDBEndpoint = (pathParts, req, res) => {
+    return res.status(200).json({ data: result.rows ?? [] })
+  }
+  catch (error) {
+    return res.status(error.code ?? 500).json({ error: error.message ?? 'k' })
+  }
+
+}
+
+const _processDBEndpoint = async (pathParts, req, res) => {
   const reqMethod = req.method.toUpperCase()
   let dbId = pathParts[1]
 
@@ -110,14 +137,56 @@ const _processDBEndpoint = (pathParts, req, res) => {
       case 'GET':
         return getDatabase(req, res)
       case 'DELETE':
+
+        // TODO
+        return;
         return getDatabase(req, res)
     }
   }
-  // Get database schema
+  // Handle specific DB 
   else {
     dbId = decodeURIComponent(dbId)
-    // return res.status(200).json({ e: dbId })
-    return getTables(req, res, dbId)
+
+    // Check if specific table is requested
+    const processTable = _processDBTableEndpoint(pathParts, req, res)
+    if (processTable) {
+      return processTable
+    }
+
+    // No table specified
+    switch (reqMethod) {
+      case 'POST':
+        // return createDatabase(req, res)
+        return
+
+      // Get database schema
+      case 'GET':
+        return getTables(req, res, dbId)
+
+      case 'DELETE':
+        return
+      // return getDatabase(req, res)
+    }
+
+  }
+}
+
+const _processDBTableEndpoint = (pathParts, req, res) => {
+  const reqMethod = req.method.toUpperCase()
+  let dbId = pathParts[1]
+  let tableId = pathParts[2]
+
+  // Exit if no db or table id
+  if (!(dbId && tableId)) {
+    return
+  }
+  dbId = decodeURIComponent(dbId)
+  tableId = decodeURIComponent(tableId)
+
+  switch (reqMethod) {
+    // Alter table
+    case 'PATCH', 'POST', 'PUT':
+      return
   }
 
 }

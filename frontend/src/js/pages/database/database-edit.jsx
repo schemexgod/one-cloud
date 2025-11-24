@@ -35,6 +35,7 @@ export class DatbaseEditPage extends View {
     constructor(context) {
         super(context)
         this.context = context ?? {}
+        this.onTypeClick = this.onTypeClick.bind(this)
     }
 
     compile() {
@@ -60,7 +61,17 @@ export class DatbaseEditPage extends View {
         this.tableData = resultTables
         this._loadTableViews()
     }
-
+    /**
+     * 
+     * @param {Event} event 
+     */
+    async onTypeClick(event) {
+        /** @type {HTMLElement} */
+        const target = event.currentTarget
+        console.log('type click', target.dataset.column)
+        const res = await runSql(this.context.authToken, this.context.route.params.id, 'SELECT * FROM games')
+        console.log('res', res)
+    }
     _loadTableViews() {
         console.log("--", this.tableData)
         if (Object.keys(this.tableData).length === 0) {
@@ -84,7 +95,7 @@ export class DatbaseEditPage extends View {
                 const newEl = (
                     <div class="column-row">
                         <span class="column-name">{curColumn.name}</span>
-                        <span class="column-type">{curColumn.type}</span>
+                        <span class="column-type" data-column={curColumn.name} onClick={this.onTypeClick}>{curColumn.type}</span>
                     </div>
                 )
 
@@ -92,7 +103,6 @@ export class DatbaseEditPage extends View {
             })
             this.domEl.querySelector('.tables-grid').replaceChildren(...nodes)
         }
-
 
         // const newEl = (
         //     <div class="table-card">
@@ -129,6 +139,51 @@ async function getTables(authToken, dbId) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             }
+        })
+
+        // Http error
+        if (!resp.ok) {
+            if (resp.status == 401) {
+                // window.location = '/signout'
+            }
+            throw new Error(`HTTP error! status: ${resp.json()}`);
+        }
+
+        // Show list
+        const json = await resp.json()
+        console.log('json', json)
+        return json.data ?? []
+
+    }
+    catch (error) {
+        console.error('Error GettingDB:', error);
+    }
+}
+
+/**
+ * Runs a sql command
+ * @param {string} authToken 
+ * @param {string} command sql command 
+ * @returns {Promise<[Object]?>} array of db objects
+ */
+async function runSql(authToken, dbId, command) {
+    console.log('authToken', authToken)
+
+    // const testEndPoint = 'https://us-central1-oneshot-c5e23.cloudfunctions.net/userAdmin/db'
+    const testEndPoint = `http://127.0.0.1:5001/oneshot-c5e23/us-central1/userAdmin/sql/${dbId}`
+
+    try {
+        // Fetch DB list
+        const resp = await fetch(testEndPoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                sqlCmd: command
+            })
+
         })
 
         // Http error

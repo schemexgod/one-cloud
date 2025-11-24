@@ -124,6 +124,24 @@ export const getDatabase = async (req, res) => {
   }
 }
 
+
+export const hasAccess = async (uid, dbId) => {
+  // Get All DBs
+  let client
+  try {
+    client = await dbClient({ dbId: 'app', uid: uid })
+    const { rows } = await client.query("SELECT * FROM user_databases WHERE user_id=auth.uid() AND id=$1", [dbId]);
+
+    return rows.length > 0
+
+  } catch (error) {
+    throw new AppError(error.message ?? 'Unknown connection error', error.code ?? 500)
+  }
+  finally {
+    client?.release()
+  }
+}
+
 export const deleteDatabase = async (req, res) => {
   // MUST be signed in
   const user = await getUserOrFail(req, res)
@@ -251,13 +269,65 @@ ORDER BY
   }
 }
 
+export const alterTable = async (dbId, tableId, data) => {
+
+  /** @type {AlterTablePayload} */
+  const reqBody = data
+  const target = reqBody.target
+  const action = reqBody.action
+  const payload = reqBody.value
+
+  // Exit if missing
+  if (!target) {
+    throw new AppError('Missing `target` in payload', 400)
+  }
+  if (!action) {
+    throw new AppError('Missing `action` in payload', 400)
+  }
+  if (!payload) {
+    throw new AppError('Missing `value` in payload', 400)
+  }
+
+  // Get data
+  let client
+  try {
+    switch (target) {
+      case 'column':
+        if (action == 'alter') {
+          const { name, type } = payload
+          client = await dbClient({ dbId: dbId, uid: user.uid, dbUser: dbId })
+          const query = await client.query('ALTER TABLE "$1" ALTER COLUMN "$2" TYPE $3', [tableId, name, type])
+          return true
+        }
+        if (action == 'add') {
+          const { name, type } = payload
+          client = await dbClient({ dbId: dbId, uid: user.uid, dbUser: dbId })
+          const query = await client.query('ALTER TABLE "$1" ADD COLUMN "$2" $3', [tableId, name, type])
+          return true
+        }
+
+      default:
+        throw new AppError('Unsupported alter target', 400)
+    }
+  }
+  catch (error) {
+    const errorCode = error?.code ?? 500
+    if (error instanceof Error) {
+      throw new AppError(error.message ?? 'Unknown connection error', errorCode)
+    }
+    throw new AppError(error.message ?? 'Unknown connection error', errorCode)
+  }
+}
 
 
-function isPlainObject(value) {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.prototype.toString.call(value) === '[object Object]'
-  );
+
+export const runSql = async (user, dbId, query) => {
+  try {
+    const client = await dbClient({ dbId: dbId, uid: user.uid, dbUser: dbId })
+    return await client.query(query)
+  }
+  catch (error) {
+    const errorCode = error?.code ?? 500
+    throw new AppError(error.message ?? 'Unknown connection error', errorCode)
+  }
 }
