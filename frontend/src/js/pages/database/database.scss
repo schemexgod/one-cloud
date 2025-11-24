@@ -93,6 +93,49 @@ h1 {
     border-radius: 20px;
     font-size: 0.85em;
     font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.column-type:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.column-type select {
+    background: white;
+    color: #333;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+
+.delete-btn {
+    background: #ff4757;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.delete-btn:hover {
+    background: #ff3838;
+    transform: scale(1.05);
+}
+
+.column-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .sort-controls {

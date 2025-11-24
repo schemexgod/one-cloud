@@ -19,6 +19,26 @@ import './database.scss'
  * @property {boolean} not_null Whether the value cannot be NULL
 */
 
+const columnTypes = [
+    'INTEGER',
+    'VARCHAR',
+    // 'VARCHAR(50)',
+    // 'VARCHAR(100)',
+    // 'VARCHAR(255)',
+    'TEXT',
+    // 'DECIMAL(10,2)',
+    'BOOLEAN',
+    'DATE',
+    'TIMESTAMP',
+    // 'FLOAT',
+    'DOUBLE',
+    'BIGINT',
+    // 'SMALLINT',
+    // 'CHAR(10)',
+    'JSON',
+    // 'BLOB'
+];
+
 export class DatbaseEditPage extends View {
     /** @type {AppContext} */
     context
@@ -95,7 +115,17 @@ export class DatbaseEditPage extends View {
                 const newEl = (
                     <div class="column-row">
                         <span class="column-name">{curColumn.name}</span>
-                        <span class="column-type" data-column={curColumn.name} onClick={this.onTypeClick}>{curColumn.type}</span>
+                        {/* <span class="column-type" data-column={curColumn.name} onClick={this.onTypeClick}>{curColumn.type}</span> */}
+
+                        <div class="column-actions">
+                            <select class="column-type" onChange={this.onTypeClick}>
+                                {columnTypes.map((curType) => {
+                                    curType = curType.toLowerCase()
+                                    return <option value={curType} selected={curColumn.type.toLowerCase().startsWith(curType)} data-column={curColumn.name}>{curType}</option>
+                                })}
+                            </select>
+                            <button class="delete-btn">✕ Delete</button>
+                        </div>
                     </div>
                 )
 
