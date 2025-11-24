@@ -23,23 +23,14 @@ export const dbClient = async (config = { dbId: 'app' }) => {
   if (pool) {
     return configClient(await pool.connect(), uid)
   }
-  let creds = _getCreds()
-  let temp = {
-    ...creds,
-    // user: 'postgres',
-    // password: 'Oneshot123!',
-    // host: '10.124.144.3', // Private IP of your Cloud SQL instance
-    database: dbId,
-    port: 5432,
-  }
+
   let prog = 0
   try {
     const creds = dbUser ? { user: dbUser, password: 'Oneshot123!' } : _getCreds()
     const connector = new Connector()
     const clientOpts = await connector.getOptions({
       instanceConnectionName: 'oneshot-c5e23:us-central1:one-shot',
-      authType: 'PASSWORD',
-      ...creds
+      authType: 'PASSWORD'
     });
     prog = 1
     // TODO: Put credentials in google secrets
