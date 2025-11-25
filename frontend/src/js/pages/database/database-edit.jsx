@@ -211,7 +211,24 @@ export class DatbaseEditPage extends View {
 
         var nodes = []
         for (let key in this.tableData) {
+
             const curInfo = this.tableData[key]
+            let primaryKeyCol
+            for (let info of curInfo.constraints) {
+                if (info.constraint_type_code == 'p') {
+                    const text = info.constraint_definition
+                    const regex = /\((.*?)\)/; // Matches content inside the first set of parentheses
+                    const match = text.match(regex);
+
+                    if (match && match[1]) {
+                        const content = match[1];
+                        primaryKeyCol = content.trim()
+                    }
+
+                    break
+                }
+            }
+                        console.log("---primaryKeyCol", primaryKeyCol)
             const headerEls = (
                 <div class="table-card">
                     <h3 class="table-header">{key}</h3>
@@ -247,7 +264,11 @@ export class DatbaseEditPage extends View {
             curInfo.columns.forEach((curColumn) => {
                 const newEl = (
                     <div class="column-row">
-                        <span class="column-name">{curColumn.name}</span>
+                        <span class="column-name">
+                            <span>{curColumn.name}</span>
+                            {primaryKeyCol == curColumn.name ? (<span class="pk-badge" title="Primary Key - Click to remove">PK</span>) : <> </>}
+
+                        </span>
                         {/* <span class="column-type" data-column={curColumn.name} onClick={this.onTypeClick}>{curColumn.type}</span> */}
 
                         <div class="column-actions">

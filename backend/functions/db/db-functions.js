@@ -181,6 +181,9 @@ export const deleteDatabase = async (req, res) => {
   }
 }
 
+function _tableInfoObj() {
+  return { columns: [], constraints: [] }
+}
 /**
  * Gets tables and
  * @param {Request} req 
@@ -239,6 +242,7 @@ ORDER BY
 
     const returnData = {}
 
+    // All tables
     const allTablesQuery = `SELECT table_schema, table_name
     FROM information_schema.tables
     WHERE table_type = 'BASE TABLE'
@@ -248,9 +252,33 @@ ORDER BY
     const { rows: tableRows } = await client.query(allTablesQuery);
 
     tableRows.forEach((curRow) => {
-      returnData[curRow.table_name] = { columns: [] }
+      returnData[curRow.table_name] = _tableInfoObj()
     })
 
+    // Constraints
+    const constraintQuery = `SELECT
+  t.relname As table_name,
+    conname AS constraint_name,
+    contype AS constraint_type_code,
+    pg_get_constraintdef(c.oid) AS constraint_definition
+FROM
+    pg_constraint c
+JOIN
+    pg_class AS t ON t.oid = c.conrelid
+JOIN
+    pg_namespace AS n ON n.oid = t.relnamespace
+WHERE
+    n.nspname = 'public'`
+
+    const { rows: constraintRows } = await client.query(constraintQuery);
+    constraintRows.forEach((curRow) => {
+      const { table_name, ...otherInfo } = curRow
+      const curInfo = returnData[table_name]
+      if (!curInfo) { return }
+      curInfo.constraints.push(otherInfo)
+    })
+
+    // Column Info
     const { rows } = await client.query(queryStr);
 
     const len = rows.length
@@ -261,7 +289,7 @@ ORDER BY
       const { table_name, ...columnData } = resultColumnData
 
       /** @type {DBTableInfo} */
-      const curTableData = returnData[table_name] ?? { columns: [] }
+      const curTableData = returnData[table_name] ?? _tableInfoObj()
       curTableData.columns.push(columnData)
       returnData[table_name] = curTableData
     }

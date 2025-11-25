@@ -84,6 +84,57 @@ h1 {
     font-weight: 600;
     color: #333;
     font-size: 1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pk-badge {
+    background: #f39c12;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pk-badge:hover {
+    background: #e67e22;
+    transform: scale(1.05);
+}
+
+.fk-badge {
+    background: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.fk-badge:hover {
+    background: #2980b9;
+    transform: scale(1.05);
+}
+
+.constraint-btn {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.constraint-btn:hover {
+    background: #7f8c8d;
 }
 
 .column-type {
