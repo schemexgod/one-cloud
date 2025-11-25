@@ -236,8 +236,23 @@ ORDER BY
   try {
 
     client = await dbClient({ dbId: dbId, uid: user.uid, dbUser: dbId })
-    const { rows } = await client.query(queryStr);
+
     const returnData = {}
+
+    const allTablesQuery = `SELECT table_schema, table_name
+    FROM information_schema.tables
+    WHERE table_type = 'BASE TABLE'
+    AND table_schema NOT IN ('pg_catalog', 'information_schema')
+    ORDER BY table_schema, table_name`
+
+    const { rows: tableRows } = await client.query(allTablesQuery);
+
+    tableRows.forEach((curRow) => {
+      returnData[curRow.table_name] = { columns: [] }
+    })
+
+    const { rows } = await client.query(queryStr);
+
     const len = rows.length
 
     // Transform data to output format

@@ -58,6 +58,7 @@ export class DatbaseEditPage extends View {
         this.onTypeClick = this.onTypeClick.bind(this)
         this.onDeleteClick = this.onDeleteClick.bind(this)
         this.onCreateColumnClick = this.onCreateColumnClick.bind(this)
+        this.onCreateTableClick = this.onCreateTableClick.bind(this)
     }
 
     compile() {
@@ -71,7 +72,6 @@ export class DatbaseEditPage extends View {
             </section>
         )
     }
-
     async didRender(props) {
         const { authToken, route } = this.context
         const resultTables = await getTables(authToken, route.params.id)
@@ -83,6 +83,25 @@ export class DatbaseEditPage extends View {
         this.tableData = resultTables
         this._loadTableViews()
     }
+
+    async onCreateTableClick(event) {
+        const tableName = document.getElementById('new-table-name').value.trim()
+        if (!tableName || tableName.length == 0) { return }
+
+        const query = `CREATE TABLE "${tableName}" ()`
+        console.log('sql command ::', query)
+
+        try {
+            const res = await runSql(this.context.authToken, this.context.route.params.id, query)
+            console.log('res', res)
+            this.tableData[tableName] = { columns: [] }
+        } catch (error) {
+            console.log('eeeeee', error)
+            alert(`Error: \n\n${error.message}`)
+            target.value = prevType
+        }
+    }
+
     /**
      * 
      * @param {Event} event 
@@ -265,14 +284,14 @@ export class DatbaseEditPage extends View {
                 <h3>➕ Add New Table</h3>
                 <div class="add-table-form">
                     <input type="text" placeholder="Enter table name..." id="new-table-name" />
-                        <button class="add-table-btn">Create Table</button>
+                    <button class="add-table-btn" onClick={this.onCreateTableClick}>Create Table</button>
                 </div>
             </div>
         )
 
         gridEl.append(addCell.domEl)
 
-        
+
 
     }
 }
