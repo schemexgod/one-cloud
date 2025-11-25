@@ -56,6 +56,8 @@ export class DatbaseEditPage extends View {
         super(context)
         this.context = context ?? {}
         this.onTypeClick = this.onTypeClick.bind(this)
+        this.onDeleteClick = this.onDeleteClick.bind(this)
+        this.onCreateColumnClick = this.onCreateColumnClick.bind(this)
     }
 
     compile() {
@@ -88,10 +90,98 @@ export class DatbaseEditPage extends View {
     async onTypeClick(event) {
         /** @type {HTMLElement} */
         const target = event.currentTarget
+        const optionEl = target.options[target.selectedIndex]
         console.log('type click', target.dataset.column)
-        const res = await runSql(this.context.authToken, this.context.route.params.id, 'SELECT * FROM games')
-        console.log('res', res)
+        const table = optionEl.dataset.table
+        const column = optionEl.dataset.column
+        const prevType = target.dataset.prevValue
+        let newType = target.value
+
+        // Check if we need additional info
+        if (newType == 'varchar') {
+            let length = prompt("Enter length of VARCHAR:");
+            length = parseInt(length)
+            if (!length || length <= 0) {
+                alert('Invalid number!')
+                target.value = prevType
+                return
+            }
+            newType += `(${length})`
+        }
+
+        const query = `ALTER TABLE "${table}" ALTER COLUMN "${column}" TYPE ${newType}`
+
+        // Check if we need conversion
+        // if()
+
+
+        console.log('sql command ::', query, prevType)
+        try {
+            const res = await runSql(this.context.authToken, this.context.route.params.id, query)
+            console.log('res', res)
+        } catch (error) {
+            console.log('eeeeee', error)
+            alert(`Error: \n\n${error.message}`)
+            target.value = prevType
+        }
     }
+
+    async onDeleteClick(event) {
+        let userConfirmed = confirm("Are you sure you want to delete this item?");
+        if (!userConfirmed) { return }
+
+        const target = event.currentTarget
+        const table = target.dataset.table
+        const column = target.dataset.column
+        const query = `ALTER TABLE "${table}" DROP COLUMN "${column}"`
+
+        console.log('sql command ::', query)
+        /** @type {HTMLElement} */
+        const rowEl = target.closest('.column-row')
+        rowEl.style.display = 'none'
+        try {
+            const res = await runSql(this.context.authToken, this.context.route.params.id, query)
+            console.log('res', res)
+            rowEl?.remove()
+            this.tableData[table].columns = this.tableData[table].columns.filter((el) => {
+                return el.name != column
+            })
+        } catch (error) {
+            console.log('eeeeee', error)
+            alert(`Error: \n\n${error.message}`)
+            rowEl.style.display = undefined
+
+        }
+    }
+
+    async onCreateColumnClick(event) {
+        const target = event.currentTarget
+        const parent = target.closest('.add-column-form')
+        const table = parent.dataset.table
+        const column = parent.querySelector('.add-column-name').value
+        let newType = parent.querySelector('.add-column-type').value
+
+        if (!(table && column && newType)) {
+            alert('Missing info')
+            return
+        }
+        if (newType == "DOUBLE") {
+            newType += " PRECISION"
+        }
+        const query = `ALTER TABLE "${table}" ADD COLUMN "${column}" ${newType}`
+
+        try {
+            const res = await runSql(this.context.authToken, this.context.route.params.id, query)
+            console.log('res', res)
+            this.tableData[table].columns.push({ name: column, type: newType, not_null: false })
+            this._loadTableViews()
+        } catch (error) {
+            console.log('eeeeee', error)
+            alert(`Error: \n\n${error.message}`)
+        }
+
+    }
+
     _loadTableViews() {
         console.log("--", this.tableData)
         if (Object.keys(this.tableData).length === 0) {
@@ -107,6 +197,30 @@ export class DatbaseEditPage extends View {
                 <div class="table-card">
                     <h3 class="table-header">{key}</h3>
                     <div class="columns-list"></div>
+                    <div class="add-column-section">
+                        <div class="add-column-form" data-table={key}>
+                            <input type="text" placeholder="Column name..." class="add-column-name" />
+                            <select class="add-column-type">
+                                <option value="INTEGER">INTEGER</option>
+                                <option value="VARCHAR(50)">VARCHAR(50)</option>
+                                <option value="VARCHAR(100)">VARCHAR(100)</option>
+                                <option value="VARCHAR(255)">VARCHAR(255)</option>
+                                <option value="TEXT">TEXT</option>
+                                <option value="DECIMAL(10,2)">DECIMAL(10,2)</option>
+                                <option value="BOOLEAN">BOOLEAN</option>
+                                <option value="DATE">DATE</option>
+                                <option value="TIMESTAMP">TIMESTAMP</option>
+                                <option value="FLOAT">FLOAT</option>
+                                <option value="DOUBLE">DOUBLE</option>
+                                <option value="BIGINT">BIGINT</option>
+                                <option value="SMALLINT">SMALLINT</option>
+                                <option value="CHAR(10)">CHAR(10)</option>
+                                <option value="JSON">JSON</option>
+                                <option value="BLOB">BLOB</option>
+                            </select>
+                            <button class="add-btn" onClick={this.onCreateColumnClick}>+ Add Column</button>
+                        </div>
+                    </div>
                 </div>
             )
             nodes.push(headerEls.domEl)
@@ -120,32 +234,45 @@ export class DatbaseEditPage extends View {
                         <div class="column-actions">
                             <select class="column-type" onChange={this.onTypeClick}>
                                 {columnTypes.map((curType) => {
-                                    curType = curType.toLowerCase()
-                                    return <option value={curType} selected={curColumn.type.toLowerCase().startsWith(curType)} data-column={curColumn.name}>{curType}</option>
+                                    curType = curType?.toLowerCase()
+                                    const isSelected = curColumn.type?.toLowerCase().startsWith(curType)
+                                    const label = isSelected ? curColumn.type : curType
+                                    return <option value={curType} selected={isSelected} data-table={key} data-column={curColumn.name}>{label}</option>
                                 })}
                             </select>
-                            <button class="delete-btn">✕ Delete</button>
+                            <button class="delete-btn" onClick={this.onDeleteClick} data-table={key} data-column={curColumn.name}>✕ Delete</button>
                         </div>
                     </div>
                 )
 
                 listEl.append(newEl.domEl)
             })
-            this.domEl.querySelector('.tables-grid').replaceChildren(...nodes)
+
         }
 
-        // const newEl = (
-        //     <div class="table-card">
-        //         <h3 class="table-header">orders</h3>
-        //         <div class="columns-list">
-        //             <div class="column-row"><span class="column-name">prop('id')</span><span class="column-type">INTEGER</span></div>
-        //             <div class="column-row"><span class="column-name">user_id</span><span class="column-type">INTEGER</span></div>
-        //             <div class="column-row"><span class="column-name">order_date</span><span class="column-type">TIMESTAMP</span></div>
-        //             <div class="column-row"><span class="column-name">total_amount</span><span class="column-type">DECIMAL(10,2)</span></div>
-        //             <div class="column-row"><span class="column-name">status</span><span class="column-type">VARCHAR(20)</span></div>
-        //         </div>
-        //     </div>
-        // )
+        const gridEl = this.domEl.querySelector('.tables-grid')
+        gridEl.replaceChildren(...nodes)
+
+        document.querySelectorAll('.tables-grid select').forEach((curEl) => {
+            curEl.dataset.prevValue = curEl.value
+        })
+
+
+        // Add new table
+
+        const addCell = (
+            <div class="add-table-card">
+                <h3>➕ Add New Table</h3>
+                <div class="add-table-form">
+                    <input type="text" placeholder="Enter table name..." id="new-table-name" />
+                        <button class="add-table-btn">Create Table</button>
+                </div>
+            </div>
+        )
+
+        gridEl.append(addCell.domEl)
+
+        
 
     }
 }
@@ -221,7 +348,8 @@ async function runSql(authToken, dbId, command) {
             if (resp.status == 401) {
                 // window.location = '/signout'
             }
-            throw new Error(`HTTP error! status: ${resp.json()}`);
+            const json = await resp.json()
+            throw new Error(json.error);
         }
 
         // Show list
@@ -232,6 +360,7 @@ async function runSql(authToken, dbId, command) {
     }
     catch (error) {
         console.error('Error GettingDB:', error);
+        throw error
     }
 }
 

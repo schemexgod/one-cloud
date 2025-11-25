@@ -138,6 +138,121 @@ h1 {
     gap: 10px;
 }
 
+.add-column-section {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 2px solid #e0e0e0;
+}
+
+.add-column-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.add-column-form input {
+    padding: 8px 12px;
+    border: 2px solid #667eea;
+    border-radius: 6px;
+    font-size: 0.9em;
+    flex: 1;
+    min-width: 150px;
+}
+
+.add-column-form input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.add-column-form select {
+    padding: 8px 12px;
+    border: 2px solid #667eea;
+    border-radius: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+    background: white;
+}
+
+.add-btn {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.add-btn:hover {
+    background: #27ae60;
+    transform: scale(1.05);
+}
+
+
+.add-table-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    transition: transform 0.3s ease;
+}
+
+.add-table-card:hover {
+    transform: translateY(-5px);
+}
+
+.add-table-card h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 1.4em;
+}
+
+.add-table-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.add-table-form input {
+    padding: 12px 15px;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    font-size: 1em;
+    width: 100%;
+}
+
+.add-table-form input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.add-table-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.add-table-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
 .sort-controls {
     background: white;
     padding: 20px;

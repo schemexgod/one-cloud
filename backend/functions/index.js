@@ -120,7 +120,8 @@ const _processSqlEndpoint = async (pathParts, req, res) => {
     return res.status(200).json({ data: result.rows ?? [] })
   }
   catch (error) {
-    return res.status(error.code ?? 500).json({ error: error.message ?? 'k' })
+    // return res.status(200).json({work: 's', error})
+    return res.status(error.code ?? 500).json({ error: error.message ?? 'Unknown error' })
   }
 
 }

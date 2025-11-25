@@ -328,6 +328,6 @@ export const runSql = async (user, dbId, query) => {
   }
   catch (error) {
     const errorCode = error?.code ?? 500
-    throw new AppError(error.message ?? 'Unknown connection error', errorCode)
+    throw new AppError(error.message ?? 'Unknown connection error', 400)
   }
 }
