@@ -59,6 +59,8 @@ export class DatbaseEditPage extends View {
         this.onDeleteClick = this.onDeleteClick.bind(this)
         this.onCreateColumnClick = this.onCreateColumnClick.bind(this)
         this.onCreateTableClick = this.onCreateTableClick.bind(this)
+        this.onFKMouseEnter = this.onFKMouseEnter.bind(this)
+        this.onFKMouseLeave = this.onFKMouseLeave.bind(this)
     }
 
     compile() {
@@ -83,7 +85,24 @@ export class DatbaseEditPage extends View {
         this.tableData = resultTables
         this._loadTableViews()
     }
+    onFKMouseEnter(event) {
+        const target = event.currentTarget
+        const table = target.dataset.fkTable
+        const column = target.dataset.fkColumn
+        const foreignRowEl = this.domEl.querySelector(`.table-card[data-table="${table}"] .column-row[data-column="${column}"]`)
+        console.log('----', table, column, foreignRowEl)
+        foreignRowEl.style.backgroundColor = 'rgba(0, 119, 255, 0.2)'
 
+    }
+    onFKMouseLeave(event) {
+        const target = event.currentTarget
+        const table = target.dataset.fkTable
+        const column = target.dataset.fkColumn
+        const foreignRowEl = this.domEl.querySelector(`.table-card[data-table="${table}"] .column-row[data-column="${column}"]`)
+        console.log('----', table, column, foreignRowEl)
+        foreignRowEl.style.backgroundColor = null
+
+    }
     async onCreateTableClick(event) {
         const tableName = document.getElementById('new-table-name').value.trim()
         if (!tableName || tableName.length == 0) { return }
@@ -213,24 +232,21 @@ export class DatbaseEditPage extends View {
         for (let key in this.tableData) {
 
             const curInfo = this.tableData[key]
+
+            // Check for Keys and Constraints
             let primaryKeyCol
+            let foreignKeys = {}
             for (let info of curInfo.constraints) {
-                if (info.constraint_type_code == 'p') {
-                    const text = info.constraint_definition
-                    const regex = /\((.*?)\)/; // Matches content inside the first set of parentheses
-                    const match = text.match(regex);
-
-                    if (match && match[1]) {
-                        const content = match[1];
-                        primaryKeyCol = content.trim()
-                    }
-
-                    break
+                if (info.constraint_type == 'p') {
+                    primaryKeyCol = info.column_names
+                }
+                else if (info.constraint_type == 'f') {
+                    foreignKeys[info.column_names] = { table: info.foreign_table_name, column: info.foreign_column_names }
                 }
             }
-                        console.log("---primaryKeyCol", primaryKeyCol)
+
             const headerEls = (
-                <div class="table-card">
+                <div class="table-card" data-table={key}>
                     <h3 class="table-header">{key}</h3>
                     <div class="columns-list"></div>
                     <div class="add-column-section">
@@ -262,12 +278,20 @@ export class DatbaseEditPage extends View {
             nodes.push(headerEls.domEl)
             const listEl = headerEls.domEl.querySelector('.columns-list')
             curInfo.columns.forEach((curColumn) => {
+                const foreignColumn = foreignKeys[curColumn.name]
                 const newEl = (
-                    <div class="column-row">
+                    <div class="column-row" data-column={curColumn.name}>
                         <span class="column-name">
                             <span>{curColumn.name}</span>
                             {primaryKeyCol == curColumn.name ? (<span class="pk-badge" title="Primary Key - Click to remove">PK</span>) : <> </>}
-
+                            {foreignColumn ? (<span
+                                class="fk-badge" title="Foreign Key - Click to remove"
+                                data-fk-table={foreignColumn.table}
+                                data-fk-column={foreignColumn.column}
+                                onMouseEnter={this.onFKMouseEnter}
+                                onMouseLeave={this.onFKMouseLeave}>
+                                FK → {`${foreignColumn.table}.${foreignColumn.column}`}
+                            </span>) : <> </>}
                         </span>
                         {/* <span class="column-type" data-column={curColumn.name} onClick={this.onTypeClick}>{curColumn.type}</span> */}
 

@@ -257,18 +257,38 @@ ORDER BY
 
     // Constraints
     const constraintQuery = `SELECT
-  t.relname As table_name,
-    conname AS constraint_name,
-    contype AS constraint_type_code,
+    c.conname AS constraint_name,
+    c.contype AS constraint_type,
+    t.relname AS table_name,
+    CASE 
+        WHEN c.contype IN ('p', 'u', 'f','c') THEN
+            (SELECT string_agg(a.attname, ', ' ORDER BY array_position(c.conkey, a.attnum))
+             FROM pg_attribute a
+             WHERE a.attrelid = c.conrelid
+               AND a.attnum = ANY(c.conkey))
+        ELSE NULL
+    END AS column_names,
+    CASE 
+        WHEN c.contype = 'f' THEN
+            (SELECT cl.relname 
+             FROM pg_class cl 
+             WHERE cl.oid = c.confrelid)
+        ELSE NULL
+    END AS foreign_table_name,
+    CASE 
+        WHEN c.contype = 'f' THEN
+            (SELECT string_agg(a.attname, ', ' ORDER BY array_position(c.confkey, a.attnum))
+             FROM pg_attribute a
+             WHERE a.attrelid = c.confrelid
+               AND a.attnum = ANY(c.confkey))
+        ELSE NULL
+    END AS foreign_column_names,
     pg_get_constraintdef(c.oid) AS constraint_definition
-FROM
-    pg_constraint c
-JOIN
-    pg_class AS t ON t.oid = c.conrelid
-JOIN
-    pg_namespace AS n ON n.oid = t.relnamespace
-WHERE
-    n.nspname = 'public'`
+FROM pg_constraint c
+JOIN pg_class t ON c.conrelid = t.oid
+JOIN pg_namespace n ON t.relnamespace = n.oid
+WHERE n.nspname = 'public'
+ORDER BY t.relname, c.conname`
 
     const { rows: constraintRows } = await client.query(constraintQuery);
     constraintRows.forEach((curRow) => {
