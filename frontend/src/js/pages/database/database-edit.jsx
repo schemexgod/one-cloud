@@ -61,6 +61,7 @@ export class DatbaseEditPage extends View {
         this.onCreateTableClick = this.onCreateTableClick.bind(this)
         this.onFKMouseEnter = this.onFKMouseEnter.bind(this)
         this.onFKMouseLeave = this.onFKMouseLeave.bind(this)
+        this.onSetPKClick = this.onSetPKClick.bind(this)
     }
 
     compile() {
@@ -220,6 +221,29 @@ export class DatbaseEditPage extends View {
 
     }
 
+    async onSetPKClick(event) {
+        const target = event.currentTarget
+        const column = target.closest('.column-row').dataset.column
+        const table = target.closest('.table-card').dataset.table
+
+        const query = `ALTER TABLE "${table}" ADD CONSTRAINT "${table}_pkey" PRIMARY KEY (${column});`
+        console.log('query', query)
+        try {
+            const res = await runSql(this.context.authToken, this.context.route.params.id, query)
+            console.log('res', res)
+            this.tableData[table].constraints = this.tableData[table].constraints.filter((cur) => {
+                return cur.constraint_type != 'p'
+            })
+            this.tableData[table].constraints.push({ column_names: column, constraint_type: 'p' })
+            this._loadTableViews()
+
+        } catch (error) {
+            console.log('eeeeee', error)
+            alert(`Error: \n\n${error.message}`)
+
+        }
+    }
+
     _loadTableViews() {
         console.log("--", this.tableData)
         if (Object.keys(this.tableData).length === 0) {
@@ -283,19 +307,32 @@ export class DatbaseEditPage extends View {
                     <div class="column-row" data-column={curColumn.name}>
                         <span class="column-name">
                             <span>{curColumn.name}</span>
-                            {primaryKeyCol == curColumn.name ? (<span class="pk-badge" title="Primary Key - Click to remove">PK</span>) : <> </>}
-                            {foreignColumn ? (<span
-                                class="fk-badge" title="Foreign Key - Click to remove"
-                                data-fk-table={foreignColumn.table}
-                                data-fk-column={foreignColumn.column}
-                                onMouseEnter={this.onFKMouseEnter}
-                                onMouseLeave={this.onFKMouseLeave}>
-                                FK → {`${foreignColumn.table}.${foreignColumn.column}`}
-                            </span>) : <> </>}
+                            {primaryKeyCol == curColumn.name ? (
+                                <span
+                                    class="pk-badge"
+                                    title="Primary Key - Click to remove">
+                                    PK
+                                </span>
+                            ) : <> </>}
+
+                            {foreignColumn ? (
+                                <span
+                                    class="fk-badge" title="Foreign Key - Click to remove"
+                                    data-fk-table={foreignColumn.table}
+                                    data-fk-column={foreignColumn.column}
+                                    onMouseEnter={this.onFKMouseEnter}
+                                    onMouseLeave={this.onFKMouseLeave}>
+                                    FK → {`${foreignColumn.table}.${foreignColumn.column}`}
+                                </span>
+                            ) : <> </>}
+
                         </span>
                         {/* <span class="column-type" data-column={curColumn.name} onClick={this.onTypeClick}>{curColumn.type}</span> */}
 
                         <div class="column-actions">
+                            {primaryKeyCol == curColumn.name ? <></> : (
+                                <button class="constraint-btn" title="Set as Primary Key" onClick={this.onSetPKClick}>Set PK</button>
+                            )}
                             <select class="column-type" onChange={this.onTypeClick}>
                                 {columnTypes.map((curType) => {
                                     curType = curType?.toLowerCase()
