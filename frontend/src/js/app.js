@@ -126,7 +126,7 @@ class AppView extends View {
       <div>
         <header id="header">
           <div class="header-content">
-            <h1>PlayCloud</h1>
+            <h2>PlayCloud</h2>
             <nav>
               <a href="/databases">databases</a>
 
