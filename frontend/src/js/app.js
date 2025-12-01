@@ -59,6 +59,7 @@ class AppView extends View {
       },
       '/databases': this.pageRoute(() => { return import('./pages/database/database.jsx') }),
       '/databases/:id': this.pageRoute(() => { return import('./pages/database/database-edit.jsx') }),
+      '/databases/:id/:tableId': this.pageRoute(() => { return import('./pages/database/table-records.jsx') }),
       '/signin': this.pageRoute(() => { return import('./pages/signin/signin.jsx') }),
     })
 
