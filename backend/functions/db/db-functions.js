@@ -189,12 +189,20 @@ function _tableInfoObj() {
  * @param {Request} req 
  * @param {Response} res 
  * @param {string} dbId 
+ * @param {string?} tableId 
  * @returns 
  */
-export const getTables = async (req, res, dbId) => {
+export const getTables = async (req, res, dbId, tableId) => {
   // MUST be signed in
   const user = await getUserOrFail(req, res)
   if (!user) { return }
+
+  let tableConditional = ''
+  let tableConditional2 = ''
+  if (tableId) {
+    tableConditional = `AND t.table_name='${tableId}' `
+    tableConditional2 = `AND t.relname='${tableId}' `
+  }
 
   /** @type {GetDBBody} */
   const reqBody = req.query
@@ -228,7 +236,7 @@ JOIN
     AND t.table_name = c.table_name
 WHERE 
     t.table_schema NOT IN ('pg_catalog', 'information_schema')
-    AND t.table_type = 'BASE TABLE'
+    AND t.table_type = 'BASE TABLE' ${tableConditional}
 ORDER BY 
     t.table_schema,
     t.table_name,
@@ -243,17 +251,20 @@ ORDER BY
     const returnData = {}
 
     // All tables
-    const allTablesQuery = `SELECT table_schema, table_name
+    if (!tableId) {
+      const allTablesQuery = `SELECT table_schema, table_name
     FROM information_schema.tables
     WHERE table_type = 'BASE TABLE'
     AND table_schema NOT IN ('pg_catalog', 'information_schema')
     ORDER BY table_schema, table_name`
 
-    const { rows: tableRows } = await client.query(allTablesQuery);
+      const { rows: tableRows } = await client.query(allTablesQuery);
 
-    tableRows.forEach((curRow) => {
-      returnData[curRow.table_name] = _tableInfoObj()
-    })
+      tableRows.forEach((curRow) => {
+        returnData[curRow.table_name] = _tableInfoObj()
+      })
+    }
+
 
     // Constraints
     const constraintQuery = `SELECT
@@ -287,7 +298,7 @@ ORDER BY
 FROM pg_constraint c
 JOIN pg_class t ON c.conrelid = t.oid
 JOIN pg_namespace n ON t.relnamespace = n.oid
-WHERE n.nspname = 'public'
+WHERE n.nspname = 'public' ${tableConditional2}
 ORDER BY t.relname, c.conname`
 
     const { rows: constraintRows } = await client.query(constraintQuery);

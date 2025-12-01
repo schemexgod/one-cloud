@@ -185,6 +185,8 @@ const _processDBTableEndpoint = (pathParts, req, res) => {
   tableId = decodeURIComponent(tableId)
 
   switch (reqMethod) {
+    case 'GET':
+      return getTables(req, res, dbId, tableId)
     // Alter table
     case 'PATCH', 'POST', 'PUT':
       return

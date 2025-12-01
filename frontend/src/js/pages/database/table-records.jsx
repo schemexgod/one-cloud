@@ -17,6 +17,8 @@ export class TableRecordsPage extends View {
   /** @type {[JsxElementInfoType]} */
   #_rows = []
 
+  #_tableSchema = {}
+
   /**
    * Initialize with AppContext
    * @param {AppContext} context 
@@ -45,8 +47,8 @@ export class TableRecordsPage extends View {
 
   }
   didRender(props) {
-    console.log('db page', this.domEl, props)
-    this._fetchRecords()
+    console.log('table records page', this.domEl, props)
+    // this._fetchRecords()
   }
 
   renderDBList() {
@@ -98,6 +100,23 @@ export class TableRecordsPage extends View {
     const { authToken, route } = this.context
     const tableName = decodeURI(route.params.tableId)
 
+    // Get table schema
+    try {
+      const res = await getTableSchema(authToken, route.params.id, tableName)
+      console.log('res', res)
+      console.log('tables', res)
+      console.log('fetching db result', res)
+      this.#_tableSchema = res
+
+    }
+    catch (error) {
+      console.log('eeeeee', error)
+      alert(`Error: \n\n${error.message}`)
+    }
+
+    // Get Rows
+
+
     const query = `SELECT * FROM "${tableName}"`
     console.log('sql command ::', query)
 
@@ -124,11 +143,11 @@ export class TableRecordsPage extends View {
  * @param {string} authToken 
  * @returns {Promise<[Object]?>} array of db objects
  */
-async function getDatabases(authToken) {
+async function getTableSchema(authToken, dbId, tableId) {
   console.log('authToken', authToken)
 
   // const testEndPoint = 'https://us-central1-oneshot-c5e23.cloudfunctions.net/userAdmin/db'
-  const testEndPoint = 'http://127.0.0.1:5001/oneshot-c5e23/us-central1/userAdmin/db'
+  const testEndPoint = `http://127.0.0.1:5001/oneshot-c5e23/us-central1/userAdmin/db/${dbId}/${tableId}`
 
   try {
     // Fetch DB list
