@@ -81,9 +81,9 @@ export class DatbaseEditPage extends View {
         const resultTables = await getTables(authToken, route.params.id)
 
         console.log('tables', resultTables)
-        const pre = document.createElement('pre')
-        pre.innerHTML = JSON.stringify(resultTables, null, "  ")
-        this.domEl.append(pre)
+        // const pre = document.createElement('pre')
+        // pre.innerHTML = JSON.stringify(resultTables, null, "  ")
+        // this.domEl.append(pre)
         this.tableData = resultTables
         this._loadTableViews()
     }
@@ -272,7 +272,10 @@ export class DatbaseEditPage extends View {
 
             const headerEls = (
                 <div class="table-card" data-table={key}>
-                    <h3 class="table-header">{key}</h3>
+                    <div class="table-header">
+                        <h3>{key}</h3>
+                        <a href={`/databases/${this.context.route.params.id}/${key}`}>View Entries</a>
+                    </div>
                     <div class="columns-list"></div>
                     <div class="add-column-section">
                         <div class="add-column-form" data-table={key}>

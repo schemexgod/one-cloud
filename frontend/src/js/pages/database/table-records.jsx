@@ -1,5 +1,6 @@
 import PlayWebUI, { View, prop } from "play-web-ui";
 import './database.scss'
+import { runSql } from "../../shared/sql-helpers";
 
 /** @typedef {import("../../play-web-ui/src/play-types").JsxElementInfoType} JsxElementInfoType */
 
@@ -31,15 +32,18 @@ export class TableRecordsPage extends View {
       <section id="db-section">
         <nav>
 
+          <h3>DB Records "{() => { return this.context.route.params.tableId }}"</h3>
+          <a onClick={this.onAddClick}>Add Record</a>
         </nav>
-        <h3>Records</h3>
         <ul class="list">
           {/** List goes here */}
         </ul>
       </section>
     )
   }
+  onAddClick() {
 
+  }
   didRender(props) {
     console.log('db page', this.domEl, props)
     this._fetchRecords()
@@ -51,7 +55,7 @@ export class TableRecordsPage extends View {
     if (!listEl) { return }
 
     if (this.dbList.length === 0) {
-      listEl.textContent = 'No databases found'
+      listEl.textContent = 'No entries found'
       return
     }
 
@@ -90,10 +94,27 @@ export class TableRecordsPage extends View {
     this.status = 'loading'
     this.domEl.querySelector('.list').textContent = 'loading...'
     console.log('fetching db', this.context)
-    const result = await getDatabases(this.context.authToken)
-    console.log('fetching db result', result)
+
+    const { authToken, route } = this.context
+    const tableName = decodeURI(route.params.tableId)
+
+    const query = `SELECT * FROM "${tableName}"`
+    console.log('sql command ::', query)
+
+    try {
+      const res = await runSql(authToken, route.params.id, query)
+      console.log('res', res)
+      console.log('tables', res)
+      console.log('fetching db result', res)
+      this.dbList = res
+
+    }
+    catch (error) {
+      console.log('eeeeee', error)
+      alert(`Error: \n\n${error.message}`)
+    }
+
     this.status = 'complete'
-    this.dbList = result
     this.renderDBList()
   }
 }
@@ -138,4 +159,4 @@ async function getDatabases(authToken) {
   }
 }
 
-export default DatabasePage
+export default TableRecordsPage
