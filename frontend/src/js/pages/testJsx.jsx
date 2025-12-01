@@ -64,12 +64,19 @@ export function testJSX2() {
   return ret
 }
 
-export const testJSX = new testJSX2()
+// export const testJSX = new testJSX2()
 
-console.log('testJSX', testJSX)
-document.body.appendChild(testJSX.domEl)
-console.log('BREAKING_--')
-testJSX.render({ firstName: 'eric', subobj: { lastName: 'eng' } })
-testJSX.domEl.addEventListener('click', () => {
-  testJSX.render({ firstName: 'dddddaaa', subobj: { lastName: 'aaaaa2' }, children: [<div>hello {prop('firstName')}</div>] })
-})
+// console.log('testJSX', testJSX)
+// document.body.appendChild(testJSX.domEl)
+// console.log('BREAKING_--')
+// testJSX.render({ firstName: 'eric', subobj: { lastName: 'eng' } })
+// testJSX.domEl.addEventListener('click', () => {
+//   testJSX.render({ firstName: 'dddddaaa', subobj: { lastName: 'aaaaa2' }, children: [<div>hello {prop('firstName')}</div>] })
+// })
+
+
+const TestFuncEl = (props) => {
+  console.log('II GOT FIRED')
+}
+
+const newThing = <TestFuncEl />

@@ -3,7 +3,7 @@ import { JsxBindProp, JsxElementInfo, JsxElementInfoType } from "./play-types";
 import { view, View } from "./View";
 
 // disable console log
-const console = { log: () => { } }
+// const console = { log: () => { } }
 
 /**
  * The core JSX factor method. 
