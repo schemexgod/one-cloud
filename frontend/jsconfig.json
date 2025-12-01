@@ -1,7 +1,7 @@
 {
-  // "compilerOptions": {
-  //   "jsx": "preserve", 
-  //   "jsxFactory": "PlayWebUI.createDomNode" ,
-  //   "jsxFragmentFactory": "PlayWebUI.Fragment"
-  // }
+  "compilerOptions": {
+    "jsx": "preserve", 
+    "jsxFactory": "PlayWebUI.createDomNode" ,
+    "jsxFragmentFactory": "PlayWebUI.Fragment"
+  }
 }
