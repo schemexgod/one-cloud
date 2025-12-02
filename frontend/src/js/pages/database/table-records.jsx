@@ -27,23 +27,20 @@ export class TableRecordsPage extends View {
   constructor(context) {
     super(context)
     this.context = context ?? {}
+    this.domEl.querySelector('.data-container').style.display = 'none'
     this._fetchRecords()
   }
 
   compile() {
     return (
       <section id="db-section">
-        <nav>
-
-          <h3>DB Records "{() => { return this.context.route.params.tableId }}"</h3>
-          <a onClick={this.onAddClick}>Add Record</a>
-        </nav>
+        <div class="loading">Loading...</div>
 
         <div class="data-container" id="dataContainer" style="display: block;">
           <div class="table-header">
             <div>
-              <span id="tableName">users</span>
-              <span class="row-count" id="rowCount">4 rows</span>
+              <span id="tableName">{() => { return this.context.route.params.tableId }}</span>
+              <span class="row-count" id="rowCount">{() => { return this.#_tableSchema.rowCount }} rows</span>
             </div>
             <button class="add-row-btn" onclick="openAddRowModal()">+ Add Row</button>
           </div>
@@ -153,13 +150,12 @@ export class TableRecordsPage extends View {
 
   async _fetchRecords() {
     this.status = 'loading'
-    this.domEl.querySelector('.list').textContent = 'loading...'
     console.log('fetching db', this.context)
 
     const { authToken, route } = this.context
     const tableName = decodeURI(route.params.tableId)
 
-    // Get table schema
+    // Get table schema    
     try {
       const res = await getTableSchema(authToken, route.params.id, tableName)
       const tableSchema = res[tableName]
@@ -168,19 +164,29 @@ export class TableRecordsPage extends View {
         throw new Error('No table schema found!')
       }
       console.log('table schema', res)
-      this.#_tableSchema = res
+      this.#_tableSchema = tableSchema
 
     }
     catch (error) {
       console.log('eeeeee', error)
       alert(`Error: \n\n${error.message}`)
+      return
     }
 
+
     // Build Column Headers
+    const headerRowEl = this.domEl.querySelector('#tableHead > tr')
+    const newEls = []
+    this.#_tableSchema.columns.forEach((curCol) => {
+      newEls.push((<th>{curCol.name}</th>).domEl)
+    })
+    headerRowEl.replaceChildren(...newEls)
+
+    // Show table data
+    this.domEl.querySelector('.data-container').style.display = null
+    this.domEl.querySelector('.loading').style.display = 'none'
 
     // Get Rows
-
-
     const query = `SELECT * FROM "${tableName}"`
     console.log('sql command ::', query)
 
@@ -197,8 +203,29 @@ export class TableRecordsPage extends View {
       alert(`Error: \n\n${error.message}`)
     }
 
+    // Build rows
+    const rowEls = []
+    // this.dbList.forEach((curRow) => {
+    //   curRow
+    //   rowEls.push((
+    //     <tr>
+    //       <td>2</td>
+    //       <td>jane_smith</td>
+    //       <td>jane@example.com</td>
+    //       <td>2024-01-16 14:20:00</td>
+    //       <td>
+    //         <button class="delete-btn">✕ Delete</button>
+    //       </td>
+    //     </tr>
+    //   ))
+    // })
+    if (this.dbList.length == 0) {
+      const tableBodyEl = this.domEl.querySelector('#tableBody')
+      tableBodyEl.replaceChildren((<tr><td>No Rows!</td></tr>).domEl)
+    }
+
     this.status = 'complete'
-    this.renderDBList()
+    // this.renderDBList()
   }
 }
 
