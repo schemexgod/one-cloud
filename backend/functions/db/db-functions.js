@@ -182,7 +182,7 @@ export const deleteDatabase = async (req, res) => {
 }
 
 function _tableInfoObj() {
-  return { columns: [], constraints: [] }
+  return { columns: [], constraints: [], rowCount: 0 }
 }
 /**
  * Gets tables and
@@ -211,6 +211,7 @@ export const getTables = async (req, res, dbId, tableId) => {
   const queryStr = `SELECT 
     t.table_name,
     c.column_name AS name,
+    pg.n_live_tup AS "REMOVEME_TABLE_ROW_COUNT",
     CASE 
         WHEN c.data_type = 'character varying' THEN 
             'varchar(' || c.character_maximum_length || ')'        
@@ -234,13 +235,16 @@ JOIN
     information_schema.columns c 
     ON t.table_schema = c.table_schema 
     AND t.table_name = c.table_name
+JOIN 
+    pg_stat_user_tables pg
+    ON t.table_name = pg.relname
 WHERE 
     t.table_schema NOT IN ('pg_catalog', 'information_schema')
     AND t.table_type = 'BASE TABLE' ${tableConditional}
 ORDER BY 
     t.table_schema,
     t.table_name,
-    c.ordinal_position;`
+    c.ordinal_position`
 
   // Get data
   let client
@@ -317,11 +321,12 @@ ORDER BY t.relname, c.conname`
     // Transform data to output format
     for (let i = 0; i < len; i++) {
       const resultColumnData = rows[i]
-      const { table_name, ...columnData } = resultColumnData
+      const { table_name, REMOVEME_TABLE_ROW_COUNT, ...columnData } = resultColumnData
 
       /** @type {DBTableInfo} */
       const curTableData = returnData[table_name] ?? _tableInfoObj()
       curTableData.columns.push(columnData)
+      curTableData.rowCount = parseInt(REMOVEME_TABLE_ROW_COUNT) ?? 0
       returnData[table_name] = curTableData
     }
 

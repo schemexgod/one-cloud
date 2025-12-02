@@ -1,5 +1,6 @@
 import PlayWebUI, { View, prop } from "play-web-ui";
 import './database.scss'
+import './table-records.scss'
 import { runSql } from "../../shared/sql-helpers";
 
 /** @typedef {import("../../play-web-ui/src/play-types").JsxElementInfoType} JsxElementInfoType */
@@ -37,9 +38,67 @@ export class TableRecordsPage extends View {
           <h3>DB Records "{() => { return this.context.route.params.tableId }}"</h3>
           <a onClick={this.onAddClick}>Add Record</a>
         </nav>
-        <ul class="list">
-          {/** List goes here */}
-        </ul>
+
+        <div class="data-container" id="dataContainer" style="display: block;">
+          <div class="table-header">
+            <div>
+              <span id="tableName">users</span>
+              <span class="row-count" id="rowCount">4 rows</span>
+            </div>
+            <button class="add-row-btn" onclick="openAddRowModal()">+ Add Row</button>
+          </div>
+          <div class="table-wrapper">
+            <table id="dataTable">
+              <thead id="tableHead">
+                <tr>
+                  <th>id</th>
+                  <th>username</th>
+                  <th>email</th>
+                  <th>created_at</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <tr>
+                  <td>1</td>
+                  <td>john_doe</td>
+                  <td>john@example.com</td>
+                  <td>2024-01-15 10:30:00</td>
+                  <td>
+                    <button class="delete-btn">✕ Delete</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>jane_smith</td>
+                  <td>jane@example.com</td>
+                  <td>2024-01-16 14:20:00</td>
+                  <td>
+                    <button class="delete-btn">✕ Delete</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>bob_wilson</td>
+                  <td>bob@example.com</td>
+                  <td>2024-01-17 09:15:00</td>
+                  <td>
+                    <button class="delete-btn">✕ Delete</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>alice_brown</td>
+                  <td>alice@example.com</td>
+                  <td>2024-01-18 11:45:00</td>
+                  <td>
+                    <button class="delete-btn">✕ Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
     )
   }
@@ -103,9 +162,12 @@ export class TableRecordsPage extends View {
     // Get table schema
     try {
       const res = await getTableSchema(authToken, route.params.id, tableName)
-      console.log('res', res)
-      console.log('tables', res)
-      console.log('fetching db result', res)
+      const tableSchema = res[tableName]
+
+      if (!tableSchema) {
+        throw new Error('No table schema found!')
+      }
+      console.log('table schema', res)
       this.#_tableSchema = res
 
     }
@@ -113,6 +175,8 @@ export class TableRecordsPage extends View {
       console.log('eeeeee', error)
       alert(`Error: \n\n${error.message}`)
     }
+
+    // Build Column Headers
 
     // Get Rows
 
