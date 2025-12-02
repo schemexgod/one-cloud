@@ -96,6 +96,22 @@ export class TableRecordsPage extends View {
             </table>
           </div>
         </div>
+        <div id="addRowModal" class="modal active">
+          <div class="modal-content">
+            <h2>Add New Row</h2>
+            <form id="addRowForm">
+              <div class="form-group">
+                <label>id (INTEGER)</label>
+                <input type="number" id="input-id" name="id" />
+              </div>
+
+            </form>
+            <div class="modal-buttons">
+              <button class="modal-btn secondary" onclick="closeAddRowModal()">Cancel</button>
+              <button class="modal-btn primary" onclick="saveNewRow()">Add Row</button>
+            </div>
+          </div>
+        </div>
       </section>
     )
   }
@@ -174,13 +190,22 @@ export class TableRecordsPage extends View {
     }
 
 
-    // Build Column Headers
+    // Build Column Headers & Add Row Form
     const headerRowEl = this.domEl.querySelector('#tableHead > tr')
+    const formEl = this.domEl.querySelector('#addRowForm')
     const newEls = []
+    const newFormEls = []
     this.#_tableSchema.columns.forEach((curCol) => {
       newEls.push((<th>{curCol.name}</th>).domEl)
+      newFormEls.push((
+        <div class="form-group">
+          <label>{curCol.name} ({curCol.type})</label>
+          <input type="text" name={curCol.name} />
+        </div>
+      ).domEl)
     })
     headerRowEl.replaceChildren(...newEls)
+    formEl.replaceChildren(...newFormEls)
 
     // Show table data
     this.domEl.querySelector('.data-container').style.display = null
