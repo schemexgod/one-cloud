@@ -169,6 +169,7 @@ h3 {
 
 a {
     color: white;
+    text-underline-offset: 5px;
 }
 
 h3 {

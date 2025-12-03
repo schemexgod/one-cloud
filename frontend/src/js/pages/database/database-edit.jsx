@@ -274,7 +274,7 @@ export class DatbaseEditPage extends View {
                 <div class="table-card" data-table={key}>
                     <div class="table-header">
                         <h3>{key}</h3>
-                        <a href={`/databases/${this.context.route.params.id}/${key}`}>View Entries</a>
+                        <a href={`/databases/${this.context.route.params.id}/${key}`}>{curInfo.rowCount} Entries</a>
                     </div>
                     <div class="columns-list"></div>
                     <div class="add-column-section">

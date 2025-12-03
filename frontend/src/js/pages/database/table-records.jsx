@@ -26,6 +26,7 @@ export class TableRecordsPage extends View {
    */
   constructor(context) {
     super(context)
+    this.onAddRowSubmit = this.onAddRowSubmit.bind(this)
     this.onAddClick = this.onAddClick.bind(this)
     this.onCancelAddClick = this.onCancelAddClick.bind(this)
     this.context = context ?? {}
@@ -111,13 +112,60 @@ export class TableRecordsPage extends View {
               </form>
               <div class="modal-buttons">
                 <button class="modal-btn secondary" onclick={this.onCancelAddClick}>Cancel</button>
-                <button class="modal-btn primary" onclick="saveNewRow()">Add Row</button>
+                <button class="modal-btn primary" onclick={this.onAddRowSubmit}>Add Row</button>
               </div>
             </div>
           </div>
         </div>
       </section>
     )
+  }
+  async onAddRowSubmit() {
+    const formInputs = document.querySelectorAll('#addRowForm input')
+    if (formInputs.length == 0) {
+      alert(`Error: Cannot find form info!`)
+    }
+
+    const { authToken, route } = this.context
+    const tableName = decodeURI(route.params.tableId)
+
+    let columnStr = ''
+    let valueStr = ''
+
+    // Loop through inputs and for query
+    formInputs.forEach((curInput) => {
+      const value = curInput.value
+      if (!value || value.length == 0) {
+        return
+      }
+      columnStr += `"${curInput.name}", `
+      valueStr += `'${curInput.value}', `
+      console.log('form input', curInput.name, curInput.value)
+    })
+
+    if (columnStr.length < 2) {
+      alert(`Error: Fill out form!`)
+      return
+    }
+
+    columnStr = columnStr.slice(0, -2)
+    valueStr = valueStr.slice(0, -2)
+
+    const queryStr = `INSERT INTO "${tableName}" (${columnStr}) VALUES (${valueStr})`
+    console.log('-- insert query ::', queryStr)
+    try {
+      const res = await runSql(authToken, route.params.id, queryStr)
+      console.log('res', res)
+      console.log('tables', res)
+      console.log('fetching db result', res)
+      // this.dbList = res
+
+      this.domEl.querySelector('#addRowModal').classList.remove('active')
+    }
+    catch (error) {
+      console.log('eeeeee', error)
+      alert(`Error: \n\n${error.message}`)
+    }
   }
   onAddClick() {
     console.log('this', this, this.domEl)
@@ -197,6 +245,8 @@ export class TableRecordsPage extends View {
       return
     }
 
+    this.domEl.querySelector('#rowCount').textContent = `${this.#_tableSchema.rowCount} rows`
+
 
     // Build Column Headers & Add Row Form
     const headerRowEl = this.domEl.querySelector('#tableHead > tr')
@@ -212,6 +262,7 @@ export class TableRecordsPage extends View {
         </div>
       ).domEl)
     })
+    newEls.push((<th>Actions</th>).domEl)
     headerRowEl.replaceChildren(...newEls)
     formEl.replaceChildren(...newFormEls)
 
@@ -238,25 +289,31 @@ export class TableRecordsPage extends View {
       alert(`Error: \n\n${error.message}`)
     }
 
-    // Build rows
-    const rowEls = []
-    // this.dbList.forEach((curRow) => {
-    //   curRow
-    //   rowEls.push((
-    //     <tr>
-    //       <td>2</td>
-    //       <td>jane_smith</td>
-    //       <td>jane@example.com</td>
-    //       <td>2024-01-16 14:20:00</td>
-    //       <td>
-    //         <button class="delete-btn">✕ Delete</button>
-    //       </td>
-    //     </tr>
-    //   ))
-    // })
     if (this.dbList.length == 0) {
       tableBodyEl.replaceChildren((<tr><td colspan={this.#_tableSchema.columns.length ?? 1}>No Rows!</td></tr>).domEl)
     }
+    else {
+      // Build rows
+      const rowEls = []
+      this.dbList.forEach((curRow) => {
+        const rows = this.#_tableSchema.columns.map((curCol) => {
+          const colName = curCol.name
+          return ((<td>{curRow[colName] ?? ''}</td>))
+        })
+
+        rowEls.push((
+          <tr>
+            {rows}
+            <td>
+              <button class="delete-btn">✕ Delete</button>
+            </td>
+          </tr>
+        ).domEl)
+      })
+
+      tableBodyEl.replaceChildren(...rowEls)
+    }
+
 
     this.status = 'complete'
     // this.renderDBList()
