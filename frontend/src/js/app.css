@@ -154,7 +154,7 @@ h3 {
 #main {
     display: flex;
     justify-content: center;
-    padding-top: calc(var(--header-height) + 40px);
+    padding: calc(var(--header-height) + 40px) 25px 0 25px;
 }
 
 #main>* {

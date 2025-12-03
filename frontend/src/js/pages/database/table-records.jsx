@@ -26,6 +26,8 @@ export class TableRecordsPage extends View {
    */
   constructor(context) {
     super(context)
+    this.onAddClick = this.onAddClick.bind(this)
+    this.onCancelAddClick = this.onCancelAddClick.bind(this)
     this.context = context ?? {}
     this.domEl.querySelector('.data-container').style.display = 'none'
     this._fetchRecords()
@@ -42,7 +44,7 @@ export class TableRecordsPage extends View {
               <span id="tableName">{() => { return this.context.route.params.tableId }}</span>
               <span class="row-count" id="rowCount">{() => { return this.#_tableSchema.rowCount }} rows</span>
             </div>
-            <button class="add-row-btn" onclick="openAddRowModal()">+ Add Row</button>
+            <button class="add-row-btn" onclick={this.onAddClick}>+ Add Row</button>
           </div>
           <div class="table-wrapper">
             <table id="dataTable">
@@ -96,7 +98,7 @@ export class TableRecordsPage extends View {
             </table>
           </div>
         </div>
-        <div id="addRowModal" class="modal active">
+        <div id="addRowModal" class="modal">
           <div class="modal-content">
             <div class="modal-content-scroll">
               <h2>Add New Row</h2>
@@ -108,7 +110,7 @@ export class TableRecordsPage extends View {
 
               </form>
               <div class="modal-buttons">
-                <button class="modal-btn secondary" onclick="closeAddRowModal()">Cancel</button>
+                <button class="modal-btn secondary" onclick={this.onCancelAddClick}>Cancel</button>
                 <button class="modal-btn primary" onclick="saveNewRow()">Add Row</button>
               </div>
             </div>
@@ -118,7 +120,11 @@ export class TableRecordsPage extends View {
     )
   }
   onAddClick() {
-
+    console.log('this', this, this.domEl)
+    this.domEl.querySelector('#addRowModal').classList.add('active')
+  }
+  onCancelAddClick() {
+    this.domEl.querySelector('#addRowModal').classList.remove('active')
   }
   didRender(props) {
     console.log('table records page', this.domEl, props)
@@ -210,6 +216,8 @@ export class TableRecordsPage extends View {
     formEl.replaceChildren(...newFormEls)
 
     // Show table data
+    const tableBodyEl = this.domEl.querySelector('#tableBody')
+    tableBodyEl.replaceChildren((<tr><td colspan={this.#_tableSchema.columns.length ?? 1}>Loading...</td></tr>).domEl)
     this.domEl.querySelector('.data-container').style.display = null
     this.domEl.querySelector('.loading').style.display = 'none'
 
@@ -247,8 +255,7 @@ export class TableRecordsPage extends View {
     //   ))
     // })
     if (this.dbList.length == 0) {
-      const tableBodyEl = this.domEl.querySelector('#tableBody')
-      tableBodyEl.replaceChildren((<tr><td>No Rows!</td></tr>).domEl)
+      tableBodyEl.replaceChildren((<tr><td colspan={this.#_tableSchema.columns.length ?? 1}>No Rows!</td></tr>).domEl)
     }
 
     this.status = 'complete'

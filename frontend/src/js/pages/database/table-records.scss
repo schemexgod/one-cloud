@@ -91,6 +91,7 @@ th {
 td {
     padding: 12px 15px;
     border-bottom: 1px solid #e0e0e0;
+    text-align: center;
 }
 
 tbody tr {
@@ -160,7 +161,7 @@ tbody tr:hover {
     overflow-y: auto;
     max-height: 80vh;
     padding: 30px;
-    width: 100%;
+    width:100%;
 }
 
 .modal-content h2 {
