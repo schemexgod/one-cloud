@@ -98,17 +98,19 @@ export class TableRecordsPage extends View {
         </div>
         <div id="addRowModal" class="modal active">
           <div class="modal-content">
-            <h2>Add New Row</h2>
-            <form id="addRowForm">
-              <div class="form-group">
-                <label>id (INTEGER)</label>
-                <input type="number" id="input-id" name="id" />
-              </div>
+            <div class="modal-content-scroll">
+              <h2>Add New Row</h2>
+              <form id="addRowForm">
+                <div class="form-group">
+                  <label>id (INTEGER)</label>
+                  <input type="number" id="input-id" name="id" />
+                </div>
 
-            </form>
-            <div class="modal-buttons">
-              <button class="modal-btn secondary" onclick="closeAddRowModal()">Cancel</button>
-              <button class="modal-btn primary" onclick="saveNewRow()">Add Row</button>
+              </form>
+              <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeAddRowModal()">Cancel</button>
+                <button class="modal-btn primary" onclick="saveNewRow()">Add Row</button>
+              </div>
             </div>
           </div>
         </div>
