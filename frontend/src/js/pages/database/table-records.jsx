@@ -2,6 +2,7 @@ import PlayWebUI, { View, prop } from "play-web-ui";
 import './database.scss'
 import './table-records.scss'
 import { runSql } from "../../shared/sql-helpers";
+import { debounce } from "../../shared/utils";
 
 /** @typedef {import("../../play-web-ui/src/play-types").JsxElementInfoType} JsxElementInfoType */
 
@@ -20,17 +21,22 @@ export class TableRecordsPage extends View {
 
   #_tableSchema = {}
 
+  debouncedUpdateRowData
+
   /**
    * Initialize with AppContext
    * @param {AppContext} context 
    */
   constructor(context) {
     super(context)
+    this.updateRowData = this.updateRowData.bind(this)
+    this.onRowDataChange = this.onRowDataChange.bind(this)
     this.onDeleteClick = this.onDeleteClick.bind(this)
     this.onAddRowSubmit = this.onAddRowSubmit.bind(this)
     this.onAddClick = this.onAddClick.bind(this)
     this.onCancelAddClick = this.onCancelAddClick.bind(this)
     this.context = context ?? {}
+    this.debouncedUpdateRowData = debounce(this.updateRowData, 300);
     this.domEl.querySelector('.data-container').style.display = 'none'
     this._fetchRecords()
   }
@@ -65,33 +71,6 @@ export class TableRecordsPage extends View {
                   <td>john_doe</td>
                   <td>john@example.com</td>
                   <td>2024-01-15 10:30:00</td>
-                  <td>
-                    <button class="delete-btn">✕ Delete</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>jane_smith</td>
-                  <td>jane@example.com</td>
-                  <td>2024-01-16 14:20:00</td>
-                  <td>
-                    <button class="delete-btn">✕ Delete</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>bob_wilson</td>
-                  <td>bob@example.com</td>
-                  <td>2024-01-17 09:15:00</td>
-                  <td>
-                    <button class="delete-btn">✕ Delete</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>4</td>
-                  <td>alice_brown</td>
-                  <td>alice@example.com</td>
-                  <td>2024-01-18 11:45:00</td>
                   <td>
                     <button class="delete-btn">✕ Delete</button>
                   </td>
@@ -258,7 +237,7 @@ export class TableRecordsPage extends View {
       this.dbList.forEach((curRow) => {
         const rows = this.#_tableSchema.columns.map((curCol) => {
           const colName = curCol.name
-          return ((<td>{curRow[colName] ?? ''}</td>))
+          return ((<td><div contenteditable="true" data-ctid={curRow.ctid} data-column-name={colName} onblur={this.onRowDataChange} onKeyDown={this.onKeyDown}>{curRow[colName] ?? ''}</div></td>))
         })
 
         rowEls.push((
@@ -277,6 +256,41 @@ export class TableRecordsPage extends View {
 
     this.status = 'complete'
     // this.renderDBList()
+  }
+
+  onKeyDown(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default form submission
+      event.currentTarget.blur()      
+    }
+  }
+
+  onRowDataChange(event) {
+    const target = event.currentTarget
+    const data = target.dataset
+    console.log('-- change', data.ctid, data.columnName, target.textContent)
+    this.debouncedUpdateRowData(data.ctid, data.columnName, target.textContent)
+  }
+
+  async updateRowData(ctid, columnName, value) {
+    console.log('-- updateRowData', ctid, columnName, value)
+
+    const { authToken, route } = this.context
+    const tableName = decodeURI(route.params.tableId)
+
+    const query = `UPDATE "${tableName}" SET "${columnName}" = '${value}' WHERE ctid = '${ctid}'`
+    console.log('sql command ::', query)
+
+    try {
+      const res = await runSql(authToken, route.params.id, query)
+      console.log('UPDATE', res)
+
+    }
+    catch (error) {
+      console.log('eeeeee UPDATE', error)
+      alert(`Error: \n\n${error.message}`)
+    }
+
   }
 
   async onDeleteClick(event) {
