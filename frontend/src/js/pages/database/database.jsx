@@ -22,17 +22,46 @@ export class DatabasePage extends View {
    */
   constructor(context) {
     super(context)
+    this.onDeleteAllClick = this.onDeleteAllClick.bind(this)
+    this.onAddDBClick = this.onAddDBClick.bind(this)
     this.context = context ?? {}
     this._fetchUserDBs()
+  }
+
+  async onDeleteAllClick(evt) {
+    evt.preventDefault()
+    evt.stopImmediatePropagation()
+    if (!confirm('Are you sure you want to delete all databases?')) { return }
+    await deleteAllDatabases(this.context.authToken)
+    this._fetchUserDBs()
+  }
+
+
+  async onAddDBClick(evt) {
+    evt.preventDefault()
+    evt.stopImmediatePropagation()
+    let name = prompt("Please enter your DB Name:")
+    console.log("NAME", name, name.length)
+    if (name == null) {
+      return
+    }
+
+    name = name.trim()
+
+    if (name.length == 0) {
+      console.log("NAME", name)
+      alert('No name was entered!')
+      return
+    }
+    createDatabase(this.context.authToken, name)
   }
 
   compile() {
     return (
       <section id="db-section">
         <nav>
-
+          <h3>Databases</h3><a href="#" onClick={this.onAddDBClick}>Add DB</a><a href="#" onClick={this.onDeleteAllClick}>Delete All</a>
         </nav>
-        <h3>Databases</h3>
         <ul class="list">
           {/** List goes here */}
         </ul>
@@ -117,6 +146,88 @@ async function getDatabases(authToken) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${authToken}`
       }
+    })
+
+    // Http error
+    if (!resp.ok) {
+      if (resp.status == 401) {
+        // window.location = '/signout'
+      }
+      throw new Error(`HTTP error! status: ${resp.json()}`);
+    }
+
+    // Show list
+    const json = await resp.json()
+    console.log('json', json)
+    return json.data ?? []
+
+  }
+  catch (error) {
+    console.error('Error GettingDB:', error);
+  }
+}
+
+/**
+ * Gets DB
+ * @param {string} authToken 
+ * @returns {Promise<[Object]?>} array of db objects
+ */
+async function deleteAllDatabases(authToken) {
+  console.log('authToken', authToken)
+
+  // const testEndPoint = 'https://us-central1-oneshot-c5e23.cloudfunctions.net/userAdmin/db'
+  const testEndPoint = 'http://127.0.0.1:5001/oneshot-c5e23/us-central1/userAdmin/db'
+
+  try {
+    // Fetch DB list
+    const resp = await fetch(testEndPoint, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      }
+    })
+
+    // Http error
+    if (!resp.ok) {
+      if (resp.status == 401) {
+        // window.location = '/signout'
+      }
+      throw new Error(`HTTP error! status: ${resp.json()}`);
+    }
+
+    // Show list
+    const json = await resp.json()
+    console.log('json', json)
+    return json.data ?? []
+
+  }
+  catch (error) {
+    console.error('Error GettingDB:', error);
+  }
+}
+/**
+ * Gets DB
+ * @param {string} authToken 
+ * @returns {Promise<[Object]?>} array of db objects
+ */
+async function createDatabase(authToken, name) {
+  console.log('authToken', authToken)
+
+  // const testEndPoint = 'https://us-central1-oneshot-c5e23.cloudfunctions.net/userAdmin/db'
+  const testEndPoint = 'http://127.0.0.1:5001/oneshot-c5e23/us-central1/userAdmin/db'
+
+  try {
+    // Fetch DB list
+    const resp = await fetch(testEndPoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        displayName: name
+      })
     })
 
     // Http error

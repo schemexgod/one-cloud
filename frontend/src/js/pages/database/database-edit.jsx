@@ -247,10 +247,6 @@ export class DatbaseEditPage extends View {
 
     _loadTableViews() {
         console.log("--", this.tableData)
-        if (Object.keys(this.tableData).length === 0) {
-            this.domEl.querySelector('.tables-grid').textContent = 'No Tables'
-            return
-        }
         const len = this.tableData
 
         var nodes = []
@@ -376,9 +372,6 @@ export class DatbaseEditPage extends View {
         )
 
         gridEl.append(addCell.domEl)
-
-
-
     }
 }
 /**

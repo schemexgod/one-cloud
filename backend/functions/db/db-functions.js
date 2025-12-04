@@ -55,13 +55,25 @@ export const createDatabase = async (req, res) => {
     // Create DB with cloudsuperuser owner so its editable in gcloud web console
     const result = await client.query(`CREATE DATABASE "${newDbName}" OWNER = cloudsqlsuperuser`);
     position = 3
-    // Create user for this DB
-    const userResult = await client.query(`CREATE USER "${newUserName}" WITH ENCRYPTED PASSWORD "Oneshot123!"`)
+
+    // Create admin user for this DB
+    const userResult = await client.query(`CREATE USER "${newUserName}" WITH ENCRYPTED PASSWORD 'Oneshot123!'`)
     // Give user all privileges for this database
-    const userAssignResult = await client.query(`GRANT ALL PRIVILEGES ON DATABASE "${newDbName}" TO "${newUserName}"`);
-    const userSchemaAssignResult = await client.query(`GRANT ALL ON SCHEMA public TO "${newUserName}"`);
+    await client.query(`GRANT ALL PRIVILEGES ON DATABASE "${newDbName}" TO "${newUserName}"`);
+    await client.query(`GRANT ALL ON SCHEMA public TO "${newUserName}"`);
+    await client.query(`GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO "${newUserName}"`);
+    await client.query(`GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "${newUserName}"`);
+    // Give user all privileges for future tables
+    await client.query(`ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO "${newUserName}"`);
 
 
+    // Create public user for this DB
+    const publicUserName = `${newUserName}_public`
+    await client.query(`CREATE USER "${publicUserName}" WITH ENCRYPTED PASSWORD 'Oneshot123!'`)
+    // Give user read and write access to tables
+    await client.query(`GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO "${publicUserName}"`);
+    // Give user read and write access to future tables
+    await client.query(`ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO "${publicUserName}"`);
 
     res.status(200)
       .json({
@@ -408,5 +420,63 @@ export const runSql = async (user, dbId, query) => {
   catch (error) {
     const errorCode = error?.code ?? 500
     throw new AppError(error.message ?? 'Unknown connection error', 400)
+  }
+}
+
+
+// FOR ADMIN TESTING
+export const deleteAllDB = async (req, res) => {
+  // MUST be signed in
+  const user = await getUserOrFail(req, res)
+  if (!user) { return }
+
+  /** @type {GetDBBody} */
+  const reqBody = req.query
+
+  let place = 0
+  // Get All DBs
+  let client
+  try {
+    client = await dbClient({ dbId: 'app', uid: user.uid })
+
+    // Get DBs
+    const { rows } = await client.query('SELECT id FROM user_databases WHERE user_id=auth.uid()');
+
+    let errors = []
+
+    // Start deleting
+    rows.forEach(async (curRow) => {
+      const curDbId = curRow.id
+      const querys = [
+        `DROP DATABASE "${curDbId}"`,
+        `DROP USER "${curDbId}"`,
+        `DROP USER "${curDbId}_public"`,
+        `DELETE FROM user_databases WHERE id='${curDbId}'`
+      ]
+      querys.forEach(async (query) => {
+        try {
+          await client.query(query);
+        }
+        catch (error) {
+          errors.push(error.message ?? `unknow error on '${curDbId}'`)
+        }
+      })
+
+    })
+    res.status(200)
+      .json({
+        errors,
+        place
+      })
+  } catch (error) {
+    const errorCode = error?.code ?? 500
+    if (error instanceof Error) {
+      return res.status(errorCode).json({ error: error.message ?? 'Unknown connection error' })
+    }
+    return res.status(errorCode ?? 500)
+      .json({ error: error ?? 'Unknown connection error' })
+  }
+  finally {
+    client?.release()
   }
 }
