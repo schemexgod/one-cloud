@@ -26,6 +26,7 @@ export class TableRecordsPage extends View {
    */
   constructor(context) {
     super(context)
+    this.onDeleteClick = this.onDeleteClick.bind(this)
     this.onAddRowSubmit = this.onAddRowSubmit.bind(this)
     this.onAddClick = this.onAddClick.bind(this)
     this.onCancelAddClick = this.onCancelAddClick.bind(this)
@@ -179,47 +180,6 @@ export class TableRecordsPage extends View {
     // this._fetchRecords()
   }
 
-  renderDBList() {
-    /** @type {HTMLElement} */
-    const listEl = this.domEl.querySelector('.list')
-    if (!listEl) { return }
-
-    if (this.dbList.length === 0) {
-      listEl.textContent = 'No entries found'
-      return
-    }
-
-    const rows = []
-    this.dbList.forEach((info, index) => {
-      const nDate = (new Date(info.date_created)).toLocaleString()
-      const row = this.buildRow(index)
-      row.render({ ...info, date: nDate })
-      rows.push(row.domEl)
-    })
-    listEl.replaceChildren(...rows)
-  }
-
-  /**
-   * @param {number} index
-   * @returns {JsxElementInfoType}
-   */
-  buildRow(index) {
-    let row = this.#_rows[index]
-    if (row) { return row }
-
-    row = (
-      <li class="row">
-        <div><a href={(props) => `/databases/${props.id}`}>{prop('name')}</a></div>
-        <div>{prop('date')}</div>
-        <div><input type="checkbox" /></div>
-      </li>
-    )
-
-    this.#_rows.push(row)
-
-    return row
-  }
-
   async _fetchRecords() {
     this.status = 'loading'
     console.log('fetching db', this.context)
@@ -273,7 +233,7 @@ export class TableRecordsPage extends View {
     this.domEl.querySelector('.loading').style.display = 'none'
 
     // Get Rows
-    const query = `SELECT * FROM "${tableName}"`
+    const query = `SELECT ctid, * FROM "${tableName}"`
     console.log('sql command ::', query)
 
     try {
@@ -305,7 +265,7 @@ export class TableRecordsPage extends View {
           <tr>
             {rows}
             <td>
-              <button class="delete-btn">✕ Delete</button>
+              <button class="delete-btn" data-ctid={curRow.ctid} onClick={this.onDeleteClick}>✕ Delete</button>
             </td>
           </tr>
         ).domEl)
@@ -317,6 +277,20 @@ export class TableRecordsPage extends View {
 
     this.status = 'complete'
     // this.renderDBList()
+  }
+
+  async onDeleteClick(event) {
+    const deletBtnEl = event.currentTarget
+    const ctid = deletBtnEl.dataset.ctid
+
+    let userConfirmed = confirm("Are you sure you want to delete this item?");
+    if (!userConfirmed) { return }
+
+    const { authToken, route } = this.context
+    const tableName = decodeURI(route.params.tableId)
+    const query = `DELETE FROM "${tableName}" WHERE ctid = '${ctid}';`
+    const res = await runSql(authToken, route.params.id, query)
+    await this._fetchRecords()
   }
 }
 
