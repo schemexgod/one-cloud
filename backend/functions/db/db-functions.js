@@ -43,7 +43,7 @@ export const createDatabase = async (req, res) => {
   const newDbName = format(`d${generateId()}_${reqName}`)
   const newUserName = newDbName
 
-  const client = await dbClient()
+  let client = await dbClient()
   const uid = user.uid
   let position = 0
 
@@ -55,6 +55,12 @@ export const createDatabase = async (req, res) => {
     // Create DB with cloudsuperuser owner so its editable in gcloud web console
     const result = await client.query(`CREATE DATABASE "${newDbName}" OWNER = cloudsqlsuperuser`);
     position = 3
+
+    // Release this connection
+    client.release()
+
+    // Make connection to new database
+    client = await dbClient({dbId: newDbName})
 
     // Create admin user for this DB
     const userResult = await client.query(`CREATE USER "${newUserName}" WITH ENCRYPTED PASSWORD 'Oneshot123!'`)
