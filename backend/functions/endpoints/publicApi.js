@@ -18,14 +18,13 @@ export const api = onRequest({
             reqPath = reqPath.slice(1)
         }
 
-        const pathParts = reqPath.split('/')
-        const projectId = pathParts[0]
+        const [dbId, apiRoute] = str.split(/,(.*)/s);
 
-        // TODO: Separate by request types vs endpoints. Might be better easier for pointing to read replicas
-
-        if (projectId) {
-            
+        // If no project and route found
+        if (!dbId || !apiRoute) {
+            return res.status(404).json({ error: 'Invalid endpoint' })
         }
 
-        return res.status(404).json({ error: 'No API found' })
+        // Get the api routes
+         
     })
