@@ -36,6 +36,35 @@ h1 {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.table-selector {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.table-selector label {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.table-selector textarea {
+    padding: 10px 15px;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    background: white;
+    flex: 1;
+    resize: none;
+    // max-width: 300px;
+}
+
 .tables-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));

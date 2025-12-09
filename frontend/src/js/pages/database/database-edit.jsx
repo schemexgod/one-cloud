@@ -63,12 +63,18 @@ export class DatbaseEditPage extends View {
         this.onFKMouseEnter = this.onFKMouseEnter.bind(this)
         this.onFKMouseLeave = this.onFKMouseLeave.bind(this)
         this.onSetPKClick = this.onSetPKClick.bind(this)
+        this.onRunSqlClick = this.onRunSqlClick.bind(this)
     }
 
     compile() {
         return (
             <section>
                 <h2>Edit Database</h2>
+                <div class="table-selector">
+                    <label for="tableSelect">Run SQL Command:</label>
+                    <textarea name="sqlCmd" />
+                    <button class="add-btn" onClick={this.onRunSqlClick}>Run</button>
+                </div>
                 <div class="section-tables">
                     <div class="tables-grid">
                     </div>
@@ -86,6 +92,19 @@ export class DatbaseEditPage extends View {
         // this.domEl.append(pre)
         this.tableData = resultTables
         this._loadTableViews()
+    }
+    async onRunSqlClick() {
+        const sqlCmd = (this.domEl.querySelector('[name="sqlCmd"]').value ?? '').trim()
+        if (!sqlCmd) { return }
+        
+        try {
+            const res = await runSql(this.context.authToken, this.context.route.params.id, sqlCmd)
+            console.log('res', res)
+            alert('Complete!')
+        } catch (error) {
+            console.log('eeeeee', error)
+            alert(`Error: \n\n${error.message}`)
+        }
     }
     onFKMouseEnter(event) {
         const target = event.currentTarget
