@@ -109,7 +109,7 @@ export class DatbaseEditPage extends View {
         const tableName = document.getElementById('new-table-name').value.trim()
         if (!tableName || tableName.length == 0) { return }
 
-        const query = `CREATE TABLE "${tableName}" ()`
+        const query = `CREATE TABLE "${tableName}" (id SERIAL PRIMARY KEY)`
         console.log('sql command ::', query)
 
         try {

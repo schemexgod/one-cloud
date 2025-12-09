@@ -73,3 +73,4 @@ const verifyToken = async (jwtToken) => {
 
 
 export * from "./endpoints/userAdmin.js";
+export * from "./endpoints/publicApi.js";
