@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"> -->
+  <script type="module" src="js/app.js"></script>
+</head>
+
+<body>
+  <main id="app">
+
+  </main>
+  <script>
+    const Helper = {
+      fromRaw: (rawHtml) => {
+        const holder = document.createElement('template')
+        holder.innerHTML = rawHtml.trim()
+        console.log('holder', holder.content.cloneNode(true))
+        return holder.content.cloneNode(true).firstChild
+      }
+    }
+    const HeroA = (title, subtitle, backgroundImage) => {
+      return Helper.fromRaw(`<div data-component-id="hero-a" class="hero-a">
+                  <style>
+    .hero-a {
+      position: relative;
+      flex-direction: column;
+      text-align: center;
+      display: flex;
+      justify-content: top;
+      align-items: center;
+      width: 100%;
+      height: 692px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .hero-a .bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: url('${backgroundImage}');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-a .content {
+      position: relative;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      color: white;
+      width: 600px;
+    }
+  </style>
+    <div class="bg"></div>
+    <div class="content">
+      <h1>${title}</h1>
+      <p>${subtitle}</p>
+    </div>
+  </div>`)
+    }
+    const CardA = (title, subtitle, imageUrl) => {
+      return Helper.fromRaw(`
+            <div class="card-a">
+                <h1>${title}</h1>
+                <p>${subtitle}</p>
+            </div>
+            `)
+
+    }
+
+  </script>
+
+  <!-- TESTING JSON OUTPUT-->
+
+  <script>
+    const llmJson = {
+      "layout": {
+        "type": "div",
+        "domProps": {
+          "style": "margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;"
+        },
+        "children": [
+          {
+            "type": "HeroA",
+            "templateProps": {
+              "title": "hero_title",
+              "subtitle": "hero_subtitle",
+              "backgroundImage": "hero_bg"
+            }
+          },
+          {
+            "type": "section",
+            "domProps": {
+              "style": "max-width: 1200px; margin: 60px auto; padding: 0 20px;"
+            },
+            "children": [
+              {
+                "type": "h2",
+                "domProps": {
+                  "style": "text-align: center; font-size: 2.5rem; margin-bottom: 20px; color: #333;"
+                },
+                "children": ["features_heading"]
+              },
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "text-align: center; font-size: 1.2rem; color: #666; margin-bottom: 50px;"
+                },
+                "children": ["features_subheading"]
+              },
+              {
+                "type": "div",
+                "domProps": {
+                  "style": "display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;"
+                },
+                "children": [
+                  {
+                    "type": "CardA",
+                    "templateProps": {
+                      "title": "feature1_title",
+                      "subtitle": "feature1_desc",
+                      "imageUrl": "feature1_img"
+                    }
+                  },
+                  {
+                    "type": "CardA",
+                    "templateProps": {
+                      "title": "feature2_title",
+                      "subtitle": "feature2_desc",
+                      "imageUrl": "feature2_img"
+                    }
+                  },
+                  {
+                    "type": "CardA",
+                    "templateProps": {
+                      "title": "feature3_title",
+                      "subtitle": "feature3_desc",
+                      "imageUrl": "feature3_img"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "domProps": {
+              "style": "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 80px 20px; text-align: center; color: white;"
+            },
+            "children": [
+              {
+                "type": "h2",
+                "domProps": {
+                  "style": "font-size: 2.5rem; margin-bottom: 20px;"
+                },
+                "children": ["cta_heading"]
+              },
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "font-size: 1.3rem; margin-bottom: 30px; opacity: 0.95;"
+                },
+                "children": ["cta_text"]
+              },
+              {
+                "type": "button",
+                "domProps": {
+                  "style": "background: white; color: #667eea; border: none; padding: 15px 40px; font-size: 1.1rem; border-radius: 30px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2);"
+                },
+                "children": ["cta_button"]
+              }
+            ]
+          },
+          {
+            "type": "footer",
+            "domProps": {
+              "style": "background: #333; color: white; padding: 40px 20px; text-align: center;"
+            },
+            "children": [
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "margin: 0; opacity: 0.8;"
+                },
+                "children": ["footer_text"]
+              }
+            ]
+          }
+        ]
+      },
+      "content": {
+        "hero_title": "Transform Your Business Today",
+        "hero_subtitle": "The ultimate solution for modern teams to collaborate, innovate, and succeed",
+        "hero_bg": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1600",
+        "features_heading": "Why Choose Our Product",
+        "features_subheading": "Powerful features designed to help you achieve more",
+        "feature1_title": "Lightning Fast",
+        "feature1_desc": "Experience blazing fast performance that keeps you ahead of the competition",
+        "feature1_img": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400",
+        "feature2_title": "Secure & Reliable",
+        "feature2_desc": "Enterprise-grade security with 99.9% uptime guarantee for peace of mind",
+        "feature2_img": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400",
+        "feature3_title": "Easy to Use",
+        "feature3_desc": "Intuitive interface designed for everyone, no technical expertise required",
+        "feature3_img": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400",
+        "cta_heading": "Ready to Get Started?",
+        "cta_text": "Join thousands of satisfied customers and take your business to the next level",
+        "cta_button": "Start Free Trial",
+        "footer_text": "© 2024 Your Company. All rights reserved."
+      }
+    }
+
+    const llmJson2 = {
+      "layout": {
+        "type": "div",
+        "domProps": {
+          "style": "margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;"
+        },
+        "children": [
+          {
+            "type": "HeroA",
+            "props": {
+              "title": "{{heroTitle}}",
+              "subtitle": "{{heroSubtitle}}",
+              "backgroundImage": "{{heroBackground}}"
+            }
+          },
+          {
+            "type": "section",
+            "domProps": {
+              "style": "padding: 80px 20px; text-align: center; background: #f8f9fa;"
+            },
+            "children": [
+              {
+                "type": "h2",
+                "domProps": {
+                  "style": "font-size: 2.5rem; margin-bottom: 20px; color: #333;"
+                },
+                "children": ["{{featuresTitle}}"]
+              },
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "font-size: 1.2rem; color: #666; margin-bottom: 60px; max-width: 600px; margin-left: auto; margin-right: auto;"
+                },
+                "children": ["{{featuresSubtitle}}"]
+              },
+              {
+                "type": "div",
+                "domProps": {
+                  "style": "display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;"
+                },
+                "children": [
+                  {
+                    "type": "CardA",
+                    "props": {
+                      "title": "{{feature1Title}}",
+                      "subtitle": "{{feature1Desc}}",
+                      "imageUrl": "{{feature1Image}}"
+                    }
+                  },
+                  {
+                    "type": "CardA",
+                    "props": {
+                      "title": "{{feature2Title}}",
+                      "subtitle": "{{feature2Desc}}",
+                      "imageUrl": "{{feature2Image}}"
+                    }
+                  },
+                  {
+                    "type": "CardA",
+                    "props": {
+                      "title": "{{feature3Title}}",
+                      "subtitle": "{{feature3Desc}}",
+                      "imageUrl": "{{feature3Image}}"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "domProps": {
+              "style": "padding: 80px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;"
+            },
+            "children": [
+              {
+                "type": "h2",
+                "domProps": {
+                  "style": "font-size: 2.5rem; margin-bottom: 20px;"
+                },
+                "children": ["{{ctaTitle}}"]
+              },
+              {
+                "type": "p",
+                "domProps": {
+                  "style": "font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9;"
+                },
+                "children": ["{{ctaSubtitle}}"]
+              },
+              {
+                "type": "button",
+                "domProps": {
+                  "id": "ctaButton",
+                  "style": "padding: 18px 48px; font-size: 1.1rem; background: white; color: #667eea; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;",
+                  "onmouseover": "{{buttonHover}}",
+                  "onmouseout": "{{buttonLeave}}",
+                  "onclick": "{{buttonClick}}"
+                },
+                "children": ["{{ctaButtonText}}"]
+              }
+            ]
+          },
+          {
+            "type": "footer",
+            "domProps": {
+              "style": "padding: 40px 20px; text-align: center; background: #333; color: #aaa; font-size: 0.9rem;"
+            },
+            "children": [
+              {
+                "type": "p",
+                "children": ["{{footerText}}"]
+              }
+            ]
+          }
+        ]
+      },
+      "content": {
+        "heroTitle": "Revolutionary Product That Changes Everything",
+        "heroSubtitle": "Experience innovation like never before with our cutting-edge solution",
+        "heroBackground": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1600&h=900&fit=crop",
+        "featuresTitle": "Powerful Features",
+        "featuresSubtitle": "Everything you need to succeed, all in one place",
+        "feature1Title": "Lightning Fast",
+        "feature1Desc": "Optimized performance that delivers results in milliseconds, not seconds",
+        "feature1Image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
+        "feature2Title": "Secure & Reliable",
+        "feature2Desc": "Enterprise-grade security with 99.9% uptime guarantee",
+        "feature2Image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=300&fit=crop",
+        "feature3Title": "Easy Integration",
+        "feature3Desc": "Seamlessly integrate with your existing tools and workflow",
+        "feature3Image": "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop",
+        "ctaTitle": "Ready to Get Started?",
+        "ctaSubtitle": "Join thousands of satisfied customers today",
+        "ctaButtonText": "Start Free Trial",
+        "footerText": "© 2024 Your Company. All rights reserved."
+      },
+      "interactions": {
+        "buttonHover": "this.style.transform = 'scale(1.05)';",
+        "buttonLeave": "this.style.transform = 'scale(1)';",
+        "buttonClick": "alert('Thank you for your interest! Free trial coming soon.');"
+      }
+    }
+    function recursiveBuildLayout(elementModel) {
+      /** @type {Element?} */
+      let newEl
+      if (elementModel.type == "HeroA") {
+        // get props
+        const { title, subtitle, backgroundImage } = elementModel.templateProps
+        newEl = HeroA(title, subtitle, backgroundImage)
+
+      }
+      if (!newEl) { return }
+      for (const next in elementModel.children) {
+        const curChild = recursiveBuildLayout(next)
+        if (curChild) {
+          newEl.append(curChild)
+        }
+      }
+    }
+
+    const rootEl = recursiveBuildLayout(llmJson.layout)
+    // document.body.append(rootEl)
+  </script>
+
+
+
+  <!--
+    <script>
+      // Hero Section
+const hero = HeroA(
+  "Introducing the Future of Innovation",
+  "Experience cutting-edge technology that transforms the way you work and live",
+  "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920"
+);
+
+// Features Section
+const featuresSection = Helper.fromRaw(`
+  <div style="max-width: 1200px; margin: 0 auto; padding: 80px 20px;">
+    <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 20px; color: #1a1a1a;">
+      Why Choose Our Product
+    </h2>
+    <p style="text-align: center; font-size: 1.2rem; color: #666; margin-bottom: 60px;">
+      Designed with you in mind, built for excellence
+    </p>
+    <div id="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+    </div>
+  </div>
+`);
+
+// Feature Cards
+const feature1 = CardA(
+  "Lightning Fast",
+  "Experience unparalleled speed and performance that keeps you ahead of the competition",
+  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800"
+);
+
+const feature2 = CardA(
+  "Secure & Reliable",
+  "Enterprise-grade security with 99.9% uptime guarantee to keep your data safe",
+  "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=800"
+);
+
+const feature3 = CardA(
+  "Easy Integration",
+  "Seamlessly integrate with your existing tools and workflow in minutes",
+  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800"
+);
+
+// CTA Section
+const ctaSection = Helper.fromRaw(`
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 80px 20px; text-align: center;">
+    <h2 style="color: white; font-size: 2.5rem; margin-bottom: 20px;">
+      Ready to Get Started?
+    </h2>
+    <p style="color: rgba(255,255,255,0.9); font-size: 1.3rem; margin-bottom: 40px;">
+      Join thousands of satisfied customers today
+    </p>
+    <button style="background: white; color: #667eea; padding: 18px 50px; font-size: 1.2rem; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+      Start Free Trial
+    </button>
+  </div>
+`);
+
+// Assemble the page
+document.body.style.margin = "0";
+document.body.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+
+document.body.appendChild(hero);
+document.body.appendChild(featuresSection);
+
+const featuresGrid = document.getElementById("features-grid");
+featuresGrid.appendChild(feature1);
+featuresGrid.appendChild(feature2);
+featuresGrid.appendChild(feature3);
+
+document.body.appendChild(ctaSection);
+    </script>
+  -->
+  <!-- 
+    <script>
+        // Create 5 squares with different colors
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+
+        const container = createElementFromRawHtml(`
+  <div style="
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-wrap: wrap;
+  ">
+  </div>
+`);
+
+        colors.forEach(color => {
+            const square = createElementFromRawHtml(`
+    <div style="
+      width: 150px;
+      height: 150px;
+      background-color: ${color};
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    "></div>
+  `);
+
+            square.addEventListener('mouseenter', () => {
+                square.style.transform = 'scale(1.1)';
+            });
+
+            square.addEventListener('mouseleave', () => {
+                square.style.transform = 'scale(1)';
+            });
+
+            container.appendChild(square);
+        });
+
+        document.body.appendChild(container);
+    </script>
+    -->
+
+  <script>
+    
+
+    // Programmatically navigate
+    // router.navigate('/about');
+  </script>
+</body>
+
+</html>

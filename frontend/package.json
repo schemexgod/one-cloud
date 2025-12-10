@@ -1,0 +1,26 @@
+{
+  "alias": {
+    "play-web-ui": "./src/js/play-web-ui"
+  },
+  "staticFiles": {
+    "staticPath": "static"
+  },
+  "dependencies": {
+    "codemirror": "^6.0.2",
+    "firebase": "^12.3.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router": "^7.9.6"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.16.1",
+    "buffer": "^6.0.3",
+    "parcel": "^2.16.0",
+    "parcel-reporter-static-files-copy": "^1.5.3"
+  },
+  "scripts": {
+    "dev": "parcel src/index.html src/_testing.html",
+    "build": "parcel build src/index.html --no-cache --dist-dir dist --no-source-maps",
+    "preview": "npx serve dist"
+  }
+}

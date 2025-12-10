@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Oneshot - Databases</title>
+  <meta charset="UTF-8">
+  <script type="module" src="js/pages/database/database.jsx"></script>
+</head>
+
+<body>
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      user-select: none;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      padding: 5px;
+      list-style-type: none;
+      margin: 0;
+    }
+
+    .list .row {
+      display: flex;
+      flex-direction: row;
+      padding: 5px 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    }
+
+    .list .row>* {
+      flex-grow: 1;
+    }
+  </style>
+
+  <section id="db-section">
+    <h1>Databases</h1>
+    <ul class="list">
+      <li class="row">Database 1</li>
+      <li class="row">Database 2</li>
+      <li class="row">Database 3</li>
+    </ul>
+  </section>
+
+</body>
+
+</html>

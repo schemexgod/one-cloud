@@ -1,0 +1,4 @@
+Google Cloud SQL
+instance-id: one-shot
+user: postgres
+password: Oneshot123!

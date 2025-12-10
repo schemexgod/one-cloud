@@ -1,0 +1,66 @@
+{
+  "$id": "Element",
+  "title": "Page",
+  "description": "Full Web Page",
+  "properties": {
+    "layout": {
+      "description": "Describes the entire layout for the page or component",
+      "$ref": "#/$defs/Element"
+    },
+    "content": {
+      "description": "An entire dataset of IDs to content that should be displayed in the layout",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "type": "string",
+          "description": "Text, media URL, or SVG string to display in HTML layout"
+        }
+      }
+    },
+    "interactions": {
+      "description": "An entire dataset of IDs to Javascript code that should be added to an element's domProps event callbacks",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "type": "string",
+          "description": "Text, media URL, or SVG string to display in HTML layout"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "Element": {
+      "description": "DOM Element",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Name of the Element template or HTML tag name"
+        },
+        "props": {
+          "type": "object",
+          "description": "Custom template properties to pass to the element. This should be an ID wrapped in `{{}}` from the `content` dataset"
+        },
+        "domProps": {
+          "type": "object",
+          "description": "DOM properties and values for the element including any javascript interactions. Javascript should be an ID wrapped in `{{}}` from the `interactions` dataset"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Element"
+              },
+              {
+                "type": "string",
+                "description": "Text node"
+              }
+            ]
+          }
+        }
+      }
+    }   
+  }
+}
+

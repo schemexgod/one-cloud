@@ -1,0 +1,368 @@
+### NEW backend play cloud ###
+
+NOTE:
+In the future we may want to use Docker containers to contain each users project environment and resources for their DB, Auth, Functions, etc
+For sake of speed, we are just going to handle each service separately and wrap around existing GCP services
+
+ 
+
+ #### OLD one shot Notes ###
+ 
+ 
+ 
+ Some Notes for prompting and templating and all ideas to build OneShot
+
+
+
+ Element Types
+ - section
+ - map
+ - button
+ - header
+ - footer
+ - 
+
+ Components:
+ - Name
+ - Description of what it is
+ - Properties to customize it
+
+Prebuild Layout Pieces (Lego pieces to put together a whole layout)
+- header
+- footer
+- hero
+- 2 column content
+- 3 column content
+- 4 column content
+- 1 section
+
+ Prompt Logic Order 
+ - Figure out basic layout structure
+    - Can it be described by prebuild layout lego pieces
+- Add content (copy & images)
+- Add Backend DB logic if needed
+- Add interactions
+
+
+###
+TESTING USER request
+
+I want to create a website where I can enter in my son's lacrosse games. I should be able to see the date, location, the team they are playing, and also keep track of their wins and losses for the season.
+
+
+
+
+# PROMPTS
+
+### PROMPT START ###
+
+Your job is to generate a web app using Javascript and CSS. You have a specific set of Javascript functions you can use to generate the app.
+
+### Javascript Functions
+/**
+ * Creates an HTMLElement from a premade template
+ * @param {string} templateId  
+ * @param {object} props 
+ * @returns {HTMLElement}
+ */
+function createElementFromTemplate(templateId, props): HTMLElement
+
+/**
+ * Creates an HTMLElement from a raw HTML string
+ * @param {string} rawHtml  
+ * @returns {HTMLElement}
+ */
+function createElementFromRawHtml(rawHtml): HTMLElement
+
+### 
+Only return the Javascript code for the following request: 
+Create a 5 squares with different colors
+
+
+(183) tokens
+
+
+
+--------
+### PROMPT START ###
+
+Your job is to generate a web app using Javascript and CSS. You have a specific set of Javascript functions you can use to generate the app.
+
+### Javascript Functions
+{
+  "name": "createElementFromRawHtml",
+  "description": "Creates an HTMLElement from a raw HTML string",
+  "parameters": {
+    "type": "array",
+    "prefixItems": [
+      {
+        "type": "string",
+        "description": "Raw HTML"
+      }
+    ]
+  },
+  "returns": "HTMLElement"
+}
+{
+  "name": "createElementFromTemplate",
+  "description": "Creates an HTMLElement from a premade template",
+  "parameters": {
+    "type": "array",
+    "prefixItems": [
+      {
+        "type": "string",
+        "description": "Template ID"
+      },
+      {
+        "type": "object",
+        "description": "Object to configure the template's styles and functionality"
+      }
+    ]
+  },
+  "returns": "HTMLElement"
+}
+### 
+Only return the Javascript code for the following request: 
+Create a 5 squares with different colors
+
+
+(187) tokens (when minified)
+
+
+
+
+
+### PROMPT START ###
+
+Your job is to generate a web app using Javascript and CSS. You have a specific set of Javascript functions you can use to generate the app.
+
+### Javascript Functions
+/**
+ * A simple Card layout
+ * @param {string?} title 
+ * @param {string?} subtitle 
+ * @param {string?} imageUrl 
+ * @returns {HTMLElement}
+ */
+CardA(title, subtitle, imageUrl)
+/**
+ * Hero section layout with a large image background and text
+ * @param {string?} title 
+ * @param {string?} subtitle 
+ * @param {string?} backgroundImage 
+ * @returns {HTMLElement}
+ */
+HeroA(title, subtitle, backgroundImage)
+/**
+* Creates an HTMLElement from a raw HTML string
+* @param {string} rawHtml  
+* @returns {HTMLElement}
+*/
+Helper.fromRaw(rawHtml)
+
+
+### 
+Only return the Javascript code for the following request: 
+Create a 5 squares with different colors
+
+
+(177) tokens
+
+--------
+
+
+
+
+
+
+This one is for Pure JSON output
+### PROMPT START ###
+
+Your job is to generate JSON output that represents a web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
+
+### Premade HTML templates. Each property is an ID of the content to use
+/**
+ * @typedef {object} CardA - A simple Card template
+ * @property {string?} title
+ * @property {string?} subtitle 
+ * @property {string?} imageUrl
+ */
+/**
+ * @typedef {object} HeroA - Hero section layout with a large image background and text
+ * @property {string?} title
+ * @property {string?} subtitle
+ * @property {string?} backgroundImage
+ */
+
+### Use the follow JSON schema:
+{"title":"Page","description":"Full Web Page","properties":{"layout":{"description":"Describes the entire layout for the page or component","$ref":"#/$defs/Element"},"content":{"description":"An entire dataset of IDs to content that should be displayed in the layout","type":"object","patternProperties":{"^[a-zA-Z][a-zA-Z0-9_]*$":{"type":"string","description":"Text or URL to display in HTML layout"}}}},"$defs":{"Element":{"description":"DOM Element","type":"object","properties":{"type":{"type":"string","description":"Name of the Element template or HTML tag name"},"domProps":{"type":"object","description":"DOM properties and values for the element. Does NOT include javascript interactions."},"templateProps":{"type":"object","description":"Custom template properties to pass to the element"},"children":{"type":"array","items":{"oneOf":[{"$ref":"#/$defs/Element"},{"type":"string","description":"Text node"}]}}}}}}
+
+### 
+Only return the JSON for the following request: 
+
+(450) tokens
+--------
+
+
+
+
+
+
+
+
+This one is for Pure JSON output
+### PROMPT START ###
+
+Your job is to generate JSON output that represents a web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
+
+### Use the follow JSON schema:
+{"title":"Page","description":"Full Web Page","properties":{"layout":{"description":"Describes the entire layout for the page or component","$ref":"#/$defs/Element"},"content":{"description":"An entire dataset of IDs to content that should be displayed in the layout","type":"object","patternProperties":{"^[a-zA-Z][a-zA-Z0-9_]*$":{"type":"string","description":"Text or URL to display in HTML layout"}}}},"$defs":{"Element":{"description":"DOM Element","type":"object","properties":{"type":{"type":"string","description":"Name of the Element template or HTML tag name"},"domProps":{"type":"object","description":"DOM properties and values for the element. Does NOT include javascript interactions."},"templateProps":{"type":"object","description":"Custom template properties to pass to the element"},"children":{"type":"array","items":{"oneOf":[{"$ref":"#/$defs/Element"},{"type":"string","description":"Text node"}]}}}},"CardA":{"type":"object","description":"A simple Card template","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"imageUrl":{"type":"string"}}},"HeroA":{"type":"object","description":"frontend/src/js/one-shot_tests.js","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"backgroundImage":{"type":"string"}}}}}
+
+### 
+Only return the JSON for the following request: 
+
+
+(420) tokens
+--------
+
+
+
+
+This one is for Pure JSON output
+### PROMPT START ###
+
+Your job is to generate JSON output that represents a single page web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
+
+### Element Templates
+{"$id":"templates","description":"Element Template Definitions","$defs":{"CardA":{"type":"object","description":"A simple Card template","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"imageUrl":{"type":"string"}}},"HeroA":{"type":"object","description":"Hero section layout with a large image background and text","properties":{"title":{"type":"string"},"subtitle":{"type":"string"},"backgroundImage":{"type":"string"}}}}}
+
+### Use the follow JSON schema:
+{"$id":"Element","title":"Page","description":"Full Web Page","properties":{"layout":{"description":"Describes the entire layout for the page or component","$ref":"#/$defs/Element"},"content":{"description":"An entire dataset of IDs to content that should be displayed in the layout","type":"object","patternProperties":{"^[a-zA-Z][a-zA-Z0-9_]*$":{"type":"string","description":"Text or URL to display in HTML layout"}}}},"$defs":{"Element":{"description":"DOM Element","type":"object","properties":{"type":{"type":"string","description":"Name of the Element template or HTML tag name"},"domProps":{"type":"object","description":"DOM properties and values for the element. Does NOT include javascript interactions."},"templateProps":{"type":"object","description":"Custom template properties to pass to the element"},"children":{"type":"array","items":{"oneOf":[{"$ref":"#/$defs/Element"},{"type":"string","description":"Text node"}]}}}}}}
+
+### 
+Only return the JSON for the following request: 
+
+
+(446) tokens
+--------
+
+
+
+
+This one is for Pure JSON output
+### PROMPT START ###
+
+Your job is to generate JSON output that represents a single page web app. The web app is built with Javascript and CSS. There is a library of premade custom HTML Templates you can use to assemble the web app, in addition to native HTML elements.
+
+### Element Templates
+{
+  "$id": "templates",
+  "description": "Element Template Definitions",
+  "$defs": {
+    "CardA": {
+      "type": "object",
+      "description": "A simple Card template",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "HeroA": {
+      "type": "object",
+      "description": "Hero section layout with a large image background and text",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "backgroundImage": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+
+### Use the follow JSON schema:
+{
+  "$id": "Element",
+  "title": "Page",
+  "description": "Full Web Page",
+  "properties": {
+    "layout": {
+      "description": "Describes the entire layout for the page or component",
+      "$ref": "#/$defs/Element"
+    },
+    "content": {
+      "description": "An entire dataset of IDs to content that should be displayed in the layout",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "type": "string",
+          "description": "Text, media URL, or SVG string to display in HTML layout"
+        }
+      }
+    },
+    "interactions": {
+      "description": "An entire dataset of IDs to Javascript code that should be added to an element's domProps event callbacks",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "type": "string",
+          "description": "Text, media URL, or SVG string to display in HTML layout"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "Element": {
+      "description": "DOM Element",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Name of the Element template or HTML tag name"
+        },
+        "props": {
+          "type": "object",
+          "description": "Custom template properties to pass to the element"
+        },
+        "domProps": {
+          "type": "object",
+          "description": "DOM properties and values for the element including any javascript interactions."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Element"
+              },
+              {
+                "type": "string",
+                "description": "Text node"
+              }
+            ]
+          }
+        }
+      }
+    }   
+  }
+}
+
+
+### 
+Only return the JSON for the following request: 
+
+
+
+--------
